@@ -22,7 +22,9 @@
 #'     \item \code{"all"}: Show all three types
 #'     \item \code{"none"}: Just counts, no percentages
 #'   }
-#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE).
+#'   With \code{FALSE}, missing values of either variable form their own
+#'   \code{"NA"} row or column.
 #' @param digits Decimal places for percentages (Default: 1)
 #'
 #' @return A cross-tabulation table showing the relationship between two
@@ -133,6 +135,7 @@ crosstab.data.frame <- function(data, row, col,
   row_quo <- rlang::enquo(row)
   col_quo <- rlang::enquo(col)
   weights_quo <- rlang::enquo(weights)
+  .check_crosstab_vars(row_quo, col_quo)
 
   # Get variable names as strings
   row_var <- rlang::as_name(row_quo)
@@ -164,22 +167,24 @@ crosstab.data.frame <- function(data, row, col,
   weights_vec <- weights_info$vector
   is_weighted <- !is.null(weights_var)
 
-  # Handle missing values
+  # Handle missing values. na.rm = FALSE keeps cases with a missing value
+  # as their own "NA" category (it used to have no visible effect: table()
+  # dropped them anyway while the header still counted them as missing).
+  # Cases without a weight are never tabulated.
+  has_weight <- if (is_weighted) !is.na(weights_vec) else rep(TRUE, length(row_data))
   if (na.rm) {
-    valid_cases <- !is.na(row_data) & !is.na(col_data)
-    if (is_weighted) {
-      valid_cases <- valid_cases & !is.na(weights_vec)
-    }
-
-    n_missing <- sum(!valid_cases)
-
-    row_data <- row_data[valid_cases]
-    col_data <- col_data[valid_cases]
-    if (is_weighted) {
-      weights_vec <- weights_vec[valid_cases]
-    }
+    valid_cases <- !is.na(row_data) & !is.na(col_data) & has_weight
   } else {
-    n_missing <- sum(is.na(row_data) | is.na(col_data))
+    valid_cases <- has_weight
+    row_data <- .na_as_category(row_data)
+    col_data <- .na_as_category(col_data)
+  }
+  n_missing <- sum(!valid_cases)
+
+  row_data <- row_data[valid_cases]
+  col_data <- col_data[valid_cases]
+  if (is_weighted) {
+    weights_vec <- weights_vec[valid_cases]
   }
 
   # Create contingency table
@@ -286,6 +291,7 @@ crosstab.grouped_df <- function(data, row, col,
   row_quo <- rlang::enquo(row)
   col_quo <- rlang::enquo(col)
   weights_quo <- rlang::enquo(weights)
+  .check_crosstab_vars(row_quo, col_quo)
 
   row_var <- rlang::as_name(row_quo)
   col_var <- rlang::as_name(col_quo)
@@ -487,8 +493,9 @@ print.summary.crosstab <- function(x, ...) {
   cat("\n", title, "\n", sep = "")
   cat(paste(rep("-", nchar(title)), collapse = ""), "\n")
 
-  # Info section
-  pct_label <- switch(x$percentages,
+  # Info section ("Counts only" when summary(percentages = FALSE) hides
+  # the percentage sub-rows)
+  pct_label <- if (!show_percentages) "Counts only" else switch(x$percentages,
     "row" = "Row percentages",
     "col" = "Column percentages",
     "total" = "Total percentages",
@@ -662,4 +669,40 @@ print.summary.crosstab <- function(x, ...) {
     cat("adj.res. = adjusted standardized residual; |adj.res.| > 2 marks cells\n")
     cat("deviating from independence (use chi_square() for the overall test).\n")
   }
+}
+
+
+#' Both crosstab() variables must be given
+#'
+#' crosstab(data, gender) used to fail inside rlang::as_name() with the
+#' base error 'argument "x" is missing, with no default'.
+#' @noRd
+.check_crosstab_vars <- function(row_quo, col_quo, call = rlang::caller_env()) {
+  if (rlang::quo_is_missing(row_quo)) {
+    cli_abort(c(
+      "{.fn crosstab} needs two variables.",
+      "x" = "{.arg row} and {.arg col} are missing."
+    ), call = call)
+  }
+  if (rlang::quo_is_missing(col_quo)) {
+    cli_abort(c(
+      "{.fn crosstab} needs two variables.",
+      "x" = "{.arg col} is missing.",
+      "i" = "For a single variable use {.fn frequency}."
+    ), call = call)
+  }
+  invisible(TRUE)
+}
+
+#' Missing values as an explicit "NA" category (crosstab(na.rm = FALSE))
+#'
+#' The categories keep the order table() would give them (factor levels,
+#' sorted values; labelled vectors by their codes), with "NA" last.
+#' @noRd
+.na_as_category <- function(v) {
+  f <- if (is.factor(v)) v else factor(if (inherits(v, "haven_labelled")) .plain_numeric(v) else v)
+  if (!anyNA(f)) return(f)
+  f <- addNA(f, ifany = TRUE)
+  levels(f)[is.na(levels(f))] <- "NA"
+  f
 }

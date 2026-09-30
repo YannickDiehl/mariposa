@@ -111,3 +111,8 @@
   with `"all"` only that mislabelled line.
 * `crosstab(digits = 2)` is honoured by `print()` and `summary()`; their
   own default of 1 decimal overrode the value stored by `crosstab()`.
+* `crosstab()`: `na.rm = FALSE` now keeps cases with a missing value as
+  their own "NA" row or column (it had no visible effect),
+  `summary(x, percentages = FALSE)` says "Counts only" instead of "Row
+  percentages", and `crosstab(data, gender)` without a column variable
+  gives a clear error (was the base error 'argument "x" is missing').

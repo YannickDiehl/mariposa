@@ -573,3 +573,34 @@ test_that("DESC-06: crosstab(digits = 2) is honoured by print() and summary()", 
   rg <- survey_data |> group_by(region) |> crosstab(gender, education, digits = 2)
   expect_true(any(grepl("\\d+\\.\\d{2}%", capture.output(print(rg)))))
 })
+
+
+# --- DESC-07: crosstab na.rm, header, missing col -----------------------------
+
+test_that("DESC-07: crosstab na.rm = FALSE, header without percentages, missing col", {
+  # na.rm = FALSE had no visible effect (NAs were still dropped by
+  # table()), summary(x, percentages = FALSE) still announced "Row
+  # percentages", and crosstab(data, gender) without `col` failed with the
+  # base error 'Argument "x" fehlt'.
+  r_rm <- crosstab(survey_data, life_satisfaction, gender)
+  r_na <- crosstab(survey_data, life_satisfaction, gender, na.rm = FALSE)
+  expect_equal(r_rm$total, 2421)
+  expect_equal(r_na$total, 2500)
+  expect_true("NA" %in% r_na$row_levels)
+  expect_equal(r_na$n_missing, 0)
+  out <- capture.output(print(r_na))
+  expect_true(any(grepl("^\\| NA\\s", out)))
+  expect_false(any(grepl("Missing:", out)))
+  rw <- crosstab(survey_data, life_satisfaction, gender, na.rm = FALSE,
+                 weights = sampling_weight)
+  expect_true("NA" %in% rw$row_levels)
+
+  out2 <- capture.output(print(summary(crosstab(survey_data, gender, region),
+                                       percentages = FALSE)))
+  expect_false(any(grepl("Row percentages", out2)))
+  expect_true(any(grepl("Counts only", out2)))
+
+  expect_error(crosstab(survey_data, gender), "col")
+  expect_error(crosstab(dplyr::group_by(survey_data, region), gender), "col")
+  expect_error(crosstab(survey_data), "row")
+})
