@@ -469,3 +469,26 @@ test_that("REG-13: proper call, update(), step() and informative generics", {
     expect_error(fn(gl), "grouped")
   }
 })
+
+# REG-22: weighted use = "pairwise" rounded the effective N before using it
+# in df, SS and standard errors (round(min(n_mat))), contrary to Charter
+# 5.1 (unrounded sum(w) in formulas, rounding for display only).
+test_that("REG-22: weighted pairwise regression uses the unrounded N", {
+  d <- survey_data
+  vars <- c("life_satisfaction", "age", "income")
+  rp <- linear_regression(d, life_satisfaction ~ age + income,
+                          weights = sampling_weight, use = "pairwise")
+  w <- d$sampling_weight
+  pair_n <- c(vapply(vars, function(v) sum(w[!is.na(d[[v]])]), numeric(1)),
+              utils::combn(vars, 2, function(p) {
+                sum(w[!is.na(d[[p[1]]]) & !is.na(d[[p[2]]])])
+              }))
+  n_eff <- min(pair_n)
+  expect_false(n_eff == round(n_eff))
+  expect_equal(rp$anova_table$df[2], n_eff - 3)
+  expect_equal(rp$anova_table$df[3], n_eff - 1)
+  expect_equal(rp$n, round(n_eff))
+  # Unweighted pairwise keeps integer df
+  ru <- linear_regression(d, life_satisfaction ~ age + income, use = "pairwise")
+  expect_equal(ru$anova_table$df[2], round(ru$anova_table$df[2]))
+})

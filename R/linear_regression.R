@@ -738,13 +738,18 @@ linear_regression <- function(data, formula = NULL,
   # Step 4: Effective N and degrees of freedom
   # --------------------------------------------------------------------------
 
-  N_eff <- round(min(n_mat[all_vars, all_vars]))
+  # Unrounded (Charter 5.1): the smallest pairwise N - a weight sum when
+  # weighted - enters df, SS and the standard errors; $n rounds for display
+  N_eff <- min(n_mat[all_vars, all_vars])
   df_reg <- k
   df_res <- N_eff - k - 1
   df_tot <- N_eff - 1
 
   if (df_res < 1) {
-    cli_abort("Insufficient pairwise observations for the number of predictors.")
+    cli_abort(c(
+      "Too few pairwise observations for {k} predictor{?s}.",
+      i = "The smallest pairwise N is {round(N_eff, 1)}; at least {k + 2} are needed."
+    ), class = "mariposa_degenerate_fit")
   }
 
   adj_R_sq <- 1 - (1 - R_sq) * df_tot / df_res
@@ -847,7 +852,8 @@ linear_regression <- function(data, formula = NULL,
   anova_table <- tibble::tibble(
     Source = c("Regression", "Residual", "Total"),
     Sum_of_Squares = c(SS_reg, SS_res, SS_tot),
-    df = as.integer(c(df_reg, df_res, df_tot)),
+    # numeric: non-integer for weighted data; print rounds for display
+    df = c(df_reg, df_res, df_tot),
     Mean_Square = c(MS_reg, MS_res, NA_real_),
     F_statistic = c(F_stat, NA_real_, NA_real_),
     Sig = c(F_p, NA_real_, NA_real_)
@@ -868,7 +874,7 @@ linear_regression <- function(data, formula = NULL,
     model_summary = model_stats,
     anova_table = anova_table,
     descriptives = descriptives,
-    n = N_eff
+    n = round(N_eff)
   )
 }
 

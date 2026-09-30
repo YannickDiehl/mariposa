@@ -85,3 +85,8 @@
   message instead of returning `NULL` or a base-R error; `coef()` of a
   pairwise regression returns its coefficients. `nobs()` of a weighted
   logistic model is the sum of the weights (SPSS N).
+* Weighted `linear_regression(use = "pairwise")` uses the unrounded
+  smallest pairwise sum of weights in its degrees of freedom, sums of
+  squares and standard errors (Validation Charter §5.1); it was rounded
+  first. The displayed N stays rounded; results move by a fraction of the
+  rounding error.
