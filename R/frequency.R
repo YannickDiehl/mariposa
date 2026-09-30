@@ -287,9 +287,13 @@ calculate_single_frequency <- function(x, w = NULL, sort_frq = "none", show_na =
                        cum_prc = numeric(0), n_eff = numeric(0), stringsAsFactors = FALSE))
     }
 
-    # Calculate frequencies for valid values
+    # Calculate frequencies for valid values. Values are bare numbers (as
+    # in the unweighted branch): keeping the haven_labelled class made the
+    # rbind() of several variables with different label sets fail in
+    # vec_cast ("loss of precision"), depending on the variable order.
     if (any(valid_idx)) {
       x_valid <- x[valid_idx]
+      if (inherits(x_valid, "haven_labelled")) x_valid <- .plain_numeric(x_valid)
       w_valid <- w[valid_idx]
       unique_vals <- sort(unique(x_valid))
       freq_weighted <- vapply(unique_vals, function(val) sum(w_valid[x_valid == val]), numeric(1))

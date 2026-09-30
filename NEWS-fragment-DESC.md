@@ -59,3 +59,8 @@
   unweighted data alike, as in SPSS (the weighted version took the first
   value in data order), `$results$n_modes` counts the tied values, and
   the print flags the result ("Multiple modes exist").
+* Weighted `frequency()` of several labelled variables no longer aborts
+  with "Can't convert ... due to loss of precision" depending on the order
+  of the variables. The weighted branch kept the `haven_labelled` class in
+  the value column, so combining variables with different label sets
+  failed; values are now bare numbers, as in the unweighted branch.

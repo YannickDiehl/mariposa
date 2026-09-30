@@ -308,3 +308,31 @@ test_that("DESC-17: w_* give clear errors for bad input and report tied modes", 
   out1 <- capture.output(print(w_modus(survey_data, gender)))
   expect_false(any(grepl("Multiple modes", out1)))
 })
+
+
+# --- IO-12: weighted frequency() of several labelled variables -----------------
+
+test_that("IO-12: weighted frequency() of several labelled variables does not crash", {
+  # The weighted branch kept the haven_labelled class in the value column;
+  # rbind() of two variables with different label sets then failed in
+  # vec_cast ("loss of precision"), depending on the variable order.
+  skip_if_not_installed("haven")
+  set.seed(1)
+  df <- data.frame(
+    x = haven::labelled(rep(c(1, 2), 10), c(West = 1, East = 2)),
+    y = haven::labelled(c(rep(1:3, 6), -9, -9),
+                        c(Male = 1, Female = 2, Diverse = 3, "No answer" = -9)),
+    w = runif(20, 0.5, 1.5)
+  )
+  r_xy <- expect_no_error(frequency(df, x, y, weights = w))
+  r_yx <- expect_no_error(frequency(df, y, x, weights = w))
+  expect_false(inherits(r_xy$results$value, "haven_labelled"))
+  pick <- function(r, v) {
+    out <- r$results[r$results$Variable == v, c("value", "label", "freq")]
+    rownames(out) <- NULL
+    out
+  }
+  expect_equal(pick(r_xy, "y"), pick(r_yx, "y"))
+  expect_equal(pick(r_xy, "x"), pick(r_yx, "x"))
+  expect_equal(pick(r_xy, "y")$label, c("No answer", "Male", "Female", "Diverse"))
+})
