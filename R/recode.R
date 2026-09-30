@@ -799,7 +799,11 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 #'   (e.g., \code{gender_Male}).
 #' @param ref A value to use as reference category (omitted from output).
 #'   If \code{NULL} (default), all categories get a dummy variable.
-#'   Set to a specific value for n-1 coding (e.g., for regression).
+#'   Set to a specific value for n-1 coding (e.g., for regression). For a
+#'   factor, give a level name (\code{ref = "Male"}) or a number: the
+#'   original code of a \code{\link{to_label}()} factor, otherwise the level
+#'   position (\code{ref = 1} = first level). A \code{ref} that matches no
+#'   category is an error.
 #' @param append If \code{TRUE} (default), the dummy columns are appended to
 #'   the original data frame. If \code{FALSE}, only the dummy columns are
 #'   returned. Ignored when \code{data} is a vector.
@@ -813,8 +817,11 @@ rec <- function(data, ..., rules, as_factor = FALSE, suffix = NULL,
 #'
 #' With \code{suffix = "val"}: \code{{varname}_{value}} (e.g., \code{gender_1},
 #' \code{gender_2}). With \code{suffix = "label"}: \code{{varname}_{label}}
-#' where labels are cleaned (spaces replaced with \code{_}, special characters
-#' removed).
+#' where labels are cleaned (umlauts transliterated, e.g. "männlich" ->
+#' \code{maennlich}; spaces replaced with \code{_}; other special
+#' characters removed). Values without a usable label (e.g. "..") use their
+#' value; labels shared by several values get the value appended, so every
+#' category keeps its own column.
 #'
 #' ## Reference Category
 #'
@@ -886,34 +893,48 @@ to_dummy <- function(data, ..., suffix = "val", ref = NULL, append = TRUE) {
 
 #' @noRd
 .to_dummy_vec <- function(x, var_name, suffix = "val", ref = NULL) {
-  # Get unique values (excluding NA)
-  if (is.factor(x)) {
+  is_factor <- is.factor(x)
+  if (is_factor) {
     vals <- levels(x)
-    is_factor <- TRUE
+    keys <- as.integer(x)                 # position of the level
+    val_keys <- seq_along(vals)
   } else {
-    vals <- sort(unique(x[!is.na(x)]))
-    is_factor <- FALSE
+    raw <- if (is.numeric(x)) as.double(.plain_numeric(x)) else x
+    vals <- sort(unique(raw[!is.na(raw)]))
+    keys <- match(raw, vals)
+    val_keys <- seq_along(vals)
   }
 
-  # Build label map for column naming
-  label_map <- NULL
+  # Column suffixes: raw values, or cleaned value labels
+  col_suffix <- as.character(vals)
   if (suffix == "label") {
     if (is_factor) {
-      label_map <- stats::setNames(as.character(vals), as.character(vals))
+      lbl <- as.character(vals)
     } else {
       vl <- attr(x, "labels", exact = TRUE)
+      lbl <- rep(NA_character_, length(vals))
       if (!is.null(vl)) {
-        # Only use non-NA labels
         vl <- vl[!is.na(vl)]
-        label_map <- stats::setNames(names(vl), as.character(unname(vl)))
+        hit <- match(vals, as.double(.plain_numeric(vl)))
+        lbl[!is.na(hit)] <- names(vl)[hit[!is.na(hit)]]
       }
     }
+    cleaned <- .clean_label_for_colname(lbl)
+    use <- !is.na(cleaned) & nzchar(cleaned)
+    col_suffix[use] <- cleaned[use]
+    # Labels shared by several values (ALLBUS ".." scale points) or empty
+    # after cleaning fall back to / get the value, so no column is lost
+    dup <- col_suffix %in% col_suffix[duplicated(col_suffix)]
+    col_suffix[dup & use] <- paste0(col_suffix[dup & use], "_",
+                                    as.character(vals)[dup & use])
   }
 
   # Remove reference category
   if (!is.null(ref)) {
-    ref_char <- as.character(ref)
-    vals <- vals[as.character(vals) != ref_char]
+    ref_idx <- .dummy_ref_index(x, vals, ref, var_name)
+    vals <- vals[-ref_idx]
+    val_keys <- val_keys[-ref_idx]
+    col_suffix <- col_suffix[-ref_idx]
     if (length(vals) == 0L) {
       cli::cli_abort(
         "Reference value {.val {ref}} removed all categories for variable {.var {var_name}}."
@@ -923,28 +944,56 @@ to_dummy <- function(data, ..., suffix = "val", ref = NULL, append = TRUE) {
 
   # Create dummy columns
   result <- tibble::tibble(.rows = length(x))
-
-  for (v in vals) {
-    # Determine column name
-    if (suffix == "label" && !is.null(label_map)) {
-      lbl <- label_map[as.character(v)]
-      if (!is.na(lbl)) {
-        col_suffix <- .clean_label_for_colname(lbl)
-      } else {
-        col_suffix <- as.character(v)
-      }
-    } else {
-      col_suffix <- as.character(v)
-    }
-
-    col_name <- paste0(var_name, "_", col_suffix)
-
-    dummy <- ifelse(is.na(x), NA_integer_, as.integer(x == v))
-
-    result[[col_name]] <- dummy
+  for (j in seq_along(vals)) {
+    dummy <- as.integer(keys == val_keys[j])
+    result[[paste0(var_name, "_", col_suffix[j])]] <- dummy
   }
 
   result
+}
+
+
+#' Index of the reference category of to_dummy()
+#'
+#' Factors: a level name, or a number (the original code of a to_label()
+#' factor, otherwise the level position). Other vectors: a value. A ref
+#' that matches nothing is an error (it used to be ignored silently).
+#' @noRd
+.dummy_ref_index <- function(x, vals, ref, var_name) {
+  if (length(ref) != 1L || is.na(ref)) {
+    cli::cli_abort("{.arg ref} must be a single value.")
+  }
+  idx <- NA_integer_
+  if (is.factor(x)) {
+    if (is.character(ref)) {
+      idx <- match(ref, vals)
+    } else if (is.numeric(ref)) {
+      codes <- attr(x, "codes", exact = TRUE)
+      if (!is.null(codes) && identical(names(codes), levels(x)) &&
+          ref %in% codes) {
+        idx <- match(ref, codes)
+      } else if (ref == round(ref) && ref >= 1 && ref <= length(vals)) {
+        idx <- as.integer(ref)
+      }
+    }
+  } else {
+    idx <- match(as.character(ref), as.character(vals))
+  }
+  if (is.na(idx)) {
+    shown <- if (is.factor(x)) {
+      paste0("a level name (", paste(utils::head(vals, 6), collapse = ", "),
+             if (length(vals) > 6) ", ..." else "", ") or a position 1-",
+             length(vals))
+    } else {
+      paste0("one of the values ", paste(utils::head(vals, 10), collapse = ", "),
+             if (length(vals) > 10) ", ..." else "")
+    }
+    cli::cli_abort(c(
+      "{.arg ref} = {.val {ref}} is not a category of {.var {var_name}}.",
+      "i" = "Use {shown}."
+    ))
+  }
+  idx
 }
 
 
@@ -954,8 +1003,18 @@ to_dummy <- function(data, ..., suffix = "val", ref = NULL, append = TRUE) {
 
 #' @noRd
 .clean_label_for_colname <- function(label) {
+  # Transliterate German umlauts ("männlich" -> "maennlich", not
+  # "mnnlich"), then other accented letters via iconv where available
+  out <- label
+  from <- c("ä", "ö", "ü", "Ä", "Ö", "Ü",
+            "ß")
+  to <- c("ae", "oe", "ue", "Ae", "Oe", "Ue", "ss")
+  for (k in seq_along(from)) out <- gsub(from[k], to[k], out, fixed = TRUE)
+  ascii <- suppressWarnings(iconv(out, from = "UTF-8", to = "ASCII//TRANSLIT",
+                                  sub = ""))
+  out <- ifelse(is.na(ascii), out, ascii)
   # Replace spaces with underscores
-  out <- gsub("\\s+", "_", label)
+  out <- gsub("\\s+", "_", out)
   # Remove anything that's not alphanumeric or underscore
   out <- gsub("[^A-Za-z0-9_]", "", out)
   # Remove leading/trailing underscores

@@ -410,3 +410,30 @@ test_that("IO-22: set_na() on a factor warns instead of silently skipping", {
   expect_identical(r$gender, survey_data$gender)
   expect_warning(set_na(survey_data$gender, 1), "factor")
 })
+
+# IO-09: to_dummy(): label-based names collided (ALLBUS ".." -> one column
+# "pt12_", values lost), umlauts were stripped ("männlich" -> "mnnlich"),
+# and `ref` was ignored for factors (both dummies returned).
+test_that("IO-09: to_dummy() label names are unique and transliterated", {
+  skip_if_not_installed("haven")
+  x <- haven::labelled(c(1, 2, 3, 4, 2),
+                       labels = c("gar nicht" = 1, ".." = 2, ".." = 3,
+                                  "sehr" = 4))
+  d <- to_dummy(x, suffix = "label")
+  expect_equal(names(d), c("x_gar_nicht", "x_2", "x_3", "x_sehr"))
+  expect_equal(d$x_3, c(0L, 0L, 1L, 0L, 0L))
+  g <- haven::labelled(c(1, 2), labels = c("männlich" = 1, "weiblich" = 2,
+                                           "Größe" = 3))
+  expect_equal(names(to_dummy(g, suffix = "label")),
+               c("g_maennlich", "g_weiblich"))
+  expect_equal(.clean_label_for_colname("Größe Übel"), "Groesse_Uebel")
+})
+
+test_that("IO-09: to_dummy() ref works for factors (name or position)", {
+  d1 <- to_dummy(survey_data, gender, ref = 1, append = FALSE)
+  expect_equal(names(d1), "gender_Female")
+  d2 <- to_dummy(survey_data, gender, ref = "Female", append = FALSE)
+  expect_equal(names(d2), "gender_Male")
+  expect_error(to_dummy(survey_data, gender, ref = "Other"), "ref")
+  expect_error(to_dummy(c(1, 2, 3), ref = 9), "ref")
+})

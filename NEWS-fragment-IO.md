@@ -86,3 +86,11 @@
   column (they were stored but never used) and points to `to_labelled()`;
   `set_na()` warns when a named variable or a vector is a factor instead of
   silently returning it unchanged.
+* `to_dummy()` fixes: with `suffix = "label"`, values sharing a label text
+  (ALLBUS ".." scale points) all wrote into one column `pt12_` and their
+  dummies were lost - every category now gets its own column (value
+  appended to duplicate or empty labels); umlauts are transliterated
+  (`"männlich"` -> `maennlich`, was `mnnlich`); `ref` works for factors,
+  by level name or number (it was compared with the level names only, so
+  `ref = 1` silently returned all dummies), and a `ref` that matches no
+  category is an error.
