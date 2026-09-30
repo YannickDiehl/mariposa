@@ -97,7 +97,7 @@ test_that("to_label() with add_non_labelled includes unlabelled values", {
     labels = c("Yes" = 1, "No" = 2)
   )
 
-  result_default <- to_label(x)
+  expect_warning(result_default <- to_label(x), "add_non_labelled")
   expect_true(is.na(result_default[3]))
 
   result_add <- to_label(x, add_non_labelled = TRUE)

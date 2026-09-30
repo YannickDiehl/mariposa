@@ -63,3 +63,11 @@
   "GROSSES VERTRAUEN") and the `to_numeric()` round trip turned 3-6 into 2.
   Duplicate texts now get their code appended (`".. (2)"`, `".. (3)"`), the
   same rule the test functions use for grouping variables.
+* `to_label(data)` and `to_character(data)` without a variable selection
+  no longer turn metric variables into factors. ALLBUS `age` and `isei08`
+  (whose only labels are missing codes) became all-`NA` factors and the
+  weight a factor with one level per value, silently. Now only variables
+  whose values are all value-labelled are converted; the others are left
+  unchanged with one message listing them. Selected variables are still
+  converted, and whenever values without a label become `NA` a warning
+  names the variables and points to `add_non_labelled = TRUE`.

@@ -302,3 +302,42 @@ test_that("IO-04: duplicate label texts stay distinct levels", {
   expect_equal(length(unique(ch)), 7L)
   expect_equal(ch[2], ".. (2)")
 })
+
+# IO-05: to_label(df) turned metric variables whose only labels are missing
+# codes (ALLBUS age, isei08) into all-NA factors and the weight into a
+# factor - silently.
+io_metric_df <- function() {
+  age <- set_na(haven::labelled(c(18, 45, -9, 70),
+                                labels = c("no answer" = -9)), -9)
+  tibble::tibble(
+    sex = haven::labelled(c(1, 2, 1, 2), labels = c(male = 1, female = 2)),
+    age = age,
+    w = haven::labelled_spss(c(0.8, 1.2, 1, 1), na_range = c(-Inf, -1)),
+    kids = haven::labelled(c(0, 2, 3, 0), labels = c("none" = 0))
+  )
+}
+
+test_that("IO-05: to_label(df) leaves metric variables alone, with a message", {
+  skip_if_not_installed("haven")
+  d <- io_metric_df()
+  expect_message(r <- to_label(d), "age")
+  expect_s3_class(r$sex, "factor")
+  expect_false(is.factor(r$age))
+  expect_false(is.factor(r$w))
+  expect_false(is.factor(r$kids))
+  expect_identical(r$age, d$age)
+  # to_character() follows the same rule
+  expect_message(rc <- to_character(d), "kids")
+  expect_type(rc$sex, "character")
+  expect_false(is.character(rc$kids))
+})
+
+test_that("IO-05: explicit selection converts but warns about lost values", {
+  skip_if_not_installed("haven")
+  d <- io_metric_df()
+  expect_warning(r <- to_label(d, kids), "add_non_labelled")
+  expect_s3_class(r$kids, "factor")
+  expect_no_warning(r2 <- to_label(d, kids, add_non_labelled = TRUE))
+  expect_false(anyNA(r2$kids))
+  expect_warning(to_label(d$kids), "add_non_labelled")
+})

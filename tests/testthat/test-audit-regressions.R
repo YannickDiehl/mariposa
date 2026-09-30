@@ -449,7 +449,7 @@ test_that("to_label/to_numeric: removed dot-case args error, snake_case works", 
   expect_no_warning(to_label(x, add_non_labelled = TRUE))
 
   expect_error(to_character(x, drop.na = FALSE), "removed")
-  expect_no_warning(to_character(x, drop_na = FALSE))
+  expect_no_warning(to_character(x, drop_na = FALSE, add_non_labelled = TRUE))
 
   f <- factor(c("2", "4", "6"))
   expect_error(to_numeric(f, start.at = 0), "removed")

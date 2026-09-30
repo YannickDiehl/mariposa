@@ -18,7 +18,10 @@
 #'
 #' @param data A data frame, tibble, or a single vector.
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
-#'   empty, converts all `haven_labelled` columns.
+#'   empty, converts every `haven_labelled` column whose values are all
+#'   value-labelled; metric variables (e.g. age with labels only for its
+#'   missing codes), weights and partially labelled variables are left
+#'   unchanged with a message. Selected variables are always converted.
 #' @param ordered If `TRUE`, creates an ordered factor. Default: `FALSE`.
 #' @param drop_na If `TRUE` (default), tagged NAs are converted to regular
 #'   `NA` (excluded from factor levels). If `FALSE`, tagged NAs are kept as
@@ -27,7 +30,8 @@
 #'   Default: `FALSE`.
 #' @param add_non_labelled If `TRUE`, values without labels are included as
 #'   factor levels using their numeric value as the level name.
-#'   Default: `FALSE` (unlabelled values become `NA`).
+#'   Default: `FALSE` (unlabelled values become `NA`, with a warning naming
+#'   the variables).
 #' @param drop.na,drop.unused,add.non.labelled Defunct dot-case argument
 #'   names, removed in mariposa 0.6.9. Calling the function with any of
 #'   them is an error; use the snake_case equivalents instead. (The formals
@@ -95,17 +99,17 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
   }
 
   if (!is.data.frame(data)) {
+    .warn_unlabelled_values(
+      list(data), sub(".*\\$", "", deparse(substitute(data))[1]),
+      add_non_labelled
+    )
     return(.to_label_vec(data, ordered, drop_na, drop_unused,
                          add_non_labelled))
   }
 
-  dots <- rlang::enexprs(...)
-  if (length(dots) == 0L) {
-    # Convert all haven_labelled columns
-    cols <- which(vapply(data, inherits, logical(1), "haven_labelled"))
-  } else {
-    cols <- tidyselect::eval_select(rlang::expr(c(...)), data)
-  }
+  cols <- .label_conversion_cols(data, rlang::enexprs(...),
+                                 rlang::expr(c(...)), add_non_labelled,
+                                 "to_label")
 
   for (i in cols) {
     data[[i]] <- .to_label_vec(data[[i]], ordered, drop_na, drop_unused,
@@ -199,6 +203,81 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
 }
 
 
+#' Observed valid values of a labelled vector that carry no value label
+#'
+#' These become NA in to_label()/to_character() unless add_non_labelled =
+#' TRUE. Non-labelled inputs (plain numeric, character, factor) are
+#' converted by their values and lose nothing: numeric(0).
+#' @noRd
+.unlabelled_values <- function(x) {
+  if (!inherits(x, "haven_labelled") || !is.numeric(x)) return(numeric(0))
+  raw <- as.double(.plain_numeric(x))
+  labels <- attr(x, "labels", exact = TRUE)
+  lab_vals <- if (is.null(labels)) numeric(0) else as.double(.plain_numeric(labels))
+  sort(unique(raw[!is.na(raw) & !(raw %in% lab_vals)]))
+}
+
+
+#' Columns to_label()/to_character() convert
+#'
+#' Without a selection: every haven_labelled column whose observed values
+#' are all labelled (with add_non_labelled = TRUE: at least one observed
+#' value labelled). Metric variables whose only labels are missing codes
+#' (ALLBUS age, isei08), unlabelled weights and partially labelled
+#' variables used to become (nearly) all-NA factors; they are left
+#' unchanged with one message. An explicit selection converts every
+#' selected column and warns about values that become NA.
+#' @noRd
+.label_conversion_cols <- function(data, dots, select_expr, add_non_labelled,
+                                   fn, call = rlang::caller_env()) {
+  if (length(dots) > 0L) {
+    # evaluated in the caller's frame, where `...` lives
+    cols <- tidyselect::eval_select(select_expr, data, env = call)
+    .warn_unlabelled_values(data[cols], names(data)[cols], add_non_labelled,
+                            call = call)
+    return(cols)
+  }
+
+  cols <- which(vapply(data, inherits, logical(1), "haven_labelled"))
+  skip <- vapply(cols, function(i) {
+    x <- data[[i]]
+    unlab <- .unlabelled_values(x)
+    if (length(unlab) == 0L) return(FALSE)
+    if (!isTRUE(add_non_labelled)) return(TRUE)
+    # add_non_labelled: skip only variables without any labelled value
+    raw <- as.double(.plain_numeric(x))
+    n_obs <- length(unique(raw[!is.na(raw)]))
+    length(unlab) == n_obs
+  }, logical(1))
+
+  if (any(skip)) {
+    skipped <- names(data)[cols[skip]]
+    cli::cli_inform(c(
+      "i" = "{.fn {fn}} left {length(skipped)} variable{?s} unchanged whose values are not (all) value-labelled, e.g. metric variables or weights: {.var {skipped}}.",
+      " " = "Select a variable explicitly to convert it anyway (with {.code add_non_labelled = TRUE} to keep unlabelled values)."
+    ))
+  }
+  cols[!skip]
+}
+
+
+#' Warn when to_label()/to_character() turn unlabelled values into NA
+#' @noRd
+.warn_unlabelled_values <- function(columns, var_names, add_non_labelled,
+                                    call = rlang::caller_env()) {
+  if (isTRUE(add_non_labelled)) return(invisible(NULL))
+  lossy <- vapply(columns, function(x) length(.unlabelled_values(x)) > 0L,
+                  logical(1))
+  if (any(lossy)) {
+    cli::cli_warn(c(
+      "Values without a value label became {.val NA} in {.var {var_names[lossy]}}.",
+      "i" = "Use {.code add_non_labelled = TRUE} to keep them as levels named by their code."
+    ), call = call)
+  }
+  invisible(NULL)
+}
+
+
 #' Original codes of a factor made by to_label(), or NULL
 #'
 #' Returns the named code vector (names = levels) only when it still covers
@@ -226,7 +305,9 @@ to_label <- function(data, ..., ordered = FALSE, drop_na = TRUE,
 #'
 #' @param data A data frame, tibble, or a single vector.
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
-#'   empty, converts all `haven_labelled` columns.
+#'   empty, converts every `haven_labelled` column whose values are all
+#'   value-labelled (metric variables are left unchanged with a message, as
+#'   in [to_label()]).
 #' @param drop_na If `TRUE` (default), tagged NAs become regular `NA`.
 #' @param add_non_labelled If `TRUE`, unlabelled values are included as
 #'   their numeric string representation. Default: `FALSE`.
@@ -271,6 +352,10 @@ to_character <- function(data, ..., drop_na = TRUE,
   }
 
   if (!is.data.frame(data)) {
+    .warn_unlabelled_values(
+      list(data), sub(".*\\$", "", deparse(substitute(data))[1]),
+      add_non_labelled
+    )
     result <- .to_label_vec(data, ordered = FALSE, drop_na = drop_na,
                             drop_unused = FALSE,
                             add_non_labelled = add_non_labelled)
@@ -280,12 +365,9 @@ to_character <- function(data, ..., drop_na = TRUE,
     return(out)
   }
 
-  dots <- rlang::enexprs(...)
-  if (length(dots) == 0L) {
-    cols <- which(vapply(data, inherits, logical(1), "haven_labelled"))
-  } else {
-    cols <- tidyselect::eval_select(rlang::expr(c(...)), data)
-  }
+  cols <- .label_conversion_cols(data, rlang::enexprs(...),
+                                 rlang::expr(c(...)), add_non_labelled,
+                                 "to_character")
 
   for (i in cols) {
     result <- .to_label_vec(data[[i]], ordered = FALSE, drop_na = drop_na,
