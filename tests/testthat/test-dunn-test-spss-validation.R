@@ -9,8 +9,19 @@
 #   Captured 2026-05-19 against survey_data (life_satisfaction ~ education,
 #   N = 2421 after listwise deletion).
 #
-# Note: SPSS NPAR TESTS /K-W output does not include Dunn pairwise results
-# by default; tests/spss_reference/outputs/dunn_test_output.txt is empty.
+# Note: there are no SPSS Dunn pairwise values. SPSS NPAR TESTS /K-W prints
+# only the omnibus test; NPTESTS prints Dunn's pairwise comparisons, but
+# only in the Model Viewer, which OMS cannot export (see
+# tests/spss_reference/syntax/dunn_test.sps). The reference file
+# tests/spss_reference/outputs/dunn_test_output.txt is therefore not empty
+# but holds no Dunn values:
+#   lines 1-52:   a stale fragment of an earlier run (22:21:04: the Test 4
+#                 tables, weighted + split by region) left at the top of
+#                 the file when the later run overwrote it
+#   lines 54-337: the NPAR TESTS /K-W Ranks and Test Statistics tables of
+#                 Tests 1a-1c, 2a-2b, 3 and 4 (22:22:57), identical to
+#                 kruskal_wallis_output.txt and asserted in
+#                 test-kruskal-wallis-spss-validation.R
 # Per Charter §4 Tier-4 we validate against the established R-side reference
 # (PMCMRplus), not against a missing SPSS output.
 # =============================================================================
