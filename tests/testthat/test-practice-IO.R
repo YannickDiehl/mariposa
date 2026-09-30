@@ -827,3 +827,37 @@ test_that("IO-21: na_frequencies() without missings is quiet; data frames work",
   expect_equal(nf$code, c(-9, -8))
   expect_equal(na_frequencies(d, b)$variable, "b")
 })
+
+# IO-27: no `var_label<-` replacement function; drop_labels() ignored the
+# unused levels of factors (and its documented example was a no-op).
+test_that("IO-27: var_label<- sets and removes variable labels", {
+  x <- c(1, 2, 3)
+  var_label(x) <- "Score"
+  expect_equal(var_label(x), "Score")
+  var_label(x) <- NULL
+  expect_null(var_label(x))
+  d <- data.frame(a = 1:2, b = 3:4)
+  var_label(d) <- list(a = "First", b = "Second")
+  expect_equal(var_label(d), c(a = "First", b = "Second"))
+  var_label(d) <- c(a = "Only a")
+  expect_equal(var_label(d)[["a"]], "Only a")
+  expect_equal(var_label(d)[["b"]], "Second")
+  expect_error(var_label(d) <- list(zz = "x"), "zz")
+  expect_error(var_label(x) <- c("a", "b"), "single")
+})
+
+test_that("IO-27: drop_labels() drops unused factor levels, keeps attributes", {
+  f <- factor(c("a", "b", "a"), levels = c("a", "b", "c"))
+  attr(f, "label") <- "Letters"
+  r <- drop_labels(f)
+  expect_equal(levels(r), c("a", "b"))
+  expect_equal(attr(r, "label"), "Letters")
+  skip_if_not_installed("haven")
+  g <- to_label(haven::labelled(c(10, 20, 10),
+                                labels = c(x = 10, y = 20, z = 30)))
+  rg <- drop_labels(g)
+  expect_equal(levels(rg), c("x", "y"))
+  expect_equal(to_numeric(rg), c(10, 20, 10))
+  d <- dplyr::filter(survey_data, education != "Basic Secondary")
+  expect_false("Basic Secondary" %in% levels(drop_labels(d)$education))
+})

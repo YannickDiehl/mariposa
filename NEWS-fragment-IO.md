@@ -182,3 +182,10 @@
   instead of printing `<0 rows>`. Data frames are accepted
   (`na_frequencies(data, q1, q2)`, as the data-io vignette shows) and
   return one table with a `variable` column.
+* New replacement form `var_label(x) <- "Label"` (and
+  `var_label(data) <- list(age = "Age", sex = "Sex")`; `NULL` removes a
+  label). `drop_labels()` also drops unused factor levels (keeping the
+  variable label and the codes of `to_label()` factors); its example
+  filtered on a non-existent category and did nothing. The `copy_labels()`
+  help no longer claims that `filter()`/`select()`/`mutate()` strip labels
+  (they keep them) and names the operations that do.

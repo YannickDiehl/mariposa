@@ -59,7 +59,7 @@
 #' }
 #'
 #' @seealso [val_labels()] for value labels, [codebook()] for viewing all
-#'   metadata, [copy_labels()] for preserving labels after dplyr operations
+#'   metadata, [copy_labels()] for restoring labels lost by base-R operations
 #'
 #' @family labels
 #'
@@ -132,6 +132,57 @@ var_label <- function(data, ...) {
   }
 
   invisible(data)
+}
+
+
+#' @rdname var_label
+#' @param x For the replacement form: a vector or a data frame.
+#' @param value For the replacement form: a single character string (or
+#'   `NULL` to remove the label) for a vector; for a data frame a named list
+#'   or named character vector, names = columns (a `NULL` entry removes that
+#'   label). Columns not named keep their labels.
+#' @examples
+#' # Replacement form
+#' x <- c(1, 2, 3)
+#' var_label(x) <- "Score"
+#' d <- survey_data
+#' var_label(d) <- list(age = "Age of respondent", gender = "Gender identity")
+#'
+#' @export
+`var_label<-` <- function(x, value) {
+  if (!is.data.frame(x)) {
+    if (!is.null(value) &&
+        (!is.character(value) || length(value) != 1L)) {
+      cli::cli_abort("The label must be a single character string (or {.code NULL}).")
+    }
+    attr(x, "label") <- value
+    return(x)
+  }
+
+  if (is.null(value)) {
+    for (i in seq_along(x)) attr(x[[i]], "label") <- NULL
+    return(x)
+  }
+  value <- as.list(value)
+  nms <- names(value)
+  if (is.null(nms) || any(!nzchar(nms))) {
+    cli::cli_abort(c(
+      "For a data frame, give the labels as a named list or named character vector.",
+      "i" = "For example {.code var_label(data) <- list(age = \"Age\", sex = \"Sex\")}."
+    ))
+  }
+  unknown <- setdiff(nms, names(x))
+  if (length(unknown) > 0L) {
+    cli::cli_abort("Variable{?s} {.var {unknown}} not found in data.")
+  }
+  for (nm in nms) {
+    val <- value[[nm]]
+    if (!is.null(val) && (!is.character(val) || length(val) != 1L)) {
+      cli::cli_abort("Label for {.var {nm}} must be a single character string.")
+    }
+    attr(x[[nm]], "label") <- val
+  }
+  x
 }
 
 
@@ -370,9 +421,12 @@ val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE) {
 #'
 #' @description
 #' Copies variable labels, value labels, and tagged NA metadata from a source
-#' data frame to a target data frame. This is essential after dplyr operations
-#' like [dplyr::filter()], [dplyr::select()], or [dplyr::mutate()] which can
-#' strip label attributes.
+#' data frame to a target data frame. dplyr verbs such as [dplyr::filter()],
+#' [dplyr::select()] or [dplyr::arrange()] keep labels; they are lost by
+#' base-R conversions and computations (e.g. `as.numeric()`, `ifelse()`,
+#' arithmetic on labelled vectors), by [merge()] / `rbind()` of plain data
+#' frames, or by a detour through CSV. `copy_labels()` restores them from
+#' the original data.
 #'
 #' @param data The target data frame (e.g., after filtering or subsetting).
 #' @param source The source data frame with the original labels.
@@ -401,11 +455,13 @@ val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE) {
 #' @family labels
 #'
 #' @examples
-#' # Labels are lost after dplyr operations
-#' data_subset <- dplyr::filter(survey_data, age >= 18)
+#' # as.numeric() drops the variable label
+#' data_plain <- dplyr::mutate(survey_data, age = as.numeric(age))
+#' attr(data_plain$age, "label")
 #'
-#' # Restore them
-#' data_subset <- copy_labels(data_subset, survey_data)
+#' # Restore it
+#' data_plain <- copy_labels(data_plain, survey_data)
+#' attr(data_plain$age, "label")
 #'
 #' @export
 copy_labels <- function(data, source) {
@@ -485,13 +541,14 @@ copy_labels <- function(data, source) {
 #' Remove Unused Value Labels
 #'
 #' @description
-#' Removes value labels for values that are not present in the data. This is
-#' useful after filtering or subsetting, when some categories may no longer
-#' exist but their labels remain attached.
+#' Removes value labels for values that are not present in the data, and
+#' unused levels of factors. This is useful after filtering or subsetting,
+#' when some categories may no longer exist but their labels remain
+#' attached.
 #'
 #' @param data A data frame or a single vector.
 #' @param ... Optional: unquoted variable names (tidyselect supported). If
-#'   empty, applies to all labelled columns.
+#'   empty, applies to all labelled and factor columns.
 #' @param drop_na If `TRUE`, also removes tagged NA labels. Default: `FALSE`
 #'   (tagged NA labels are preserved even if no tagged NAs of that type exist).
 #'
@@ -502,7 +559,9 @@ copy_labels <- function(data, source) {
 #' The removed category's label still exists on the variable, which can
 #' cause confusing output in [frequency()] or [codebook()].
 #' `drop_labels()` cleans this up by keeping only labels for values
-#' actually present in the data.
+#' actually present in the data. For factors, unused levels are dropped;
+#' the variable label and the original codes of a [to_label()] factor are
+#' kept.
 #'
 #' By default, tagged NA labels are preserved (`drop_na = FALSE`) because
 #' they represent missing value types, not substantive categories.
@@ -512,9 +571,17 @@ copy_labels <- function(data, source) {
 #' @family labels
 #'
 #' @examples
-#' # After filtering, region == 4 no longer exists but its label remains
-#' data_subset <- dplyr::filter(survey_data, region != 4)
+#' # After filtering, "Basic Secondary" no longer occurs but remains a level
+#' data_subset <- dplyr::filter(survey_data, education != "Basic Secondary")
+#' levels(data_subset$education)
 #' data_clean <- drop_labels(data_subset)
+#' levels(data_clean$education)
+#'
+#' # Value labels of labelled vectors
+#' if (requireNamespace("haven", quietly = TRUE)) {
+#'   x <- haven::labelled(c(1, 2, 2), labels = c(low = 1, mid = 2, high = 3))
+#'   drop_labels(x)   # the unused label "high" is removed
+#' }
 #'
 #' @export
 drop_labels <- function(data, ..., drop_na = FALSE) {
@@ -541,6 +608,21 @@ drop_labels <- function(data, ..., drop_na = FALSE) {
 #' Internal: drop unused labels from a single vector
 #' @noRd
 .drop_labels_vec <- function(x, drop_na = FALSE) {
+  # Factors: their levels are the labels -> drop unused levels, keeping the
+  # variable label and the original codes of a to_label() factor
+  if (is.factor(x)) {
+    used <- levels(x) %in% unique(as.character(x[!is.na(x)]))
+    if (all(used)) return(x)
+    keep_attrs <- attributes(x)[setdiff(names(attributes(x)),
+                                        c("levels", "class", "names"))]
+    codes <- .factor_codes(x)
+    out <- factor(as.character(x), levels = levels(x)[used],
+                  ordered = is.ordered(x))
+    for (a in names(keep_attrs)) attr(out, a) <- keep_attrs[[a]]
+    if (!is.null(codes)) attr(out, "codes") <- codes[used]
+    return(out)
+  }
+
   labels <- attr(x, "labels", exact = TRUE)
   if (is.null(labels) || length(labels) == 0L) return(x)
 
