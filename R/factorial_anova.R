@@ -724,6 +724,7 @@ print.factorial_anova <- function(x, digits = 3, ...) {
                   fmt_int(fit$call_info$n_total)))
       .print_effect_lines(fit$anova_table, digits)
     })
+    print_summary_hint()
     return(invisible(x))
   }
 
@@ -733,6 +734,7 @@ print.factorial_anova <- function(x, digits = 3, ...) {
               fmt_int(info$n_total)))
   .print_effect_lines(x$anova_table, digits)
 
+  print_summary_hint()
   invisible(x)
 }
 

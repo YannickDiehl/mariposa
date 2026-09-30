@@ -57,3 +57,8 @@
   print (R-squared, statistics and p-values ignored it). The grouped
   `normality_test()` compact print shows the test results under a
   `[group]` line for every group instead of only the number of groups.
+* Every compact `print()` of a test or model result now ends with
+  "Use summary() for detailed output." (`t_test()`, `oneway_anova()`,
+  `factorial_anova()`, `ancova()`, the three correlation functions, both
+  regressions, `reliability()` and `efa()` did not show it, the rank tests,
+  chi-square family, Levene and normality tests did).

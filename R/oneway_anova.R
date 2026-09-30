@@ -722,6 +722,7 @@ print.oneway_anova <- function(x, digits = 3, ...) {
     }
   }
 
+  print_summary_hint()
   invisible(x)
 }
 

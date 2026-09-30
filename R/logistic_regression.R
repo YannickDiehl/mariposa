@@ -804,6 +804,7 @@ print.logistic_regression <- function(x, digits = 3, ...) {
     cat(sprintf("  %s\n", fit_line(x)))
   }
 
+  print_summary_hint()
   invisible(x)
 }
 

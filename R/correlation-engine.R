@@ -305,6 +305,7 @@
     .print_cor_compact(x, corrs, weighted_tag, digits, spec)
   }
 
+  print_summary_hint()
   invisible(x)
 }
 

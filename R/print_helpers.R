@@ -55,6 +55,16 @@ add_significance_stars <- function(p_value,
   out
 }
 
+#' Print the closing hint of a compact print()
+#'
+#' Every compact print of a test or model class ends with the same line
+#' (it was shown by about half of them).
+#' @noRd
+print_summary_hint <- function() {
+  cat("Use summary() for detailed output.\n")
+  invisible(NULL)
+}
+
 #' Print significance codes legend
 #' @param show Logical, whether to show the legend
 #' @noRd

@@ -785,6 +785,7 @@ print.reliability <- function(x, digits = 3, ...) {
     .print_reliability_compact(x, x$n_items, weighted_tag, digits)
   }
 
+  print_summary_hint()
   invisible(x)
 }
 

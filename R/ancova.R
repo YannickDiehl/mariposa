@@ -794,6 +794,7 @@ print.ancova <- function(x, digits = 3, ...) {
                   fmt_int(fit$call_info$n_total)))
       .print_effect_lines(fit$anova_table, digits, covariates = info$covariates)
     })
+    print_summary_hint()
     return(invisible(x))
   }
 
@@ -803,6 +804,7 @@ print.ancova <- function(x, digits = 3, ...) {
               fmt_int(info$n_total)))
   .print_effect_lines(x$anova_table, digits, covariates = info$covariates)
 
+  print_summary_hint()
   invisible(x)
 }
 

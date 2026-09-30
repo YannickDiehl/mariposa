@@ -237,6 +237,38 @@ test_that("EDGE-23: grouped normality_test() compact print shows the results", {
   expect_false(any(grepl("group combination", out, fixed = TRUE)))
 })
 
+test_that("EDGE-23: every compact test/model print points to summary()", {
+  # Only about half of the compact prints (rank tests, chi-square family,
+  # Levene, normality, partial_cor) ended with the summary() hint; t-test,
+  # ANOVAs, correlations, regressions, reliability and efa did not.
+  d <- survey_data
+  d$hi <- as.integer(d$life_satisfaction >= 4)
+  g <- dplyr::group_by(d, region)
+  objs <- list(
+    t_test(d, age, group = gender),
+    oneway_anova(d, age, group = education),
+    factorial_anova(d, dv = age, between = c(gender, region)),
+    ancova(d, dv = life_satisfaction, between = gender, covariate = age),
+    pearson_cor(d, age, income),
+    spearman_rho(d, age, income, life_satisfaction),
+    kendall_tau(d, age, life_satisfaction),
+    linear_regression(d, life_satisfaction ~ age),
+    logistic_regression(d, hi ~ age),
+    reliability(d, trust_government, trust_media, trust_science),
+    efa(d, trust_government, trust_media, trust_science, life_satisfaction),
+    t_test(g, age, group = gender),
+    linear_regression(g, life_satisfaction ~ age)
+  )
+  for (o in objs) {
+    out <- capture.output(print(o))
+    expect_identical(sum(grepl("Use summary() for detailed output.", out,
+                               fixed = TRUE)), 1L,
+                     info = class(o)[1])
+    expect_identical(out[length(out)], "Use summary() for detailed output.",
+                     info = class(o)[1])
+  }
+})
+
 # --- EDGE-23: one group-header style, no trailing blanks in headers -----------
 
 test_that("EDGE-23: verbose group headers share one style without a trailing blank", {

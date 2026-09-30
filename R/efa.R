@@ -1571,6 +1571,7 @@ print.efa <- function(x, digits = 3, ...) {
                        weighted_tag, digits)
   }
 
+  print_summary_hint()
   invisible(x)
 }
 
