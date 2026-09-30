@@ -1428,6 +1428,9 @@ but were never asserted. These are now fixed and asserted:
   correlation matrices, rotation sums, iteration counts); the ML initial
   communalities of all 6 ML reference runs; `ancova()` Levene tests of the
   6 unweighted reference runs.
+* The Display-tier p-value tolerance of `assert_spss()` is one unit of the
+  last printed decimal. A relative 1% was added on top, which let a p of
+  .975 drift by ten units; every reference p matches at the tighter bound.
 * `vignette("spss-compatibility")` is regenerated: it lists EXC-001/EXC-002
   with their reason (it still said "No active Tier-3 exceptions") and the
   updated assertion counts of `ancova()`, `crosstab()`, `describe()`,

@@ -238,11 +238,11 @@ assertion. NA-as-match is forbidden by Charter §8.",
   # the underlying agreement is <0.0003. To absorb this purely-rounding
   # disagreement at the boundary, we accept up to one full unit of the
   # last decimal for p-values at Display tier (instead of the strict
-  # half-unit), bounded by the relative_p (default 1%).
+  # half-unit). (Until 0.7.4 a relative 1% was added on top, which let a
+  # p of .975 drift by .00975 - ten units; no reference needs it.)
   if (tier == "display" && identical(what, "p_value")) {
     full_unit <- 10^(-precision)
-    rel_tol   <- max(abs(expected), 1e-4) * relative_p
-    abs_tol   <- max(abs_tol, full_unit, rel_tol)
+    abs_tol   <- max(abs_tol, full_unit)
   }
 
   diff <- abs(actual - expected)
