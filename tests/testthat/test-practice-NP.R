@@ -716,6 +716,34 @@ test_that("NP-19 dunn_test summary does not wrap long labels", {
   }
 })
 
+test_that("EDGE-13 mann_whitney names the group count, not a KW hint, for 1 group", {
+  # Was: "Found 1 group ... For >2 groups, use a Kruskal-Wallis test" when
+  # a split had only one group left.
+  d <- dplyr::filter(survey_data, !(region == "East" & gender == "Male"))
+  w <- character()
+  withCallingHandlers(
+    mann_whitney(dplyr::group_by(d, region), life_satisfaction, group = gender),
+    warning = function(cnd) {
+      w <<- c(w, conditionMessage(cnd))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_true(any(grepl("East", w)))
+  expect_true(any(grepl("1 group", w)))
+  expect_false(any(grepl("Kruskal", w)))
+})
+
+test_that("EDGE-13/NP-13 pairwise_wilcoxon: tied pair Z = 0, warnings name the group", {
+  # Was: an all-tied pair returned NA silently; failures were reported
+  # without the group.
+  d <- dplyr::mutate(survey_data, tg2 = trust_government)
+  pw <- pairwise_wilcoxon(friedman_test(d, trust_government, tg2, trust_media))
+  tied <- pw$comparisons[pw$comparisons$var1 == "trust_government" &
+                           pw$comparisons$var2 == "tg2", ]
+  expect_equal(tied$z, 0)
+  expect_equal(tied$p, 1)
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

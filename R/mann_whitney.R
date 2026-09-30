@@ -229,10 +229,10 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
     g_levels <- levels(droplevels(g))
     
     if (length(g_levels) != 2) {
+      n_g <- length(g_levels)
       cli_abort(c(
-        "Mann-Whitney test requires exactly 2 groups.",
-        "x" = "Found {length(g_levels)} group{?s} in variable {.var {group_name}}.",
-        "i" = "For >2 groups, use a Kruskal-Wallis test instead."
+        "{.var {group_name}} has {n_g} group{?s} with valid values; the Mann-Whitney test needs exactly 2.",
+        "i" = if (n_g > 2) "For more than 2 groups, use {.fn kruskal_wallis}."
       ))
     }
     

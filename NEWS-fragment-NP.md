@@ -154,3 +154,8 @@
   characters with long group labels, and a group or variable that
   `dunn_test()` cannot compare is reported with a warning naming the
   group.
+* Skipped groups are reported consistently: `mann_whitney()` says how
+  many groups with valid values a split has ("gender has 1 group ...")
+  instead of suggesting a Kruskal-Wallis test, and `pairwise_wilcoxon()`
+  names the group in its warnings; a pair whose values are all tied gets
+  Z = 0, p = 1 (as `wilcoxon_test()` and SPSS) instead of a silent `NA`.

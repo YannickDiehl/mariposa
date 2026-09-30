@@ -195,8 +195,12 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
     d_no_ties <- d[!tie_idx]
     n_ranked <- length(d_no_ties)
 
+    if (n_pair == 0) {
+      cli_abort("no valid pairs")
+    }
     if (n_ranked == 0) {
-      return(list(z = NA_real_, p = NA_real_, n = n_pair))
+      # every pair tied: no difference (SPSS: Z = 0, p = 1)
+      return(list(z = 0, p = 1, n = n_pair))
     }
 
     if (is.null(weight_name)) {
@@ -284,7 +288,11 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
             stringsAsFactors = FALSE
           )
         }, error = function(e) {
-          cli_warn("Pairwise Wilcoxon failed for {.var {vars[v1]}} vs {.var {vars[v2]}}: {e$message}")
+          where <- .np_where(group_info)
+          cli_warn(c(
+            "Pairwise Wilcoxon test skipped for {.var {vars[v1]}} vs {.var {vars[v2]}}{where}.",
+            "x" = "{(.np_error_reason(e))}."
+          ))
         })
       }
 
@@ -325,7 +333,10 @@ pairwise_wilcoxon.friedman_test <- function(x, p_adjust = "bonferroni", ...) {
           stringsAsFactors = FALSE
         )
       }, error = function(e) {
-        cli_warn("Pairwise Wilcoxon failed for {.var {vars[v1]}} vs {.var {vars[v2]}}: {e$message}")
+        cli_warn(c(
+          "Pairwise Wilcoxon test skipped for {.var {vars[v1]}} vs {.var {vars[v2]}}.",
+          "x" = "{(.np_error_reason(e))}."
+        ))
       })
     }
 
