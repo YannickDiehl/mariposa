@@ -403,3 +403,25 @@ test_that("SCALE-18: too few cases name the group and the empty item", {
   expect_true(any(grepl("region = East", cnd$msgs, fixed = TRUE)))
   expect_true(any(grepl("region = West", cnd$msgs, fixed = TRUE)))
 })
+
+# --- SCALE-05: Heywood cases in the omega model ---------------------------------
+
+test_that("SCALE-05: omega from a Heywood solution is not reported", {
+  # East: alpha 0.037 next to omega 0.349 from a one-factor solution whose
+  # uniqueness sat at factanal's lower bound (0.005) - without a word.
+  g <- group_by(survey_data, region)
+  cnd <- conditions_of(reliability(g, trust_government, trust_media,
+                                   trust_science))
+  r <- cnd$result
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "Heywood", fixed = TRUE)
+  expect_match(cnd$msgs, "region = East", fixed = TRUE)
+  east <- r$groups[[1]]
+  west <- r$groups[[2]]
+  expect_true(is.na(east$omega))
+  expect_true(is.finite(east$alpha))
+  expect_true(is.finite(west$omega))
+  expect_match(east$omega_note, "Heywood", fixed = TRUE)
+  out <- capture.output(print(r))
+  expect_false(any(grepl("0.349", out, fixed = TRUE)))
+})

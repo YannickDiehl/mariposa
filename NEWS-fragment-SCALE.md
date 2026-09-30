@@ -67,3 +67,8 @@
   3 items" warning appears once per call instead of once per group, and
   "Insufficient data (n = 0)" now names the group and the items without
   valid values.
+* `reliability()` no longer reports McDonald's omega from a Heywood
+  solution. For the trust items in the East region the one-factor model
+  put one uniqueness at its lower bound (loading of about 1), and omega
+  0.349 was printed next to alpha 0.037 without comment. Omega is now
+  `NA` in such cases, with a warning that names the item and the group.

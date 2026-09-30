@@ -78,7 +78,13 @@
 #' A one-factor model needs at least 3 items to be identified: with fewer
 #' than 3 items the omega fields are \code{NA} (alpha is still computed),
 #' and Omega if Item Deleted is \code{NA} whenever the reduced scale would
-#' fall below 3 items.
+#' fall below 3 items. Omega is also \code{NA}, with a warning, when the
+#' items' correlation matrix is singular or the one-factor solution is a
+#' Heywood case (an item's uniqueness at the lower bound, i.e. a loading
+#' of about 1: the "factor" is then that single item, not the scale).
+#'
+#' Items with zero variance are removed from the scale with a warning, as
+#' SPSS RELIABILITY does (\code{$removed_items}).
 #'
 #' ## Weighted variants and validation status
 #'
@@ -401,6 +407,14 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
           stats::setNames(esc(pd$reasons), rep("i", length(pd$reasons))),
           "i" = "Cronbach's alpha is unaffected."
         ))
+      } else if (identical(om$error, "heywood")) {
+        heywood_items <- om$items
+        omega_note <- "Heywood case in the one-factor model"
+        cli_warn(c(
+          "McDonald's omega is not computed{in_group}: the one-factor solution is a Heywood case.",
+          "i" = "{.var {heywood_items}} {cli::qty(length(heywood_items))}ha{?s/ve} a uniqueness at the lower bound (a loading of about 1), so the factor reflects {?this item/these items} rather than the scale.",
+          "i" = "This usually means the items share little common variance; Cronbach's alpha is unaffected."
+        ))
       } else {
         omega_note <- "the one-factor model could not be fitted"
         cli_warn(c(
@@ -587,6 +601,16 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   # Correlation metric: loadings lambda_i, uniquenesses theta_i
   lambda <- as.numeric(fit$loadings)
   theta  <- as.numeric(fit$uniquenesses)
+
+  # Heywood case: a uniqueness stuck at factanal's lower bound (0.005)
+  # means the "factor" is essentially that single item (loading ~ 1). Omega
+  # from such a boundary solution is not a reliability estimate (e.g.
+  # alpha 0.037 next to omega 0.349), so it is not reported.
+  at_bound <- theta <= 0.005 + 1e-4
+  if (any(at_bound)) {
+    return(list(omega = NA_real_, omega_std = NA_real_, error = "heywood",
+                items = rownames(cor_mat)[at_bound]))
+  }
 
   # Standardized omega: (sum lambda)^2 / ((sum lambda)^2 + sum theta)
   omega_std <- sum(lambda)^2 / (sum(lambda)^2 + sum(theta))
