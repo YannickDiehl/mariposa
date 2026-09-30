@@ -694,3 +694,30 @@ test_that("IO-26: write_xlsx() reports a missing directory", {
   expect_error(write_xlsx(frequency(survey_data, gender), bad),
                "does not exist")
 })
+
+# IO-11: write_xlsx(grouped frequency) wrote one header (first group only),
+# no group labels, and summed the groups' rows (Total Raw % = 200); the
+# weighted header showed raw floats ("N=5245.99999999998").
+test_that("IO-11: write_xlsx() writes one block per group, rounded N", {
+  skip_if_not_installed("openxlsx2")
+  tf <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(tf))
+  f <- survey_data %>% dplyr::group_by(region) %>% frequency(gender)
+  write_xlsx(f, tf)
+  cells <- openxlsx2::wb_to_df(openxlsx2::wb_load(tf), col_names = FALSE)
+  txt <- as.character(unlist(cells))
+  expect_true(any(grepl("region = East", txt, fixed = TRUE)))
+  expect_true(any(grepl("region = West", txt, fixed = TRUE)))
+  expect_equal(sum(grepl("^N=", txt)), 2L)
+  # every Total row reports 100 %, never 200
+  total_rows <- which(cells[[1]] == "Total")
+  raw_pct <- suppressWarnings(as.numeric(cells[[4]][total_rows]))
+  expect_true(all(raw_pct == 100))
+
+  fw <- frequency(survey_data, gender, weights = sampling_weight)
+  write_xlsx(fw, tf)
+  txt_w <- as.character(unlist(openxlsx2::wb_to_df(openxlsx2::wb_load(tf),
+                                                   col_names = FALSE)))
+  n_line <- grep("^N=", txt_w, value = TRUE)
+  expect_match(n_line, "^N=2516 ")
+})

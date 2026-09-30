@@ -332,42 +332,81 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
   ncols <- length(col_headers)
   cur_row <- 1L
 
-  for (v_idx in seq_along(vars)) {
-    var_name <- vars[v_idx]
-    var_results <- results[results$Variable == var_name, , drop = FALSE]
-    var_stats   <- stats_df[stats_df$Variable == var_name, , drop = FALSE]
-    var_label   <- if (!is.null(labels) && var_name %in% names(labels)) {
+  # One block per variable and (for grouped results) per group: all groups
+  # used to be written as a single block under the first group's header,
+  # with their rows summed (Total Raw % = 200) and no group labels.
+  group_vars <- if (isTRUE(freq_obj$is_grouped)) {
+    intersect(freq_obj$groups, names(results))
+  } else {
+    character(0)
+  }
+  groups <- if (length(group_vars) > 0L) {
+    unique(results[group_vars])
+  } else {
+    NULL
+  }
+  n_groups <- if (is.null(groups)) 1L else nrow(groups)
+
+  blocks <- list()
+  for (var_name in vars) {
+    for (g in seq_len(n_groups)) {
+      var_results <- results[results$Variable == var_name, , drop = FALSE]
+      var_stats   <- stats_df[stats_df$Variable == var_name, , drop = FALSE]
+      group_text  <- NULL
+      if (!is.null(groups)) {
+        gv <- groups[g, , drop = FALSE]
+        for (gn in group_vars) {
+          var_results <- var_results[.group_match(var_results[[gn]], gv[[gn]]), ,
+                                     drop = FALSE]
+          if (gn %in% names(var_stats)) {
+            var_stats <- var_stats[.group_match(var_stats[[gn]], gv[[gn]]), ,
+                                   drop = FALSE]
+          }
+        }
+        group_text <- .format_group_label(gv)
+      }
+      if (nrow(var_results) == 0L) next
+      blocks[[length(blocks) + 1L]] <- list(var = var_name, results = var_results,
+                                            stats = var_stats, group = group_text)
+    }
+  }
+
+  for (b_idx in seq_along(blocks)) {
+    blk <- blocks[[b_idx]]
+    var_name <- blk$var
+    var_label <- if (!is.null(labels) && var_name %in% names(labels)) {
       labels[var_name]
     } else {
       ""
     }
 
-    # --- Row 1: Variable header (merged, dark background) ---
-    header_text <- if (nzchar(var_label)) {
+    # --- Row 1: Variable header (merged, bold), with the group ---
+    header_text <- if (!is.na(var_label) && nzchar(var_label)) {
       paste0(var_name, " (", var_label, ")")
     } else {
       var_name
     }
+    if (!is.null(blk$group)) header_text <- paste0(header_text, " — ", blk$group)
     .freq_write_variable_header(wb, sheet, cur_row, ncols, header_text)
     cur_row <- cur_row + 1L
 
-    # --- Row 2: Stats summary (gray background, italic) ---
-    if (nrow(var_stats) > 0L) {
-      .freq_write_stats_row(wb, sheet, cur_row, ncols, var_stats)
+    # --- Row 2: Stats summary (gray text) ---
+    if (nrow(blk$stats) > 0L) {
+      .freq_write_stats_row(wb, sheet, cur_row, ncols, blk$stats)
       cur_row <- cur_row + 1L
     }
 
-    # --- Row 3: Column headers (medium gray background) ---
+    # --- Row 3: Column headers ---
     .freq_write_col_headers(wb, sheet, cur_row, col_headers)
     cur_row <- cur_row + 1L
 
     # --- Data rows + summary rows ---
     cur_row <- .freq_write_data_rows(
-      wb, sheet, cur_row, var_results, col_headers, opts
+      wb, sheet, cur_row, blk$results, col_headers, opts
     )
 
-    # 3 blank rows between variables (except after the last one)
-    if (v_idx < length(vars)) {
+    # 3 blank rows between blocks (except after the last one)
+    if (b_idx < length(blocks)) {
       cur_row <- cur_row + 3L
     }
   }
@@ -398,9 +437,12 @@ write_xlsx.frequency <- function(x, file, overwrite = TRUE, ...) {
 #' Write the stats summary row (gray text)
 #' @noRd
 .freq_write_stats_row <- function(wb, sheet, row, ncols, var_stats) {
-  parts <- c(paste0("N=", var_stats$total_n[1]))
+  # Counts rounded like the console print (%.0f): weighted N used to show
+  # floating-point noise ("N=5245.99999999998")
+  parts <- c(paste0("N=", format(round(var_stats$total_n[1]), big.mark = "")))
   if ("valid_n" %in% names(var_stats)) {
-    parts <- c(parts, paste0("Valid N=", var_stats$valid_n[1]))
+    parts <- c(parts, paste0("Valid N=",
+                             format(round(var_stats$valid_n[1]), big.mark = "")))
   }
   if ("mean" %in% names(var_stats) && !is.na(var_stats$mean[1])) {
     parts <- c(parts, paste0("Mean=", round(var_stats$mean[1], 2)))

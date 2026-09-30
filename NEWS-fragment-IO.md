@@ -153,3 +153,9 @@
   characters, or an element called "Labels", crashed without writing a
   file); renamed sheets are listed in one message. A missing output
   directory is reported clearly, as in `codebook(file = )`.
+* `write_xlsx()` of a grouped `frequency()` result writes one block per
+  group, headed by the variable and the group ("gender (Gender) - region =
+  East") with its own N line. All groups were written as one block under
+  the first group's header, without group labels, and the Total row summed
+  the groups (Raw % = 200). Weighted N is rounded like the console print
+  ("N=2516", was "N=5245.99999999998").
