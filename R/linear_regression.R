@@ -228,10 +228,10 @@ linear_regression <- function(data, formula = NULL,
   user_call <- match.call()
 
   # Process weights (a column name or an expression such as w * 2)
-  wi <- .regression_weights(data, rlang::enquo(weights))
+  wi <- .process_weights(data, rlang::enquo(weights))
   data <- wi$data
   weight_name <- wi$name
-  weights_vec <- wi$vec
+  weights_vec <- wi$vector
   has_weights <- !is.null(weight_name)
 
   # Build and validate the formula (both interfaces)
@@ -1790,61 +1790,6 @@ df.residual.linear_regression <- function(object, ...) {
 .bt_name <- function(x) {
   ifelse(make.names(x) == x, x,
          paste0("`", gsub("`", "\\\\`", x), "`"))
-}
-
-#' Resolve the weights argument of the regression functions
-#'
-#' A bare column name (or string) is looked up in the data; any other
-#' expression (sampling_weight * 2, survey_data$w) is evaluated with the
-#' data as mask and stored as a column named by its text, so grouped fits
-#' and the printed "Weights" line keep working - rlang::as_name() used to
-#' abort with "Can't convert a call to a string".
-#'
-#' @return list(data, name, vec); name/vec NULL when unweighted
-#' @noRd
-.regression_weights <- function(data, weights_quo, call = rlang::caller_env()) {
-  if (rlang::quo_is_null(weights_quo)) {
-    return(list(data = data, name = NULL, vec = NULL))
-  }
-  expr <- rlang::quo_get_expr(weights_quo)
-  if (rlang::is_symbol(expr) || rlang::is_string(expr)) {
-    name <- rlang::as_name(weights_quo)
-    if (!name %in% names(data)) {
-      cli_abort("Weight variable {.var {name}} not found in data.", call = call)
-    }
-    vec <- data[[name]]
-  } else if (rlang::is_call(expr, c("all_of", "any_of"))) {
-    pos <- tidyselect::eval_select(weights_quo, data)
-    if (length(pos) != 1) {
-      cli_abort("{.arg weights} must select exactly one variable.", call = call)
-    }
-    name <- names(pos)
-    vec <- data[[name]]
-  } else {
-    name <- paste(trimws(deparse(expr, width.cutoff = 500L)), collapse = " ")
-    vec <- tryCatch(
-      rlang::eval_tidy(weights_quo, data),
-      error = function(e) {
-        cli_abort(c(
-          "Could not evaluate {.arg weights} = {.code {name}}.",
-          x = "{conditionMessage(e)}"
-        ), call = call)
-      }
-    )
-    if (length(vec) == 1L) vec <- rep(vec, nrow(data))
-    if (length(vec) != nrow(data)) {
-      cli_abort(
-        "{.arg weights} = {.code {name}} gives {length(vec)} value{?s}, but the data have {nrow(data)} rows.",
-        call = call
-      )
-    }
-  }
-  # Bare numbers in the vector AND the column (grouped fits re-read it):
-  # SPSS weights with NA fail every comparison (see .plain_numeric)
-  vec <- .plain_numeric(vec)
-  .check_weights(vec, name, call = call)
-  data[[name]] <- vec
-  list(data = data, name = name, vec = vec)
 }
 
 #' Build and validate the model formula of the regression functions

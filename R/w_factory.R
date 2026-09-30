@@ -80,10 +80,14 @@
     .check_dots_unused(..., call = call)
     x <- data
     weights_vec <- if (rlang::quo_is_null(weights_quo)) NULL else rlang::eval_tidy(weights_quo)
-    if (!is.null(weights_vec)) weights_vec <- .plain_numeric(weights_vec)
-
-    weighted <- .are_weights(weights_vec)
-    if (weighted) .check_weights(weights_vec)
+    weighted <- !is.null(weights_vec)
+    if (weighted) {
+      # Type check before stripping: a factor must not pass as its codes,
+      # a character vector must not fall back to unweighted
+      .check_weights(weights_vec, call = call)
+      weights_vec <- .plain_numeric(weights_vec)
+      if (length(weights_vec) == 1L) weights_vec <- rep(weights_vec, length(x))
+    }
     if (weighted && length(weights_vec) != length(x)) {
       cli_abort(c(
         "{.arg weights} and the data must have the same length.",
@@ -140,20 +144,13 @@
     ), call = call)
   }
 
-  if (rlang::quo_is_null(weights_quo)) {
-    weights_vec <- NULL
-    weights_name <- NULL
-  } else {
-    weights_name <- rlang::as_name(weights_quo)
-    if (!weights_name %in% names(data)) {
-      cli_abort("Weights variable {.var {weights_name}} not found in data.")
-    }
-    # Bare numbers in the vector AND the column (the grouped path re-reads
-    # it): SPSS weights with NA fail every comparison (see .plain_numeric)
-    weights_vec <- .plain_numeric(data[[weights_name]])
-    data[[weights_name]] <- weights_vec
-    .check_weights(weights_vec, weights_name)
-  }
+  # The package-wide weights entry (column, string, all_of(), expression;
+  # bare numbers in the vector AND the column, which the grouped path
+  # re-reads)
+  weights_info <- .process_weights(data, weights_quo, call = call)
+  data <- weights_info$data
+  weights_vec <- weights_info$vector
+  weights_name <- weights_info$name
 
   is_grouped <- inherits(data, "grouped_df")
 

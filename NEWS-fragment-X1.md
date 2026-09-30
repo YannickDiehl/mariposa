@@ -25,3 +25,18 @@
   abbreviated names such as `weight =` or `percent =`: the same typo now
   gives the same error everywhere. `fisher_test()` and `mcnemar_test()` no
   longer ignore unknown arguments.
+* `weights` accepts the same forms in every function: a bare column name,
+  a column name as string (`"sampling_weight"`, `all_of(w)`, `!!w`), an
+  expression evaluated in the data (`sampling_weight * 2`,
+  `survey_data$sampling_weight`), or a numeric vector with one value per
+  row. Outside the regressions only the bare column name worked:
+  `weights = survey_data$sampling_weight` and `weights = all_of(w)` failed
+  with "Can't convert a call to a string.", `weights = 1` with "Can't
+  convert a double vector to a string". An expression is shown by its text
+  ("Weights: sampling_weight * 2"). `weights = w` with `w` holding a column
+  name now points to `all_of(w)`; a vector of the wrong length or an
+  unknown variable inside an expression is named in the error. The `w_*`
+  functions no longer accept a factor as weights (its level codes were used
+  silently), and in `summarise()` a non-numeric `weights` is an error
+  instead of a silent unweighted result. `std()` and `center()` return the
+  weights column unchanged (it lost its attributes).

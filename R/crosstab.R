@@ -318,7 +318,12 @@ crosstab.grouped_df <- function(data, row, col,
 
   row_var <- rlang::as_name(row_quo)
   col_var <- rlang::as_name(col_quo)
-  weights_var <- if (!rlang::quo_is_null(weights_quo)) rlang::as_name(weights_quo) else NULL
+  # Weights resolved once on the whole data (an expression such as
+  # data$w must not be re-evaluated per group); the groups get the column
+  weights_info <- .process_weights(data, weights_quo)
+  data <- weights_info$data
+  weights_var <- weights_info$name
+  if (!is.null(weights_var)) weights_quo <- rlang::quo(!!weights_var)
 
   # Split data by groups
   data_list <- dplyr::group_split(data)

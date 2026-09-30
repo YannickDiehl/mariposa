@@ -147,28 +147,58 @@ NULL
 
 #' Process weights parameter
 #' @description
-#' Central function for processing the weights parameter in statistical functions.
-#' Handles both NULL weights (unweighted) and specified weights with validation.
+#' Central function for processing the weights parameter in statistical
+#' functions (the single weights entry point of the package). Accepted forms:
+#' - a bare column name: `weights = sampling_weight`
+#' - a column name as string: `weights = "sampling_weight"`,
+#'   `weights = all_of(w)`, `weights = !!w`
+#' - an expression evaluated with the data as mask:
+#'   `weights = sampling_weight * 2`, `weights = survey_data$sampling_weight`,
+#'   or a numeric vector from the environment (`weights = wts`); it must give
+#'   one value per row (a single number is recycled). Its text is the
+#'   display name, and the values are stored in `data` under that name so
+#'   grouped code paths can re-read them.
+#' A bare name that is not a column but holds a column name (`w <- "wt"`;
+#' `weights = w`) is refused with a pointer to all_of().
 #'
 #' @param data A data frame
 #' @param weights_quo Quoted expression for weights (from rlang::enquo)
-#' @return List with vector (numeric vector or NULL) and name (character or NULL)
+#' @return List with vector (bare numeric vector or NULL), name (character
+#'   or NULL) and data (the data with the stripped weights column)
 #' @noRd
 .process_weights <- function(data, weights_quo, call = rlang::caller_env()) {
   if (rlang::quo_is_null(weights_quo)) {
     return(list(vector = NULL, name = NULL, data = data))
   }
 
-  weights_name <- rlang::as_name(weights_quo)
-
-  if (!weights_name %in% names(data)) {
-    cli_abort("Weights variable {.var {weights_name}} not found in data.", call = call)
+  expr <- rlang::quo_get_expr(weights_quo)
+  if (rlang::is_string(expr) ||
+      (rlang::is_symbol(expr) && rlang::as_string(expr) %in% names(data))) {
+    weights_name <- rlang::as_string(expr)
+    if (!weights_name %in% names(data)) {
+      cli_abort("Weights variable {.var {weights_name}} not found in data.", call = call)
+    }
+    weights_vec <- data[[weights_name]]
+  } else if (rlang::is_call(expr, c("all_of", "any_of"))) {
+    pos <- tidyselect::eval_select(weights_quo, data)
+    if (length(pos) != 1) {
+      cli_abort(c(
+        "{.arg weights} must select exactly one variable.",
+        "x" = "It selects {length(pos)}."
+      ), call = call)
+    }
+    weights_name <- names(pos)
+    weights_vec <- data[[weights_name]]
+  } else {
+    weights_name <- paste(trimws(deparse(expr, width.cutoff = 500L)), collapse = " ")
+    weights_vec <- .eval_weights_expr(data, weights_quo, weights_name, call)
   }
 
-  weights_vec <- data[[weights_name]]
-
   if (!is.numeric(weights_vec)) {
-    cli_abort("Weights variable {.var {weights_name}} must be numeric.", call = call)
+    cli_abort(
+      "Weights variable {.var {weights_name}} must be numeric, not {.cls {class(weights_vec)[1]}}.",
+      call = call
+    )
   }
 
   # Downstream code works on bare numbers: an SPSS weight
@@ -357,6 +387,58 @@ get_value_labels <- function(x, freq_names) {
 
 # Entry helpers (argument and input handling)
 # -------------------------------------------
+
+#' Evaluate a weights expression with the data as mask
+#'
+#' Used by .process_weights() for everything that is not a column name:
+#' `sampling_weight * 2`, `survey_data$sampling_weight`, a numeric vector
+#' from the environment. A single number is recycled to all rows; any other
+#' length than nrow(data) is an error.
+#'
+#' @return The weights vector (not yet checked for type)
+#' @noRd
+.eval_weights_expr <- function(data, weights_quo, name, call) {
+  expr <- rlang::quo_get_expr(weights_quo)
+  env <- rlang::quo_get_env(weights_quo)
+  not_found <- function() {
+    cli_abort("Weights variable {.var {name}} not found in data.", call = call)
+  }
+  vec <- tryCatch(
+    rlang::eval_tidy(weights_quo, data),
+    error = function(e) {
+      if (rlang::is_symbol(expr)) not_found()
+      unknown <- setdiff(all.vars(expr), names(data))
+      unknown <- unknown[!vapply(unknown, exists, logical(1), envir = env)]
+      cli_abort(c(
+        "Could not evaluate {.arg weights} = {.code {name}}.",
+        "x" = if (length(unknown) > 0) {
+          "{.var {unknown}} {?is/are} neither a column of {.arg data} nor an object."
+        } else {
+          conditionMessage(e)
+        }
+      ), call = call)
+    }
+  )
+  if (rlang::is_symbol(expr)) {
+    # A bare name that is no column: fine if it holds the weights themselves;
+    # a column name in a variable needs all_of() (tidyselect convention)
+    if (is.character(vec) && length(vec) == 1 && vec %in% names(data)) {
+      cli_abort(c(
+        "Weights variable {.var {name}} not found in data.",
+        "i" = "{.var {name}} holds the column name {.val {vec}}: use {.code weights = all_of({name})}."
+      ), call = call)
+    }
+    if (!is.atomic(vec) || is.null(vec)) not_found()
+  }
+  if (length(vec) == 1L && nrow(data) != 1L) vec <- rep(vec, nrow(data))
+  if (length(vec) != nrow(data)) {
+    cli_abort(c(
+      "{.arg weights} = {.code {name}} must give one value per row.",
+      "x" = "It gives {length(vec)} value{?s}; the data have {nrow(data)} row{?s}."
+    ), call = call)
+  }
+  vec
+}
 
 #' Drop grouping variables from a variable selection
 #'

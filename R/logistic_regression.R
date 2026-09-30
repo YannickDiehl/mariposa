@@ -219,10 +219,10 @@ logistic_regression <- function(data, formula = NULL,
   user_call <- match.call()
 
   # Process weights (a column name or an expression such as w * 2)
-  wi <- .regression_weights(data, rlang::enquo(weights))
+  wi <- .process_weights(data, rlang::enquo(weights))
   data <- wi$data
   weight_name <- wi$name
-  weights_vec <- wi$vec
+  weights_vec <- wi$vector
   has_weights <- !is.null(weight_name)
 
   # Build and validate the formula (both interfaces). The outcome must be a
