@@ -40,6 +40,7 @@
 #   Mann-Whitney U   — Display(3) (printed as XXX.000)
 #   Z           — Display(3)
 #   p-value     — Display(3), boundary-rounding guard via what = "p_value"
+#   Order       — exact: Ranks table rows (Male, Female), splits (East, West)
 #
 # Phase 1 source audit (R/mann_whitney.R):
 #   Grep for round(sum(w)): no matches. The function uses sum(w) unrounded
@@ -145,6 +146,14 @@ spss_values <- list(
   )
 )
 
+# Row order of every SPSS Ranks table: the grouping codes ascending, Male
+# before Female (mann_whitney_output.txt:28-29, 68-69, 108-109, 268-272,
+# 315-319, 362-366); split files East before West (268, 271; 315, 318; 362,
+# 365). mariposa's group_stats (group1, group2) and grouped result rows
+# must follow the same order, since print()/summary() list them that way.
+spss_group_order <- c("Male", "Female")
+spss_split_order <- c("East", "West")
+
 
 # =============================================================================
 # COMPARISON HELPER
@@ -179,7 +188,11 @@ compare_mann_whitney <- function(row, gs, spss, scenario) {
   g1 <- gs$group1
   g2 <- gs$group2
 
-  # Map by name to the SPSS reference (Male/Female) regardless of order
+  # Ranks table row order as SPSS prints it (Male, then Female)
+  expect_identical(c(g1$name, g2$name), spss_group_order,
+                   label = sprintf("[%s] Ranks table group order", scenario))
+
+  # Map by name to the SPSS reference (Male/Female)
   spss_by_name <- list(Male = spss$male, Female = spss$female)
   for (name in names(spss_by_name)) {
     expected <- spss_by_name[[name]]
@@ -261,7 +274,9 @@ test_that("Test 3a: Mann-Whitney life_satisfaction by gender, grouped by region 
   r <- survey_data |>
     group_by(region) |>
     mann_whitney(life_satisfaction, group = gender)
-  for (rg in c("East", "West")) {
+  expect_identical(as.character(r$results$region), spss_split_order,
+                   label = "split-file order (East, West)")
+  for (rg in spss_split_order) {
     cell <- extract_grouped_cell(r, rg)
     compare_mann_whitney(cell$row, cell$gs,
                          spss_values$test_3a_life_by_gender_grouped[[rg]],
@@ -273,7 +288,9 @@ test_that("Test 3b: Mann-Whitney income by gender, grouped by region — matches
   r <- survey_data |>
     group_by(region) |>
     mann_whitney(income, group = gender)
-  for (rg in c("East", "West")) {
+  expect_identical(as.character(r$results$region), spss_split_order,
+                   label = "split-file order (East, West)")
+  for (rg in spss_split_order) {
     cell <- extract_grouped_cell(r, rg)
     compare_mann_whitney(cell$row, cell$gs,
                          spss_values$test_3b_income_by_gender_grouped[[rg]],
@@ -285,7 +302,9 @@ test_that("Test 3c: Mann-Whitney age by gender, grouped by region — matches SP
   r <- survey_data |>
     group_by(region) |>
     mann_whitney(age, group = gender)
-  for (rg in c("East", "West")) {
+  expect_identical(as.character(r$results$region), spss_split_order,
+                   label = "split-file order (East, West)")
+  for (rg in spss_split_order) {
     cell <- extract_grouped_cell(r, rg)
     compare_mann_whitney(cell$row, cell$gs,
                          spss_values$test_3c_age_by_gender_grouped[[rg]],
