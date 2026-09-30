@@ -56,3 +56,14 @@
   the items with missing values and points to `na.rm = TRUE` (listwise
   deletion, as SPSS), and `print()`/`summary()` say "not computed (...)"
   instead of "Cronbach's Alpha = NA ()".
+* `reliability()` warnings are clearer. An item with zero variance is
+  removed from the scale with a warning naming it, as SPSS RELIABILITY
+  does; it used to stay in (alpha 0.042 instead of 0.047, standardized
+  alpha `NA`) next to the German base warnings "Standardabweichung ist
+  Null" and "NaNs wurden erzeugt". When omega cannot be computed (e.g. a
+  duplicated item makes the correlation matrix singular), the warning
+  says why in English and names the perfectly correlated items instead
+  of relaying factanal's translated error. The "omega requires at least
+  3 items" warning appears once per call instead of once per group, and
+  "Insufficient data (n = 0)" now names the group and the items without
+  valid values.

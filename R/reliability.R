@@ -174,6 +174,14 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     cli_abort("{.fn reliability} requires at least 2 items.")
   }
 
+  # Once per call (it was repeated for every group)
+  if (length(var_names) < 3) {
+    cli_warn(c(
+      "McDonald's omega requires at least 3 items; a one-factor model is not identified for k = {length(var_names)}.",
+      "i" = "Omega fields are set to NA. Cronbach's alpha is unaffected."
+    ))
+  }
+
   # Process weights
   weights_info <- .process_weights(data, rlang::enquo(weights))
   data <- weights_info$data
@@ -267,6 +275,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   }
 
   # Listwise deletion (only complete cases across all items)
+  mat_all <- mat
   complete <- stats::complete.cases(mat)
   if (!is.null(weights_vec)) {
     complete <- complete & !is.na(weights_vec)
@@ -276,11 +285,43 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   n <- nrow(mat)
 
   if (n < 2) {
-    cli_warn("Insufficient data for reliability analysis (n = {n}).")
+    empty <- var_names[colSums(!is.na(mat_all)) == 0]
+    cli_warn(c(
+      "{.fn reliability}{in_group}: only {n} complete case{?s}; the scale cannot be analysed.",
+      if (length(empty)) c("x" = "No valid values in {.var {empty}}.") else
+        c("i" = "Listwise deletion keeps only cases with valid values on every item.")
+    ))
     return(.reliability_na_result(
       k, n, sprintf("%d complete case%s", n, if (n == 1) "" else "s"),
       weighted_n = if (!is.null(weights_vec)) sum(weights_vec) else NULL
     ))
+  }
+
+  # Zero-variance items: SPSS RELIABILITY removes them from the scale with
+  # a warning. Keeping them biased alpha (k counted an item without
+  # variance), made the correlations NA and leaked base-R warnings.
+  item_var_raw <- vapply(var_names, function(v) {
+    if (is.null(weights_vec)) stats::var(mat[, v]) else .w_var(mat[, v], weights_vec)
+  }, numeric(1))
+  zero_var <- !is.na(item_var_raw) & item_var_raw <= 0
+  removed_items <- var_names[zero_var]
+  if (length(removed_items) > 0) {
+    k_before <- k
+    var_names <- var_names[!zero_var]
+    mat <- mat[, !zero_var, drop = FALSE]
+    k <- length(var_names)
+    cli_warn(c(
+      "{.fn reliability}{in_group}: {cli::qty(length(removed_items))}item{?s} with zero variance {?is/are} removed from the scale: {.var {removed_items}}.",
+      "i" = "SPSS RELIABILITY removes zero-variance items the same way.",
+      if (k >= 2 && k < 3 && k_before >= 3) c("i" = "McDonald's omega needs at least 3 items and is not computed.")
+    ))
+    if (k < 2) {
+      res <- .reliability_na_result(
+        k, n, "fewer than 2 items with non-zero variance",
+        weighted_n = if (!is.null(weights_vec)) sum(weights_vec) else NULL)
+      res$removed_items <- removed_items
+      return(res)
+    }
   }
 
   # ============================================================================
@@ -293,7 +334,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     w_n <- sum(weights_vec)
   } else {
     cov_mat <- stats::cov(mat)
-    cor_mat <- stats::cor(mat)
+    cor_mat <- .efa_cor_quiet(mat)
     w_n <- n
   }
 
@@ -337,21 +378,36 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
   # statistic is Tier 4 / Internal per the Validation Charter (§4).
   # References: McDonald (1999); Hayes & Coutts (2020).
 
+  omega_note <- NULL
   if (k < 3) {
-    cli_warn(c(
-      "McDonald's omega requires at least 3 items; a one-factor model is not identified for k = {k}.",
-      "i" = "Omega fields are set to NA. Cronbach's alpha is unaffected."
-    ))
+    # (warned once per call in reliability(), not once per group)
     omega <- NA_real_
     omega_std <- NA_real_
     omega_if_deleted <- rep(NA_real_, k)
+    omega_note <- "requires at least 3 items"
   } else {
-    om <- .omega_one_factor(cor_mat, cov_mat, w_n)
+    pd <- .efa_pd_check(cor_mat, var_names, n)
+    om <- if (pd$pd) {
+      .omega_one_factor(cor_mat, cov_mat, w_n)
+    } else {
+      list(omega = NA_real_, omega_std = NA_real_, error = "singular")
+    }
     if (!is.null(om$error)) {
-      cli_warn(c(
-        "The one-factor model for McDonald's omega could not be fitted; omega is set to NA.",
-        "i" = "factanal reported: {om$error}"
-      ))
+      esc <- function(s) gsub("}", "}}", gsub("{", "{{", s, fixed = TRUE), fixed = TRUE)
+      if (identical(om$error, "singular")) {
+        omega_note <- "the items' correlation matrix is singular"
+        cli_warn(c(
+          "McDonald's omega is not computed{in_group}: the items' correlation matrix is singular.",
+          stats::setNames(esc(pd$reasons), rep("i", length(pd$reasons))),
+          "i" = "Cronbach's alpha is unaffected."
+        ))
+      } else {
+        omega_note <- "the one-factor model could not be fitted"
+        cli_warn(c(
+          "McDonald's omega is not computed{in_group}: the one-factor maximum-likelihood model could not be fitted.",
+          "i" = "Cronbach's alpha is unaffected."
+        ))
+      }
     }
     omega <- om$omega
     omega_std <- om$omega_std
@@ -374,7 +430,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 
   if (!is.null(weights_vec)) {
     item_means <- vapply(var_names, function(v) {
-      sum(mat[, v] * weights_vec) / sum(weights_vec)
+      .w_mean(mat[, v], weights_vec)
     }, numeric(1))
     item_sds <- sqrt(item_variances)
     item_n <- rep(w_n, k)
@@ -419,7 +475,7 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
       corrected_item_total_r[i] <- .weighted_cor_vec(mat[, i], total_remaining, weights_vec)
     } else {
       total_remaining <- rowSums(remaining_mat)
-      corrected_item_total_r[i] <- stats::cor(mat[, i], total_remaining)
+      corrected_item_total_r[i] <- .efa_cor_quiet(cbind(mat[, i], total_remaining))[1, 2]
     }
 
     # Alpha if Item Deleted
@@ -457,7 +513,9 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
     item_total = item_total,
     inter_item_cor = cor_mat,
     n = n,
-    weighted_n = if (!is.null(weights_vec)) w_n else NULL
+    weighted_n = if (!is.null(weights_vec)) w_n else NULL,
+    removed_items = if (length(removed_items)) removed_items else NULL,
+    omega_note = omega_note
   )
 }
 
@@ -505,16 +563,25 @@ reliability <- function(data, ..., weights = NULL, na.rm = TRUE) {
 #' @param cov_mat (weighted) covariance matrix of the items
 #' @param n_obs number of listwise-complete cases; for weighted analyses the
 #'   unrounded sum of weights (Charter §5.1 convention)
-#' @return list(omega, omega_std, error) — error is NULL on success
+#' @return list(omega, omega_std, error) — error is NULL on success,
+#'   "singular" for a singular correlation matrix, "no_fit" when factanal
+#'   failed. factanal's own (translated) warnings and errors are not passed
+#'   on; the caller words the warning.
 #' @noRd
 .omega_one_factor <- function(cor_mat, cov_mat, n_obs) {
+  ev <- eigen(cor_mat, symmetric = TRUE, only.values = TRUE)$values
+  if (anyNA(ev) || min(ev) <= 1e-8) {
+    return(list(omega = NA_real_, omega_std = NA_real_, error = "singular"))
+  }
   fit <- tryCatch(
-    stats::factanal(covmat = cor_mat, factors = 1, n.obs = n_obs),
+    withCallingHandlers(
+      stats::factanal(covmat = cor_mat, factors = 1, n.obs = n_obs),
+      warning = function(w) invokeRestart("muffleWarning")
+    ),
     error = function(e) e
   )
   if (inherits(fit, "error")) {
-    return(list(omega = NA_real_, omega_std = NA_real_,
-                error = conditionMessage(fit)))
+    return(list(omega = NA_real_, omega_std = NA_real_, error = "no_fit"))
   }
 
   # Correlation metric: loadings lambda_i, uniquenesses theta_i
@@ -764,6 +831,9 @@ print.summary.reliability <- function(x, ...) {
   print_info_section(list(
     "Items" = paste(x$variables, collapse = ", "),
     "N of Items" = x$n_items,
+    "Removed (zero variance)" = if (length(x$removed_items)) {
+      paste(x$removed_items, collapse = ", ")
+    },
     "Weights" = x$weights
   ))
 

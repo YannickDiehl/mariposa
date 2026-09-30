@@ -343,3 +343,63 @@ test_that("SCALE-07: na.rm = FALSE with missing values gives NA, not a crash", {
   b <- reliability(cc, trust_government, trust_media, trust_science)
   expect_equal(a$alpha, b$alpha)
 })
+
+# --- SCALE-18: reliability() warnings -------------------------------------------
+
+german <- "Standardabweichung|NaNs wurden|erzeugt|nicht-fehlendes|factanal reported|singulär|reziproke|optim"
+
+test_that("SCALE-18: a constant item is removed with a warning naming it", {
+  # alpha 0.042 included the constant item without any message, next to
+  # standardized alpha NA and German base warnings. SPSS removes
+  # zero-variance items from the scale with a warning.
+  d <- survey_data
+  d$const <- 3
+  cnd <- conditions_of(reliability(d, trust_government, trust_media,
+                                   trust_science, const))
+  r <- cnd$result
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "zero variance", fixed = TRUE)
+  expect_match(cnd$msgs, "const", fixed = TRUE)
+  expect_false(any(grepl(german, cnd$msgs)))
+  ref <- reliability(d, trust_government, trust_media, trust_science)
+  expect_equal(r$alpha, ref$alpha)
+  expect_equal(r$alpha_standardized, ref$alpha_standardized)
+  expect_equal(r$omega, ref$omega)
+  expect_equal(r$removed_items, "const")
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("zero variance", out, fixed = TRUE)))
+})
+
+test_that("SCALE-18: a singular item set gives an English omega warning", {
+  # A duplicated item leaked "System ist fuer den Rechner singulaer" and
+  # "NaNs wurden erzeugt" from factanal.
+  d <- survey_data
+  d$dup <- d$trust_government
+  cnd <- conditions_of(reliability(d, trust_government, trust_media,
+                                   trust_science, dup))
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "omega", ignore.case = TRUE)
+  expect_match(cnd$msgs, "`trust_government` and `dup`", fixed = TRUE)
+  expect_false(any(grepl(german, cnd$msgs)))
+  expect_true(is.finite(cnd$result$alpha))
+  expect_true(is.na(cnd$result$omega))
+})
+
+test_that("SCALE-18: the k = 2 omega warning appears once per call", {
+  g <- group_by(survey_data, education)
+  cnd <- conditions_of(reliability(g, trust_government, trust_media))
+  expect_length(cnd$msgs, 1)
+  expect_match(cnd$msgs, "at least 3 items", fixed = TRUE)
+})
+
+test_that("SCALE-18: too few cases name the group and the empty item", {
+  # "Insufficient data for reliability analysis (n = 0)." named neither.
+  d <- survey_data
+  d$allna <- NA_real_
+  cnd <- conditions_of(reliability(group_by(d, region), trust_government,
+                                   trust_media, allna))
+  expect_length(cnd$msgs, 2)
+  expect_true(all(grepl("allna", cnd$msgs, fixed = TRUE)))
+  expect_true(any(grepl("region = East", cnd$msgs, fixed = TRUE)))
+  expect_true(any(grepl("region = West", cnd$msgs, fixed = TRUE)))
+})
