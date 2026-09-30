@@ -77,3 +77,29 @@ test_that("DESC-14: describe() finds quantile columns by exact name", {
   expect_true(any(grepl("Q25", out2)) && any(grepl("Q75", out2)))
   expect_true(any(grepl("2700", out2)))  # SPSS Q25 of income
 })
+
+
+# --- DESC-15: show validation, quantile names, duplicate Q50, NaN -------------
+
+test_that("DESC-15: describe() validates show and prints no NaN or duplicates", {
+  # Unknown show values were silently ignored (show = "min" printed only
+  # N/Missing), probs = 1/3 gave the header "Q33.3333333333333",
+  # show = "all" printed Q50 next to the identical Median, and a constant
+  # variable showed Skewness "NaN".
+  expect_error(describe(survey_data, age, show = "min"), "min")
+  expect_error(describe(survey_data, age, show = c("mean", "sdev")), "sdev")
+
+  r <- describe(survey_data, age, show = "quantiles", probs = 1 / 3)
+  expect_true("age_Q33.33" %in% names(r$results))
+  expect_false(any(grepl("33.3333", capture.output(print(r)))))
+
+  r_all <- describe(survey_data, age, show = "all")
+  out <- capture.output(print(r_all))
+  expect_false(any(grepl("Q50", out)))
+  expect_true(any(grepl("Median", out)))
+  expect_true("age_Q50" %in% names(r_all$results))  # still in the result
+
+  rk <- describe(survey_data |> mutate(k = 5), k, show = "all")
+  expect_false(any(vapply(rk$results, function(v) any(is.nan(v)), logical(1))))
+  expect_false(any(grepl("NaN", capture.output(print(rk)))))
+})

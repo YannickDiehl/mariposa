@@ -22,8 +22,14 @@
 #'     \item \code{"short"} (default): Essential stats (mean, median, SD, range, IQR, skewness)
 #'     \item \code{"all"}: Everything including variance, kurtosis, mode, quantiles
 #'     \item Custom list: Choose specific stats like \code{c("mean", "sd", "range")}
+#'       from \code{"mean"}, \code{"median"}, \code{"sd"}, \code{"se"},
+#'       \code{"var"}, \code{"range"}, \code{"iqr"}, \code{"skew"},
+#'       \code{"kurtosis"}, \code{"mode"}, \code{"quantiles"}. Unknown names
+#'       are an error.
 #'   }
-#' @param probs For quantiles, which percentiles to show (default: 25th, 50th, 75th)
+#' @param probs For quantiles, which percentiles to show (default: 25th, 50th,
+#'   75th). The 50th percentile is the median; when the median is shown it
+#'   is not printed a second time (the result keeps both columns).
 #' @param na.rm Remove missing values before calculating? (Default: TRUE).
 #'   With \code{FALSE}, the result for a variable that contains missing
 #'   values is \code{NA} (as in base R).
@@ -107,6 +113,21 @@ describe <- function(data, ..., weights = NULL,
     cli_abort("{.arg data} must be a data frame.")
   }
   
+  # Validate show: an unknown value (e.g. "min") used to be ignored
+  # silently, leaving a table with nothing but N and Missing
+  valid_show <- c("short", "all", "mean", "median", "sd", "se", "var",
+                  "range", "iqr", "skew", "kurtosis", "mode", "quantiles")
+  if (!is.character(show) || length(show) == 0) {
+    cli_abort("{.arg show} must be a character vector of statistic names.")
+  }
+  bad_show <- setdiff(show, valid_show)
+  if (length(bad_show) > 0) {
+    cli_abort(c(
+      "Unknown {.arg show} value{?s}: {.val {bad_show}}.",
+      "i" = "Valid values: {.val {valid_show}}."
+    ))
+  }
+
   # Process show parameter - expand shortcuts to full statistic names
   if ("all" %in% show) {
     show <- c("mean", "median", "sd", "se", "range", "iqr", "skew", "kurtosis", "var", "mode", "quantiles")
@@ -251,11 +272,18 @@ describe <- function(data, ..., weights = NULL,
   # Handle quantiles - can be multiple values
   if ("quantiles" %in% show) {
     quantiles <- .w_quantile(xs, ws, probs = probs, na.rm = na.rm)
+    q_names <- .desc_quantile_name(probs)
     for (i in seq_along(probs)) {
-      prob_name <- .desc_quantile_name(probs[i])
-      stats_list[[prob_name]] <- quantiles[i]
+      stats_list[[q_names[i]]] <- unname(quantiles[i])
     }
   }
+
+  # Undefined statistics are NA, never NaN (a constant variable gives 0/0
+  # in the skewness and kurtosis formulas)
+  stats_list <- lapply(stats_list, function(v) {
+    if (is.numeric(v)) v[is.nan(v)] <- NA_real_
+    v
+  })
 
   # Add sample size information
   if (is.null(w)) {
@@ -462,7 +490,10 @@ print.summary.describe <- function(x, ...) {
         # Quantile columns by their exact names: a regex prefix match
         # (grep("^var_Q")) also caught variables such as income_Quintile
         # and failed on names with metacharacters (`Einkommen (EUR)`)
-        for (q_name in .desc_quantile_name(probs)) {
+        # The 50th percentile IS the median (same HAVERAGE kernel); it
+        # stays in the result but is not printed twice
+        q_probs <- if ("median" %in% show) probs[probs != 0.5] else probs
+        for (q_name in .desc_quantile_name(q_probs)) {
           q_col <- paste0(var_name, "_", q_name)
           if (q_col %in% names(results_df)) {
             row_data[[q_name]] <- round(results_df[[q_col]], digits)
@@ -518,9 +549,19 @@ print.summary.describe <- function(x, ...) {
 
 
 #' Result/display name of a quantile column ("Q25" for probs = 0.25)
+#'
+#' Percent values are shown with at most two decimals ("Q33.33" for
+#' probs = 1/3 instead of "Q33.3333333333333"); more decimals are used only
+#' when two requested probabilities would otherwise get the same name.
+#'
 #' @param p Probabilities
 #' @return Character vector
 #' @noRd
 .desc_quantile_name <- function(p) {
-  paste0("Q", p * 100)
+  pct <- p * 100
+  for (d in 2:10) {
+    nm <- as.character(round(pct, d))
+    if (!anyDuplicated(nm) || anyDuplicated(pct)) break
+  }
+  paste0("Q", nm)
 }
