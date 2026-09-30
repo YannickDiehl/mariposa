@@ -877,7 +877,9 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
         tbl <- data.frame(
           Assumption = c("Equal variances assumed", "Equal variances not assumed"),
           t = fmt_num(num("statistic"), digits),
-          df = .fmt_df(num("parameter"), digits),
+          # SPSS prints the Student df as a whole number (weighted:
+          # sum(w) - 2 rounded), the Welch df with decimals
+          df = .fmt_df(c(round(num("parameter")[1]), num("parameter")[2]), digits),
           p = fmt_p(p_vals, digits),
           `Mean Diff.` = fmt_num(ifelse(is.na(num("statistic")), NA_real_, mean_diff), digits),
           `SE Diff.` = fmt_num(num("stderr"), digits),
@@ -988,7 +990,8 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   ci_label <- paste0(format(100 * x$conf.level), "% CI")
   tbl <- data.frame(
     t = fmt_num(row_results$t_stat[idx], digits),
-    df = .fmt_df(row_results$df[idx], digits),
+    # SPSS prints the one-sample df as a whole number (weighted: sum(w) - 1)
+    df = .fmt_df(round(row_results$df[idx]), digits),
     p = fmt_p(p_val, digits),
     `Mean Difference` = fmt_num(row_results$mean_diff[idx], digits),
     Lower = fmt_num(row_results$conf_int_lower[idx], digits),

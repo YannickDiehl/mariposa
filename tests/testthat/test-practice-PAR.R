@@ -311,6 +311,22 @@ test_that("PAR-21/PAR-26: t_test() summary tables: SPSS formats, Group Statistic
 
 # --- PAR-19 / PAR-21: oneway_anova() summary and conf.level --------------------
 
+test_that("PAR-21: weighted t-test df displayed as SPSS does", {
+  # SPSS T-TEST with WEIGHT BY prints the Student / one-sample df as whole
+  # numbers (sum(w) - 2 = 2434.609 -> 2435) and the Welch df with 3
+  # decimals (t_test_output.txt:97, 99 and 82); the computed values stay
+  # unrounded in $results.
+  tt <- t_test(survey_data, life_satisfaction, group = gender,
+               weights = sampling_weight)
+  out <- capture.output(print(summary(tt)))
+  expect_match(out[grepl("^ +Equal variances assumed", out)], " 2435 ")
+  expect_match(out[grepl("^ +Equal variances not assumed", out)], " 2391\\.291 ")
+  os <- t_test(survey_data, life_satisfaction, mu = 3, weights = sampling_weight)
+  out_os <- capture.output(print(summary(os)))
+  expect_true(any(grepl("^ +26\\.771 +2436 ", out_os)))
+  expect_false(isTRUE(all.equal(os$results$df, round(os$results$df))))
+})
+
 test_that("PAR-19: oneway conf.level reaches the descriptives CI and the post-hoc tests", {
   # The header said "99%" but no interval was printed anywhere, and
   # tukey_test() on the result silently used 95%.

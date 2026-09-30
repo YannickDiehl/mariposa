@@ -154,3 +154,6 @@
   warning and prints "not computed (<reason>)" instead of silent "n/a"
   results; the Tests of Normality table stays aligned with umlaut
   variable names. (EDGE-13)
+* `summary(t_test())` with weights prints the Student and one-sample df as
+  whole numbers like SPSS (2435, not 2434.609) and the Welch df with
+  decimals; the unrounded values stay in `$results`. (PAR-21)
