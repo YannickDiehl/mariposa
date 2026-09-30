@@ -211,6 +211,7 @@ logistic_regression <- function(data, formula = NULL,
   }
 
   factors <- match.arg(factors)
+  user_call <- match.call()
 
   # Process weights (a column name or an expression such as w * 2)
   wi <- .regression_weights(data, rlang::enquo(weights))
@@ -230,6 +231,8 @@ logistic_regression <- function(data, formula = NULL,
   dep_name <- fb$dep_name
   pred_names <- fb$pred_names
   all_vars <- c(dep_name, pred_names)
+  # The call a user would type, in formula form: update()/step() re-run it
+  user_call <- .regression_call(user_call, model_formula)
 
   # Outcome encoding (SPSS "Dependent Variable Encoding"), fixed once on
   # the cases in the analysis so every group models the same category
@@ -282,7 +285,8 @@ logistic_regression <- function(data, formula = NULL,
         group_vars = group_vars,
         conf.level = conf.level,
         dv_encoding = .logistic_encoding_table(dv_encoding),
-        dv_labels = dv_encoding$short
+        dv_labels = dv_encoding$short,
+        call = user_call
       ),
       class = "logistic_regression"
     )
@@ -290,6 +294,7 @@ logistic_regression <- function(data, formula = NULL,
     result <- .glm_core(data, model_formula, dep_name, pred_names,
                         weights_vec, conf.level, factors, dv_encoding)
     # result IS the fitted glm (with mariposa slots attached).
+    result$call <- user_call
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -568,6 +573,9 @@ logistic_regression <- function(data, formula = NULL,
   out$n                <- n_report
   out$dv_encoding      <- .logistic_encoding_table(dv_encoding)
   out$dv_labels        <- dv_encoding$short
+  if (!is.null(weights_vec)) {
+    out$weight_sum <- sw            # unrounded SPSS N, for nobs()
+  }
   out
 }
 
@@ -1206,6 +1214,78 @@ confint.logistic_regression <- function(object, parm, level = 0.95,
   } else {
     .glm_quiet_weights(stats::confint(fit, parm = parm, level = level, ...))
   }
+}
+
+#' Update and re-fit a logistic_regression model
+#'
+#' Re-runs \code{\link{logistic_regression}} with a modified formula or
+#' arguments, e.g. \code{update(model, . ~ . + income)}; \code{step()}
+#' works through it. Needs the data by name: a model fitted inside a
+#' \code{\%>\%} pipe cannot be updated.
+#'
+#' @param object A \code{logistic_regression} result (also grouped).
+#' @param formula. Changes to the formula (see \code{stats::update()}).
+#' @param ... Further arguments of \code{logistic_regression()} to change.
+#' @param evaluate If \code{FALSE}, return the updated call.
+#' @return A new \code{logistic_regression} result (or the call).
+#' @export
+#' @method update logistic_regression
+update.logistic_regression <- function(object, formula., ..., evaluate = TRUE) {
+  .check_regression_update(object, "logistic_regression")
+  NextMethod()
+}
+
+#' Standard glm accessors for logistic_regression results
+#'
+#' \code{coef()}, \code{residuals()}, \code{fitted()} and \code{vcov()}
+#' dispatch to the \code{glm} methods for an ungrouped model; a grouped
+#' result raises an informative error (each element of \code{$groups} is a
+#' fitted model). \code{nobs()} returns the number of cases, or for a
+#' weighted model the unrounded sum of the frequency weights (SPSS N, shown
+#' rounded in the summary).
+#'
+#' @param object A \code{logistic_regression} result.
+#' @param ... Passed to the \code{glm} methods.
+#' @return As the corresponding \code{glm} method.
+#' @name logistic_regression-accessors
+#' @export
+#' @method coef logistic_regression
+coef.logistic_regression <- function(object, ...) {
+  .glr_require_glm(object, "coef")
+  NextMethod()
+}
+
+#' @rdname logistic_regression-accessors
+#' @export
+#' @method residuals logistic_regression
+residuals.logistic_regression <- function(object, ...) {
+  .glr_require_glm(object, "residuals")
+  NextMethod()
+}
+
+#' @rdname logistic_regression-accessors
+#' @export
+#' @method fitted logistic_regression
+fitted.logistic_regression <- function(object, ...) {
+  .glr_require_glm(object, "fitted")
+  NextMethod()
+}
+
+#' @rdname logistic_regression-accessors
+#' @export
+#' @method vcov logistic_regression
+vcov.logistic_regression <- function(object, ...) {
+  .glr_require_glm(object, "vcov")
+  NextMethod()
+}
+
+#' @rdname logistic_regression-accessors
+#' @export
+#' @method nobs logistic_regression
+nobs.logistic_regression <- function(object, ...) {
+  .glr_require_glm(object, "nobs")
+  if (!is.null(object$weight_sum)) return(object$weight_sum)
+  NextMethod()
 }
 
 #' Profile likelihood for a logistic_regression model

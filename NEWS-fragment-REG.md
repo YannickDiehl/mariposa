@@ -74,3 +74,14 @@
     (it failed with "Can't convert a call to a string").
   - `anova()` on a weighted logistic model no longer leaks
     "non-integer #successes" warnings.
+* `update()` and `step()` work on `linear_regression()` and
+  `logistic_regression()` results. The objects stored lm's internal call
+  (`data = data_complete, weights = .wt`), so both failed with "object
+  'data_complete' not found". The stored call is now the user's own call
+  in formula form. A model fitted inside a `%>%` pipe (no data name to
+  re-use) gets a clear error instead. `coef()`, `residuals()`,
+  `fitted()`, `confint()`, `nobs()` and `vcov()` on grouped results (and
+  all but `coef()` on pairwise results) now stop with an informative
+  message instead of returning `NULL` or a base-R error; `coef()` of a
+  pairwise regression returns its coefficients. `nobs()` of a weighted
+  logistic model is the sum of the weights (SPSS N).

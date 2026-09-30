@@ -418,3 +418,54 @@ test_that("REG-21: weights can be an expression", {
   expect_error(linear_regression(d, life_satisfaction ~ age, weights = nope * 2),
                "weights")
 })
+
+# REG-13: update()/step() failed ("object 'data_complete' not found") and
+# the stored call showed internal names; coef()/residuals() returned NULL
+# silently on grouped and pairwise results; confint()/nobs() gave base-R
+# (German) errors there.
+test_that("REG-13: proper call, update(), step() and informative generics", {
+  sd_reg <- survey_data
+  m <- linear_regression(sd_reg, life_satisfaction ~ age + income + trust_media)
+  expect_identical(m$call[[1]], quote(linear_regression))
+  expect_identical(m$call$data, quote(sd_reg))
+  m2 <- update(m, . ~ . - income)
+  expect_s3_class(m2, "linear_regression")
+  expect_equal(names(coef(m2)), c("(Intercept)", "age", "trust_media"))
+  expect_s3_class(step(m, trace = 0), "linear_regression")
+
+  # SPSS-style interface: the call records the equivalent formula
+  m3 <- linear_regression(sd_reg, dependent = life_satisfaction,
+                          predictors = c(age, income), weights = sampling_weight)
+  expect_s3_class(m3$call$formula, "formula")
+  expect_null(m3$call$dependent)
+  m4 <- update(m3, . ~ . + trust_media)
+  expect_true(isTRUE(m4$weighted))
+  expect_equal(m4$predictor_names, c("age", "income", "trust_media"))
+
+  d <- .reg_sd2()
+  ml <- logistic_regression(d, high_sat ~ age + income)
+  expect_equal(names(coef(update(ml, . ~ . - income))), c("(Intercept)", "age"))
+
+  # Fitted inside a magrittr pipe: the data has no name to re-use
+  mp <- survey_data %>% linear_regression(life_satisfaction ~ age)
+  expect_error(update(mp, . ~ . + income), "pipe")
+
+  # Grouped and pairwise results
+  g <- dplyr::group_by(sd_reg, region)
+  rg <- linear_regression(g, life_satisfaction ~ age)
+  expect_s3_class(update(rg, . ~ . + income), "linear_regression")
+  for (fn in list(coef, residuals, fitted, confint, nobs, vcov)) {
+    expect_error(fn(rg), "grouped")
+  }
+  expect_error(update(rg$groups[[1]], . ~ . + income), "single group")
+  rp <- linear_regression(sd_reg, life_satisfaction ~ age + income,
+                          use = "pairwise")
+  expect_equal(coef(rp), stats::setNames(rp$coef_table$B, rp$coef_table$Term))
+  for (fn in list(residuals, fitted, confint, nobs, vcov)) {
+    expect_error(fn(rp), "pairwise")
+  }
+  gl <- logistic_regression(dplyr::group_by(d, region), high_sat ~ age)
+  for (fn in list(coef, residuals, fitted, confint, nobs, vcov)) {
+    expect_error(fn(gl), "grouped")
+  }
+})

@@ -220,6 +220,7 @@ linear_regression <- function(data, formula = NULL,
 
   use <- match.arg(use)
   factors <- match.arg(factors)
+  user_call <- match.call()
 
   # Process weights (a column name or an expression such as w * 2)
   wi <- .regression_weights(data, rlang::enquo(weights))
@@ -238,6 +239,8 @@ linear_regression <- function(data, formula = NULL,
   dep_name <- fb$dep_name
   dep_vars <- fb$dep_vars
   pred_names <- fb$pred_names
+  # The call a user would type, in formula form: update()/step() re-run it
+  user_call <- .regression_call(user_call, model_formula)
 
   if (use == "pairwise" && !identical(dep_vars, dep_name)) {
     cli_abort(c(
@@ -288,7 +291,8 @@ linear_regression <- function(data, formula = NULL,
         is_grouped = TRUE,
         group_vars = group_vars,
         standardized = standardized,
-        conf.level = conf.level
+        conf.level = conf.level,
+        call = user_call
       ),
       class = "linear_regression"
     )
@@ -298,6 +302,7 @@ linear_regression <- function(data, formula = NULL,
                        dep_vars = dep_vars)
     # Listwise: result IS the lm (mariposa slots attached).
     # Pairwise: result is a custom list (no fitted lm available).
+    result$call <- user_call
     result$formula <- model_formula
     result$dependent <- dep_name
     result$predictor_names <- pred_names
@@ -1633,6 +1638,75 @@ nobs.linear_regression <- function(object, ...) {
   NextMethod()
 }
 
+#' Update and re-fit a linear_regression model
+#'
+#' Re-runs \code{\link{linear_regression}} with a modified formula or
+#' arguments, e.g. \code{update(model, . ~ . + income)}; \code{step()}
+#' works through it. Needs the data by name: a model fitted inside a
+#' \code{\%>\%} pipe cannot be updated.
+#'
+#' @param object A \code{linear_regression} result (also grouped or
+#'   pairwise).
+#' @param formula. Changes to the formula (see \code{stats::update()}).
+#' @param ... Further arguments of \code{linear_regression()} to change.
+#' @param evaluate If \code{FALSE}, return the updated call.
+#' @return A new \code{linear_regression} result (or the call).
+#' @export
+#' @method update linear_regression
+update.linear_regression <- function(object, formula., ..., evaluate = TRUE) {
+  .check_regression_update(object, "linear_regression")
+  NextMethod()
+}
+
+#' Coefficients of a linear_regression model
+#'
+#' The unstandardized coefficients B. Also available for pairwise results
+#' (taken from the coefficients table); grouped results hold one model per
+#' group in \code{$groups}.
+#'
+#' @param object A \code{linear_regression} result.
+#' @param ... Not used.
+#' @return A named numeric vector.
+#' @export
+#' @method coef linear_regression
+coef.linear_regression <- function(object, ...) {
+  if (isTRUE(object$is_grouped)) .lr_require_lm(object, "coef")
+  if (!inherits(object, "lm")) {
+    return(stats::setNames(object$coef_table$B, object$coef_table$Term))
+  }
+  NextMethod()
+}
+
+#' Residuals of a linear_regression model
+#'
+#' Dispatches to \code{stats::residuals()} for the fitted \code{lm};
+#' grouped and pairwise results raise an informative error.
+#'
+#' @param object A \code{linear_regression} result (ungrouped, listwise).
+#' @param ... Passed to the \code{lm} method.
+#' @return A numeric vector.
+#' @export
+#' @method residuals linear_regression
+residuals.linear_regression <- function(object, ...) {
+  .lr_require_lm(object, "residuals")
+  NextMethod()
+}
+
+#' Fitted values of a linear_regression model
+#'
+#' Dispatches to \code{stats::fitted()} for the fitted \code{lm};
+#' grouped and pairwise results raise an informative error.
+#'
+#' @param object A \code{linear_regression} result (ungrouped, listwise).
+#' @param ... Passed to the \code{lm} method.
+#' @return A numeric vector.
+#' @export
+#' @method fitted linear_regression
+fitted.linear_regression <- function(object, ...) {
+  .lr_require_lm(object, "fitted")
+  NextMethod()
+}
+
 #' Residual degrees of freedom of a linear_regression model
 #'
 #' Weighted models: \code{sum(w) - rank} (SPSS frequency weights,
@@ -1664,6 +1738,43 @@ df.residual.linear_regression <- function(object, ...) {
 .formula_label <- function(f) {
   if (is.null(f)) return("")
   paste(trimws(deparse(f, width.cutoff = 500L)), collapse = " ")
+}
+
+#' The call stored on a regression result
+#'
+#' lm()/glm() recorded their internal call (formula = formula, data =
+#' data_complete, weights = .wt), so update()/step() failed with "object
+#' 'data_complete' not found" and printed internal names. The stored call
+#' is now the user's own call in formula form (dependent=/predictors= are
+#' replaced by the equivalent formula), which update() re-evaluates.
+#' @noRd
+.regression_call <- function(cl, model_formula) {
+  cl$dependent <- NULL
+  cl$predictors <- NULL
+  cl$formula <- model_formula
+  cl
+}
+
+#' Guard for update(): the stored call must be re-evaluable
+#' @noRd
+.check_regression_update <- function(object, cls, call = rlang::caller_env()) {
+  if (!is.null(object$group_values) && !isTRUE(object$is_grouped)) {
+    cli_abort(c(
+      "{.fn update} is not available for a single group of a grouped {.cls {cls}}.",
+      i = "Update the grouped result instead; it refits every group."
+    ), call = call)
+  }
+  cl <- object$call
+  if (is.null(cl)) {
+    cli_abort("This {.cls {cls}} result stores no call to update.", call = call)
+  }
+  if (identical(cl$data, quote(.))) {
+    cli_abort(c(
+      "{.fn update} cannot re-use the data: the model was fitted inside a pipe ({.code %>%}), where the data has no name.",
+      i = "Fit the model with the data by name, e.g. {.code {cls}(my_data, y ~ x)}, then {.fn update} works."
+    ), call = call)
+  }
+  invisible(TRUE)
 }
 
 #' Backtick non-syntactic variable names for formula text
