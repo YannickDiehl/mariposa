@@ -174,6 +174,18 @@ reference:
   - anova.logistic_regression
   - predict.linear_regression
   - predict.logistic_regression
+  - confint.linear_regression
+  - confint.logistic_regression
+  - profile.logistic_regression
+  - vcov.linear_regression
+  - nobs.linear_regression
+  - df.residual.linear_regression
+  - coef.linear_regression
+  - residuals.linear_regression
+  - fitted.linear_regression
+  - update.linear_regression
+  - update.logistic_regression
+  - logistic_regression-accessors
 
 - title: "Weighted Statistics"
   desc: "Individual weighted statistics for survey data"
