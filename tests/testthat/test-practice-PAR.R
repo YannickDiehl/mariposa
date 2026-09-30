@@ -335,17 +335,18 @@ test_that("PAR-21: weighted t-test df displayed as SPSS does", {
   expect_false(isTRUE(all.equal(os$results$df, round(os$results$df))))
 })
 
-test_that("PAR-19: oneway conf.level reaches the descriptives CI and the post-hoc tests", {
-  # The header said "99%" but no interval was printed anywhere, and
-  # tukey_test() on the result silently used 95%.
+test_that("PAR-19: oneway conf.level reaches the descriptives CI, not the post-hoc tests", {
+  # The header said "99%" but no interval was printed anywhere. The
+  # post-hoc tests keep 95% unless asked: SPSS's post-hoc interval follows
+  # /POSTHOC ALPHA, not CILEVEL (tukey/scheffe reference Tests 6a/6b).
   r <- oneway_anova(survey_data, life_satisfaction, group = education,
                     conf.level = 0.99)
   out <- capture.output(print(summary(r)))
   expect_true(any(grepl("99% CI Lower", out, fixed = TRUE)))
   gs <- r$results$group_stats[[1]][["Basic Secondary"]]
   expect_true(any(grepl(sprintf("%.3f", gs$ci_lower), out, fixed = TRUE)))
-  expect_equal(tukey_test(r)$conf.level, 0.99)
-  expect_equal(scheffe_test(r)$conf.level, 0.99)
+  expect_equal(tukey_test(r)$conf.level, 0.95)
+  expect_equal(scheffe_test(r)$conf.level, 0.95)
   expect_equal(tukey_test(r, conf.level = 0.9)$conf.level, 0.9)
 })
 

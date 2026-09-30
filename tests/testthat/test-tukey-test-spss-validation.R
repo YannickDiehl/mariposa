@@ -121,3 +121,29 @@ test_that("Test 4a: weighted grouped Tukey (East) — matches SPSS", {
                       spss_values$test_4a_east_w,
                       prec_diff = 3, prec_ci = 2, scenario = "4a East weighted")
 })
+
+
+# =============================================================================
+# Test 6a: CILEVEL(.90) with /POSTHOC ALPHA(.05) — post-hoc CI stays 95%
+# =============================================================================
+# SPSS's post-hoc interval follows the post-hoc ALPHA, not the ANOVA's
+# CILEVEL (which only sets the Descriptives intervals).
+
+spss_values$test_6a_cilevel90 <- list(
+  "Basic Secondary - Intermediate Secondary" = list(ci_lower = -0.65, ci_upper = -0.34),  # tukey_test_output.txt:793
+  "Basic Secondary - University"             = list(ci_lower = -1.02, ci_upper = -0.67)   # tukey_test_output.txt:795
+)
+
+test_that("Test 6a: ANOVA conf.level = .90 keeps the 95% Tukey CI — matches SPSS", {
+  av <- survey_data |>
+    oneway_anova(life_satisfaction, group = education, conf.level = 0.90)
+  res <- tukey_test(av)$results
+  for (pname in names(spss_values$test_6a_cilevel90)) {
+    expected <- spss_values$test_6a_cilevel90[[pname]]
+    row <- res[res$Comparison == pname, , drop = FALSE]
+    assert_spss(as.numeric(row$conf_low), expected$ci_lower, tier = "display",
+                precision = 2, label = sprintf("[6a] %s CI lower", pname))
+    assert_spss(as.numeric(row$conf_high), expected$ci_upper, tier = "display",
+                precision = 2, label = sprintf("[6a] %s CI upper", pname))
+  }
+})

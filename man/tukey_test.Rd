@@ -12,8 +12,11 @@ tukey_test(x, conf.level = 0.95, ...)
 \arguments{
 \item{x}{ANOVA results from \code{oneway_anova()}}
 
-\item{conf.level}{Confidence level for intervals. Default: the
-\code{conf.level} of the \code{oneway_anova()} result (usually 0.95).}
+\item{conf.level}{Confidence level of the simultaneous intervals
+(Default: 0.95). As in SPSS it corresponds to the post-hoc
+\code{ALPHA} (1 - alpha) and does not follow the \code{conf.level} of
+\code{oneway_anova()}, which (like SPSS \code{CILEVEL}) only sets the
+intervals of the group means.}
 
 \item{...}{Additional arguments (currently unused)}
 }

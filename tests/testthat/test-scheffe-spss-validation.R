@@ -88,3 +88,17 @@ test_that("Test 4a: weighted grouped Scheffé (East) — matches SPSS", {
                         spss_values$test_4a_east_w,
                         prec_diff = 3, prec_ci = 2, scenario = "4a East weighted")
 })
+
+test_that("Test 6a: ANOVA conf.level = .90 keeps the 95% Scheffé CI — matches SPSS", {
+  # SPSS: /POSTHOC ALPHA(.05) with /CRITERIA=CILEVEL(.90) prints a 95%
+  # post-hoc interval
+  expected <- list(ci_lower = -0.66, ci_upper = -0.33)  # scheffe_test_output.txt:791
+  av <- survey_data |>
+    oneway_anova(life_satisfaction, group = education, conf.level = 0.90)
+  res <- scheffe_test(av)$results
+  row <- res[res$Comparison == "Basic Secondary - Intermediate Secondary", ]
+  assert_spss(as.numeric(row$conf_low), expected$ci_lower, tier = "display",
+              precision = 2, label = "[6a] CI lower")
+  assert_spss(as.numeric(row$conf_high), expected$ci_upper, tier = "display",
+              precision = 2, label = "[6a] CI upper")
+})

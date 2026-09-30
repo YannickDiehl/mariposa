@@ -438,8 +438,9 @@ reference output showed mariposa was wrong.
   tables with fixed decimals and `digits`. With `conf.level = 0.99` the
   header said 99% but no interval was printed anywhere; weighted N printed
   as "618.0", Mean Square as "289.79" next to "1.077", and `digits` had no
-  effect. `tukey_test()` and `scheffe_test()` on a `oneway_anova()` result
-  now default to the ANOVA's `conf.level` instead of silently using 95%.
+  effect. `tukey_test()` and `scheffe_test()` keep their own `conf.level`
+  (default 95%): as in SPSS, the post-hoc interval follows the post-hoc
+  alpha, not the ANOVA's confidence level (reference Tests 6a/6b).
   (PAR-19, PAR-21)
 * `group_by() %>% levene_test()` takes its variables through `...` like
   the ungrouped method: several variables, tidyselect helpers

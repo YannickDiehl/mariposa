@@ -12,8 +12,11 @@
 #' - A way to make all possible comparisons while controlling error rates
 #'
 #' @param x ANOVA results from \code{oneway_anova()}
-#' @param conf.level Confidence level for intervals. Default: the
-#'   \code{conf.level} of the \code{oneway_anova()} result (usually 0.95).
+#' @param conf.level Confidence level of the simultaneous intervals
+#'   (Default: 0.95). As in SPSS it corresponds to the post-hoc
+#'   \code{ALPHA} (1 - alpha) and does not follow the \code{conf.level} of
+#'   \code{oneway_anova()}, which (like SPSS \code{CILEVEL}) only sets the
+#'   intervals of the group means.
 #' @param ... Additional arguments (currently unused)
 #'
 #' @return Pairwise comparison results showing:
@@ -142,9 +145,8 @@ tukey_test.default <- function(x, conf.level = 0.95, ...) {
 tukey_test.oneway_anova <- function(x, conf.level = 0.95, ...) {
   # Shared engine in R/posthoc-pairwise.R (Tukey-specific cores in
   # .tukey_stats(); unweighted path delegates to stats::TukeyHSD)
-  # Default: the confidence level of the ANOVA (conf.level passed to
-  # oneway_anova()), so 99 percent there does not silently become 95 here
-  if (missing(conf.level)) conf.level <- x$conf.level %||% 0.95
+  # conf.level is SPSS's post-hoc ALPHA: independent of the ANOVA's
+  # conf.level (SPSS CILEVEL only sets the Descriptives intervals)
   .pairwise_posthoc(x, method = "tukey", conf.level = conf.level)
 }
 #' Print Tukey HSD test results (compact)
