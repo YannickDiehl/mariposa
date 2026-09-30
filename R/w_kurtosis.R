@@ -14,7 +14,9 @@
 #'   variables or use helpers like \code{starts_with("trust")}
 #' @param weights Survey weights to make results representative of your population.
 #'   Without weights, you get the simple sample kurtosis.
-#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE).
+#'   With \code{FALSE}, the result for a variable that contains missing
+#'   values is \code{NA} (as in base R).
 #' @param excess Show excess kurtosis? (Default: TRUE, matching SPSS). Excess
 #'   kurtosis subtracts 3 so that a normal distribution has kurtosis of 0,
 #'   making interpretation easier.

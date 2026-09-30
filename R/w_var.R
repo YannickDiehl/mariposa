@@ -14,7 +14,9 @@
 #'   variables or use helpers like \code{starts_with("trust")}
 #' @param weights Survey weights to make results representative of your population.
 #'   Without weights, you get the simple sample variance.
-#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE).
+#'   With \code{FALSE}, the result for a variable that contains missing
+#'   values is \code{NA} (as in base R).
 #'
 #' @return Population-weighted variance(s) with sample size information,
 #'   including the weighted variance, effective sample size (effective N), and the

@@ -76,6 +76,11 @@
 
     weighted <- .are_weights(weights_vec)
     if (weighted) .check_weights(weights_vec)
+    # na.rm = FALSE with missing values: the statistic is undefined (NA),
+    # as in base R - never a crash or a value computed on shifted positions
+    if (!na.rm && .w_has_missing(x, if (weighted) weights_vec)) {
+      return(empty_stat)
+    }
     if (!weighted) {
       # Unweighted
       if (na.rm) x <- x[!is.na(x)]
@@ -125,10 +130,12 @@
     result_cols <- list()
     for (var_name in var_names) {
       x <- df[[var_name]]
+      # na.rm = FALSE with missing values: NA statistic (see vector mode)
+      undefined <- !na.rm && .w_has_missing(x, w_vec)
 
       if (is.null(w_vec)) {
         if (na.rm) x <- x[!is.na(x)]
-        stat_val <- if (length(x) == 0) empty_stat else stat_fn(x, w = NULL)
+        stat_val <- if (length(x) == 0 || undefined) empty_stat else stat_fn(x, w = NULL)
         n_val <- if (length(x) == 0) empty_n else length(x)
         eff_n <- n_val
       } else {
@@ -145,7 +152,7 @@
           n_val <- 0
           eff_n <- 0
         } else {
-          stat_val <- stat_fn(x, w = w)
+          stat_val <- if (undefined) empty_stat else stat_fn(x, w = w)
           n_val <- length(x)
           eff_n <- .effective_n(w)
         }
@@ -396,4 +403,18 @@
 
   cat("\n")
   invisible(x)
+}
+
+
+#' Does a variable (or its weights) contain missing values?
+#'
+#' With na.rm = FALSE a statistic over data with missing values is
+#' undefined (NA), as in base R. Used by the w_* factory and describe().
+#'
+#' @param x Data vector
+#' @param w Weight vector or NULL
+#' @return Logical scalar
+#' @noRd
+.w_has_missing <- function(x, w = NULL) {
+  anyNA(x) || (!is.null(w) && anyNA(w))
 }

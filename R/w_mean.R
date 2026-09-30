@@ -10,7 +10,9 @@
 #'   variables or use helpers like \code{starts_with("income")}
 #' @param weights Survey weights to make the average representative of your population.
 #'   Without weights, you get the simple sample average.
-#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE).
+#'   With \code{FALSE}, the result for a variable that contains missing
+#'   values is \code{NA} (as in base R).
 #'
 #' @return Population-weighted average(s) with sample size information
 #'

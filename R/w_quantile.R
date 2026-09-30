@@ -17,7 +17,9 @@
 #'   Default: \code{c(0, 0.25, 0.5, 0.75, 1)} for the minimum, 25th percentile,
 #'   median, 75th percentile, and maximum. Use \code{c(0.1, 0.5, 0.9)} for
 #'   deciles, or \code{c(0.25, 0.5, 0.75)} for quartiles only.
-#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE).
+#'   With \code{FALSE}, the result for a variable that contains missing
+#'   values is \code{NA} (as in base R).
 #'
 #' @return Population-weighted quantile(s) with sample size information,
 #'   including the weighted percentile values, effective sample size (effective N),

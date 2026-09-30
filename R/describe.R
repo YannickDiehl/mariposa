@@ -24,7 +24,9 @@
 #'     \item Custom list: Choose specific stats like \code{c("mean", "sd", "range")}
 #'   }
 #' @param probs For quantiles, which percentiles to show (default: 25th, 50th, 75th)
-#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE).
+#'   With \code{FALSE}, the result for a variable that contains missing
+#'   values is \code{NA} (as in base R).
 #' @param excess For kurtosis, show excess kurtosis? (Default: TRUE, easier to interpret)
 #'
 #' @return A summary table with descriptive statistics for each variable
@@ -220,28 +222,41 @@ describe <- function(data, ..., weights = NULL,
   
   # Calculate missing values count
   n_missing <- sum(is.na(x))
-  
+
+  # na.rm = FALSE with missing values: every statistic is undefined (NA),
+  # as in base R. The kernels must not see the NAs: the quantile family
+  # returned shifted values (weighted) or aborted in quantile() (unweighted).
+  # Statistics are computed on xs/ws, which are empty in that case (the
+  # kernels give NA for empty input); N and Missing still describe x.
+  if (!na.rm && .w_has_missing(x, w)) {
+    xs <- x[0]
+    ws <- NULL
+  } else {
+    xs <- x
+    ws <- w
+  }
+
   # Calculate each requested statistic
-  if ("mean" %in% show) stats_list$Mean <- .w_mean(x, w, na.rm)
-  if ("median" %in% show) stats_list$Median <- .w_median(x, w, na.rm)
-  if ("sd" %in% show) stats_list$SD <- .w_sd(x, w, na.rm)
-  if ("se" %in% show) stats_list$SE <- .w_se(x, w, na.rm)
-  if ("var" %in% show) stats_list$Variance <- .w_var(x, w, na.rm)
-  if ("range" %in% show) stats_list$Range <- .w_range(x, w, na.rm)
-  if ("iqr" %in% show) stats_list$IQR <- .w_iqr(x, w, na.rm)
-  if ("skew" %in% show) stats_list$Skewness <- .w_skew(x, w, na.rm)
-  if ("kurtosis" %in% show) stats_list$Kurtosis <- .w_kurtosis(x, w, na.rm, excess)
-  if ("mode" %in% show) stats_list$Mode <- .w_mode(x, w, na.rm)
-  
+  if ("mean" %in% show) stats_list$Mean <- .w_mean(xs, ws, na.rm)
+  if ("median" %in% show) stats_list$Median <- .w_median(xs, ws, na.rm)
+  if ("sd" %in% show) stats_list$SD <- .w_sd(xs, ws, na.rm)
+  if ("se" %in% show) stats_list$SE <- .w_se(xs, ws, na.rm)
+  if ("var" %in% show) stats_list$Variance <- .w_var(xs, ws, na.rm)
+  if ("range" %in% show) stats_list$Range <- .w_range(xs, ws, na.rm)
+  if ("iqr" %in% show) stats_list$IQR <- .w_iqr(xs, ws, na.rm)
+  if ("skew" %in% show) stats_list$Skewness <- .w_skew(xs, ws, na.rm)
+  if ("kurtosis" %in% show) stats_list$Kurtosis <- .w_kurtosis(xs, ws, na.rm, excess)
+  if ("mode" %in% show) stats_list$Mode <- .w_mode(xs, ws, na.rm)
+
   # Handle quantiles - can be multiple values
   if ("quantiles" %in% show) {
-    quantiles <- .w_quantile(x, w, probs = probs, na.rm = na.rm)
+    quantiles <- .w_quantile(xs, ws, probs = probs, na.rm = na.rm)
     for (i in seq_along(probs)) {
       prob_name <- paste0("Q", probs[i] * 100)
       stats_list[[prob_name]] <- quantiles[i]
     }
   }
-  
+
   # Add sample size information
   if (is.null(w)) {
     stats_list$N <- sum(!is.na(x))

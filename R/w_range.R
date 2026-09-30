@@ -13,7 +13,9 @@
 #' @param weights Survey weights are accepted for interface consistency, but do
 #'   not affect the range calculation. The range depends only on the observed
 #'   minimum and maximum values.
-#' @param na.rm Remove missing values before calculating? (Default: TRUE)
+#' @param na.rm Remove missing values before calculating? (Default: TRUE).
+#'   With \code{FALSE}, the result for a variable that contains missing
+#'   values is \code{NA} (as in base R).
 #'
 #' @return The range (max - min) with sample size information,
 #'   including the effective sample size (effective N) when weights are provided,
