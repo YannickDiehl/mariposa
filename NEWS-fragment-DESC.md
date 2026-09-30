@@ -133,3 +133,6 @@
 * `multiple_response()` on data grouped by a labelled variable (e.g.
   ALLBUS `eastwest`) no longer aborts with "arguments imply differing
   number of rows: 1, 2".
+* `multiple_response(by = )` with a labelled `by` variable heads the
+  crosstab columns with the value labels in code order (it showed the
+  codes, e.g. "1"/"2" for ALLBUS `eastwest`).

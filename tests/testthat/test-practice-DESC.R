@@ -712,3 +712,22 @@ test_that("EDGE-05: multiple_response() works on data grouped by a labelled vari
                                           by = gender))
   expect_equal(nrow(rb$by_results), 8L)
 })
+
+
+# --- DESC-19: multiple_response(by = <labelled>) --------------------------------
+
+test_that("DESC-19: multiple_response(by = <labelled>) shows value labels", {
+  # The by-crosstab used the codes of a labelled by variable as column
+  # headers ("1"/"2" for ALLBUS eastwest).
+  skip_if_not_installed("haven")
+  d <- .mr_data()
+  d$reg_lab <- haven::labelled(as.integer(d$region), c(East = 1, West = 2))
+  r <- multiple_response(d, gov, media, by = reg_lab)
+  expect_equal(unique(r$by_results$by_level), c("East", "West"))
+  out <- capture.output(print(r))
+  expect_true(any(grepl("East", out) & grepl("West", out)))
+  # SPSS order: by code, not by first appearance
+  d2 <- d[order(-as.integer(d$region)), ]
+  r2 <- multiple_response(d2, gov, media, by = reg_lab)
+  expect_equal(unique(r2$by_results$by_level), c("East", "West"))
+})

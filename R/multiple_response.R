@@ -242,8 +242,10 @@ multiple_response <- function(data, ..., by = NULL, counted = 1,
 
   by_results <- NULL
   if (!is.null(by_name)) {
-    by_vals <- data[[by_name]][valid]
-    by_levels <- if (is.factor(by_vals)) levels(droplevels(by_vals)) else sort(unique(by_vals))
+    # SPSS order (by code) and value labels instead of codes: a labelled
+    # by variable used to head the columns with "1"/"2"
+    by_vals <- .group_factor(data[[by_name]][valid])
+    by_levels <- levels(droplevels(by_vals))
     rows <- lapply(by_levels, function(lv) {
       idx <- by_vals == lv
       w_lv <- w[idx]
