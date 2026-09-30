@@ -130,3 +130,24 @@ test_that("EDGE-08: describe()/w_* drop grouping variables from the selection", 
   expect_message(r3 <- describe(group_by(d, lab), age, lab), "Grouping variable")
   expect_equal(r3$variables, "age")
 })
+
+
+# --- DESC-13: weighted N and Missing (describe) --------------------------------
+
+test_that("DESC-13: weighted describe() prints N = sum of weights and weighted Missing", {
+  # Weighted describe() printed only Kish's effective N (2158.9 for income)
+  # under the name Effective_N and dropped the Missing column. SPSS
+  # FREQUENCIES with WEIGHT BY prints N Valid = sum of weights (2201) and
+  # Missing = weighted missing (315), see describe_output.txt Test 2b.
+  r <- describe(survey_data, age, income, weights = sampling_weight)
+  expect_equal(round(r$results$income_N), 2201)
+  expect_equal(round(r$results$income_Missing), 315)
+  expect_true("income_Effective_N" %in% names(r$results))  # kept in the object
+
+  out <- capture.output(print(r))
+  expect_false(any(grepl("Effective", out)))
+  hdr <- out[grepl("Variable", out)]
+  expect_true(any(grepl("Missing", hdr)))
+  row <- out[grepl("^\\s*income\\s", out)]
+  expect_true(any(grepl(" 2201 ", row)) && any(grepl(" 315\\b", row)))
+})

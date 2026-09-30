@@ -20,3 +20,10 @@
   and "quantile.haven_labelled() not implemented" to a dplyr internal
   error. As in `dplyr::across()`, grouping variables are excluded from the
   analysed variables, with a message.
+* Weighted `describe()` prints N and Missing like SPSS FREQUENCIES with
+  `WEIGHT BY`: N is the sum of the weights of the valid cases and Missing
+  the weighted missing count (income: N 2201, Missing 315). The table used
+  to show only Kish's effective sample size (2158.9) under the name
+  `Effective_N` and no Missing column. The effective N stays available in
+  `$results` (`<variable>_Effective_N`); `<variable>_Missing` is now the
+  weighted missing count for weighted analyses.

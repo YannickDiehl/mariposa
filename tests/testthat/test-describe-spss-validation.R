@@ -43,6 +43,14 @@ spss_values <- list(
     sd = 17.08382, variance = 291.857, skewness = 0.159, kurtosis = -0.396,
     range = 77.00, q25 = 38.0000, q50 = 50.0000, q75 = 63.0000
   ),
+  # describe_output.txt:113-128 (Test 2b). Missing is the weighted missing
+  # count (sum of the weights of cases without income), printed rounded.
+  test_2b_income_weighted = list(
+    n = 2201L, missing = 315L,
+    mean = 3743.0994, se = 30.35257, median = 3500.0000, mode = 3200.00,
+    sd = 1423.96558, variance = 2027677.966, skewness = 0.725, kurtosis = 0.388,
+    range = 7200.00, q25 = 2700.0000, q50 = 3500.0000, q75 = 4600.0000
+  ),
 
   # ---- Test 3a: Age grouped by region (unweighted) --------------------
   test_3a_age_grouped = list(
@@ -72,9 +80,17 @@ compare_describe <- function(row, spss, var, scenario, is_weighted = FALSE) {
                         label = sprintf("[%s] N", scenario))
     }
   }
-  if (!is.null(spss$missing)) assert_spss_count(as.numeric(row[[pfx("Missing")]]),
-                                                 spss$missing,
-                                                 label = sprintf("[%s] Missing", scenario))
+  if (!is.null(spss$missing)) {
+    if (is_weighted) {
+      # Weighted missing = sum of weights, displayed rounded by SPSS
+      assert_spss(as.numeric(row[[pfx("Missing")]]), spss$missing,
+                  tier = "display", precision = 0,
+                  label = sprintf("[%s] Missing (weighted)", scenario))
+    } else {
+      assert_spss_count(as.numeric(row[[pfx("Missing")]]), spss$missing,
+                        label = sprintf("[%s] Missing", scenario))
+    }
+  }
 
   # Numeric stats: variable precision per SPSS print precision
   cmp <- function(field, expected, precision) {
@@ -139,6 +155,12 @@ test_that("Test 2a: describe age weighted — matches SPSS", {
   # .calc_skewness in helpers.R), matching w_kurtosis() / w_skew() and SPSS.
   compare_describe(r$results[1, ], spss_values$test_2a_age_weighted,
                    "age", "2a: age weighted", is_weighted = TRUE)
+})
+
+test_that("Test 2b: describe income weighted — matches SPSS (incl. weighted Missing)", {
+  r <- survey_data |> describe(income, weights = sampling_weight, show = "all")
+  compare_describe(r$results[1, ], spss_values$test_2b_income_weighted,
+                   "income", "2b: income weighted", is_weighted = TRUE)
 })
 
 test_that("Test 3a: describe age grouped by region — matches SPSS", {

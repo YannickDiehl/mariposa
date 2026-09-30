@@ -49,6 +49,10 @@
 #' - **IQR**: Interquartile range - the middle 50% of values
 #' - **Skewness**: Whether data leans left (negative) or right (positive)
 #' - **Kurtosis**: Whether you have unusual outliers
+#' - **N / Missing**: Valid and missing cases. With weights, both are sums
+#'   of weights (displayed rounded), as in SPSS FREQUENCIES with
+#'   \code{WEIGHT BY}. Kish's effective sample size is kept in the result
+#'   (\code{<variable>_Effective_N}) but not printed.
 #'
 #' ## When to Use This
 #'
@@ -289,15 +293,19 @@ describe <- function(data, ..., weights = NULL,
   # Add sample size information
   if (is.null(w)) {
     stats_list$N <- sum(!is.na(x))
+    stats_list$Missing <- n_missing
   } else {
-    # Only sum weights where x is not missing (like frequency.R does)
+    # SPSS FREQUENCIES with WEIGHT BY: N Valid = sum of the weights of the
+    # valid cases, Missing = sum of the weights of the missing cases (both
+    # unrounded here, displayed rounded). Cases without a weight count
+    # nowhere, as in SPSS.
     stats_list$N <- sum(w[!is.na(x)], na.rm = TRUE)
-    # Effective N should also only consider weights for non-missing x
+    # Kish's effective sample size stays available in the result object,
+    # but it is not SPSS's N and is not printed as such
     stats_list$Effective_N <- .effective_n(w[!is.na(x)])
+    stats_list$Missing <- sum(w[is.na(x)], na.rm = TRUE)
   }
-  
-  stats_list$Missing <- n_missing
-  
+
   return(stats_list)
 }
 
@@ -514,24 +522,15 @@ print.summary.describe <- function(x, ...) {
       }
     }
     
-    # Add sample size information - different for weighted vs unweighted
-    if (is_weighted) {
-      # For weighted analysis, show effective sample size
-      eff_n_col <- paste0(var_name, "_Effective_N")
-      if (eff_n_col %in% names(results_df)) {
-        row_data$Effective_N <- round(results_df[[eff_n_col]], 1)
-      }
-    } else {
-      # For unweighted analysis, show regular N and missing count
-      n_col <- paste0(var_name, "_N")
-      if (n_col %in% names(results_df)) {
-        row_data$N <- round(results_df[[n_col]], 0)
-      }
-      
-      missing_col <- paste0(var_name, "_Missing")
-      if (missing_col %in% names(results_df)) {
-        row_data$Missing <- round(results_df[[missing_col]], 0)
-      }
+    # N and Missing as SPSS prints them: counts, or with weights the sums
+    # of weights (rounded for display; Kish's effective N is not SPSS's N)
+    n_col <- paste0(var_name, "_N")
+    if (n_col %in% names(results_df)) {
+      row_data$N <- round(results_df[[n_col]], 0)
+    }
+    missing_col <- paste0(var_name, "_Missing")
+    if (missing_col %in% names(results_df)) {
+      row_data$Missing <- round(results_df[[missing_col]], 0)
     }
     
     output_rows[[length(output_rows) + 1]] <- row_data
