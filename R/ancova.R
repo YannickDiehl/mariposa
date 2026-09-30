@@ -32,9 +32,15 @@
 #' @return An object of class \code{"ancova"} containing:
 #' \describe{
 #'   \item{anova_table}{Tibble with Source, SS, df, MS, F, p, Partial Eta Squared}
-#'   \item{parameter_estimates}{Tibble with regression coefficients (B, SE, t, p)}
+#'   \item{parameter_estimates}{Tibble with regression coefficients (B, SE,
+#'     t, p, CI, partial eta squared) in SPSS coding: one row per category,
+#'     the last category of each factor is the reference and reported as a
+#'     redundant 0 (\code{redundant = TRUE})}
 #'   \item{descriptives}{Tibble with unadjusted cell means, SDs, and Ns}
-#'   \item{estimated_marginal_means}{Tibble with adjusted means (covariates at grand mean)}
+#'   \item{estimated_marginal_means}{Tibble with adjusted cell means (covariates at grand mean)}
+#'   \item{emm_main_effects}{For 2+ factors: named list of tibbles with the
+#'     adjusted main-effect means (unweighted average of the cell means, as
+#'     SPSS \code{/EMMEANS=TABLES(factor)}); NULL for one factor}
 #'   \item{levene_test}{Tibble with Levene's test results}
 #'   \item{r_squared}{R-squared and Adjusted R-squared}
 #'   \item{model}{The underlying lm model object}
@@ -268,7 +274,8 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   # PARAMETER ESTIMATES
   # ============================================================================
 
-  param_est <- .compute_parameter_estimates(model, w_name)
+  param_est <- .compute_parameter_estimates(model_formula, data_complete,
+                                            between_names, w_name)
 
   # ============================================================================
   # DESCRIPTIVE STATISTICS (unadjusted)
@@ -284,6 +291,12 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   emm <- .compute_estimated_marginal_means(model, data_complete, dv_name,
                                             between_names, covariate_names,
                                             w_name)
+  # Main-effect marginal means (SPSS /EMMEANS=TABLES(factor)) for designs
+  # with several factors; with one factor the cell table is the main effect
+  emm_main <- if (length(between_names) > 1) {
+    .compute_emm_main_effects(model, data_complete, between_names,
+                              covariate_names, w_name)
+  } else NULL
 
   # ============================================================================
   # LEVENE'S TEST
@@ -317,6 +330,7 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
       parameter_estimates = param_est,
       descriptives = descriptives,
       estimated_marginal_means = emm,
+      emm_main_effects = emm_main,
       levene_test = levene_result,
       r_squared = c(r_squared = r_squared, adj_r_squared = adj_r_squared),
       model = model,
@@ -456,36 +470,128 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 }
 
 
-#' Compute parameter estimates from the model
+#' Parameter estimates in SPSS UNIANOVA coding
+#'
+#' The Type III table needs sum-to-zero contrasts, but SPSS's "Parameter
+#' Estimates" use indicator coding with the LAST category of every factor as
+#' the reference: one row per category ("[education=Basic Secondary]"), the
+#' last one (and every interaction cell involving a last category) set to 0
+#' as redundant. The model is therefore refitted with contr.SAS (treatment
+#' contrasts, base = last level) for all factors; the fit, residuals and
+#' Type III tests are identical. Previously R's contrasts leaked into the
+#' table (education.L/.Q/.C for ordered factors, gender1 for contr.sum).
+#'
+#' @return tibble parameter, b, se, t, p, ci_lower, ci_upper,
+#'   partial_eta_sq, redundant
 #' @noRd
-.compute_parameter_estimates <- function(model, w_name) {
+.compute_parameter_estimates <- function(model_formula, data, between_names,
+                                         w_name) {
+  ctr <- stats::setNames(rep(list("contr.SAS"), length(between_names)),
+                         between_names)
+  fit <- if (!is.null(w_name)) {
+    stats::lm(model_formula, data = data, weights = .wt, contrasts = ctr)
+  } else {
+    stats::lm(model_formula, data = data, contrasts = ctr)
+  }
 
-  coefs <- summary(model)$coefficients
-  param_names <- rownames(coefs)
+  coefs <- summary(fit)$coefficients
+  ci <- suppressWarnings(stats::confint(fit))
+  df_error <- fit$df.residual
 
-  # Extract values
-  b_vals <- coefs[, "Estimate"]
-  se_vals <- coefs[, "Std. Error"]
-  t_vals <- coefs[, "t value"]
-  p_vals <- coefs[, "Pr(>|t|)"]
+  one_row <- function(label, coef_name, redundant = FALSE) {
+    if (!redundant && coef_name %in% rownames(coefs)) {
+      t_val <- coefs[coef_name, "t value"]
+      tibble::tibble(
+        parameter = label,
+        b = coefs[coef_name, "Estimate"],
+        se = coefs[coef_name, "Std. Error"],
+        t = t_val,
+        p = coefs[coef_name, "Pr(>|t|)"],
+        ci_lower = ci[coef_name, 1],
+        ci_upper = ci[coef_name, 2],
+        partial_eta_sq = t_val^2 / (t_val^2 + df_error),
+        redundant = FALSE
+      )
+    } else {
+      # SPSS: "This parameter is set to zero because it is redundant"
+      # (reference category, or not estimable because of an empty cell)
+      tibble::tibble(parameter = label, b = 0, se = NA_real_, t = NA_real_,
+                     p = NA_real_, ci_lower = NA_real_, ci_upper = NA_real_,
+                     partial_eta_sq = NA_real_, redundant = TRUE)
+    }
+  }
 
-  # Confidence intervals
-  ci <- stats::confint(model)
+  rows <- list(one_row("Intercept", "(Intercept)"))
+  for (term in attr(stats::terms(fit), "term.labels")) {
+    parts <- strsplit(term, ":", fixed = TRUE)[[1]]
+    if (!all(parts %in% between_names)) {
+      rows[[length(rows) + 1]] <- one_row(term, term)
+      next
+    }
+    lvls <- lapply(parts, function(f) levels(data[[f]]))
+    # SPSS order: the last factor of the term varies fastest
+    grid <- rev(expand.grid(rev(lvls), stringsAsFactors = FALSE))
+    for (r in seq_len(nrow(grid))) {
+      lv <- unlist(grid[r, ], use.names = FALSE)
+      is_last <- mapply(function(l, all_l) identical(l, all_l[length(all_l)]),
+                        lv, lvls)
+      rows[[length(rows) + 1]] <- one_row(
+        paste0("[", parts, "=", lv, "]", collapse = " * "),
+        paste0(parts, lv, collapse = ":"),
+        redundant = any(is_last)
+      )
+    }
+  }
+  dplyr::bind_rows(rows)
+}
 
-  # Partial eta squared for each parameter
-  df_error <- model$df.residual
-  eta_vals <- t_vals^2 / (t_vals^2 + df_error)
 
-  tibble::tibble(
-    parameter = param_names,
-    b = b_vals,
-    se = se_vals,
-    t = t_vals,
-    p = p_vals,
-    ci_lower = ci[, 1],
-    ci_upper = ci[, 2],
-    partial_eta_sq = eta_vals
-  )
+#' Main-effect estimated marginal means (SPSS /EMMEANS=TABLES(factor))
+#'
+#' For each factor level: the unweighted mean of the predicted cell means
+#' over all levels of the other factors, covariates at their (weighted)
+#' means, SE from the contrast vector L (the averaged design rows):
+#' sqrt(L V L'). Not estimable (NA) when the model is rank deficient (an
+#' empty design cell).
+#' @noRd
+.compute_emm_main_effects <- function(model, data, between_names,
+                                      covariate_names, w_name) {
+  lvls <- lapply(between_names, function(b) levels(data[[b]]))
+  grid <- expand.grid(lvls, stringsAsFactors = FALSE)
+  names(grid) <- between_names
+  for (b in between_names) {
+    grid[[b]] <- factor(grid[[b]], levels = levels(data[[b]]))
+  }
+  for (cn in covariate_names) {
+    grid[[cn]] <- if (!is.null(w_name)) {
+      sum(data[[cn]] * data[[w_name]]) / sum(data[[w_name]])
+    } else {
+      mean(data[[cn]])
+    }
+  }
+  tt <- stats::delete.response(stats::terms(model))
+  X <- stats::model.matrix(tt, grid, contrasts.arg = model$contrasts,
+                           xlev = model$xlevels)
+  beta <- stats::coef(model)
+  V <- stats::vcov(model)
+  estimable <- !anyNA(beta)
+  t_crit <- stats::qt(0.975, model$df.residual)
+
+  out <- lapply(between_names, function(b) {
+    rows <- lapply(levels(data[[b]]), function(l) {
+      L <- colMeans(X[grid[[b]] == l, , drop = FALSE])
+      est <- if (estimable) sum(L * beta) else NA_real_
+      se <- if (estimable) sqrt(drop(t(L) %*% V %*% L)) else NA_real_
+      row <- tibble::tibble(level = factor(l, levels = levels(data[[b]])),
+                            mean = est, se = se,
+                            ci_lower = est - t_crit * se,
+                            ci_upper = est + t_crit * se)
+      names(row)[1] <- b
+      row
+    })
+    dplyr::bind_rows(rows)
+  })
+  stats::setNames(out, between_names)
 }
 
 
@@ -689,32 +795,47 @@ print.summary.ancova <- function(x, ...) {
   if (show_params) {
     cat("\nParameter Estimates\n")
     pe <- x$parameter_estimates
+    redundant <- if ("redundant" %in% names(pe)) pe$redundant else rep(FALSE, nrow(pe))
     .print_table_utf8(data.frame(
       Parameter = pe$parameter,
-      B = fmt_num(pe$b, digits),
-      SE = fmt_num(pe$se, digits),
+      B = ifelse(redundant, "0 (a)", .fmt_coef(pe$b, digits)),
+      SE = .fmt_coef(pe$se, digits),
       t = fmt_num(pe$t, digits),
       Sig = fmt_p(pe$p, digits),
-      Lower = fmt_num(pe$ci_lower, digits),
-      Upper = fmt_num(pe$ci_upper, digits),
+      Lower = .fmt_coef(pe$ci_lower, digits),
+      Upper = .fmt_coef(pe$ci_upper, digits),
       Eta = fmt_num(pe$partial_eta_sq, digits),
       stringsAsFactors = FALSE
     ), col_labels = c(SE = "Std. Error", Lower = "95% CI Lower",
                       Upper = "95% CI Upper", Eta = "Partial Eta Squared"))
+    if (any(redundant)) {
+      cat("(a) This parameter is set to zero because it is redundant (SPSS coding: the\n")
+      cat("    last category of each factor is the reference).\n")
+    }
   }
 
   # ---- ESTIMATED MARGINAL MEANS ----
   if (show_emm) {
     cat("\nEstimated Marginal Means\n")
     cat("(Evaluated at covariate means)\n")
-    emm <- x$estimated_marginal_means
-    tbl <- as.data.frame(lapply(emm[info$factors], as.character),
-                         stringsAsFactors = FALSE, check.names = FALSE)
-    tbl$Mean <- fmt_num(emm$mean, digits)
-    tbl$`Std. Error` <- fmt_num(emm$se, digits)
-    tbl$`95% CI Lower` <- fmt_num(emm$ci_lower, digits)
-    tbl$`95% CI Upper` <- fmt_num(emm$ci_upper, digits)
-    .print_table_utf8(tbl, left = length(info$factors))
+    emm_table <- function(emm, factors) {
+      tbl <- as.data.frame(lapply(emm[factors], as.character),
+                           stringsAsFactors = FALSE, check.names = FALSE)
+      tbl$Mean <- fmt_num(emm$mean, digits)
+      tbl$`Std. Error` <- fmt_num(emm$se, digits)
+      tbl$`95% CI Lower` <- fmt_num(emm$ci_lower, digits)
+      tbl$`95% CI Upper` <- fmt_num(emm$ci_upper, digits)
+      .print_table_utf8(tbl, left = length(factors))
+    }
+    # Main effects first (SPSS /EMMEANS=TABLES(factor)), then the cells
+    for (f in names(x$emm_main_effects)) {
+      cat(sprintf("\n%s\n", f))
+      emm_table(x$emm_main_effects[[f]], f)
+    }
+    if (length(info$factors) > 1) {
+      cat(sprintf("\n%s\n", paste(info$factors, collapse = " * ")))
+    }
+    emm_table(x$estimated_marginal_means, info$factors)
   }
 
   if (show_levene) .print_levene_line(x$levene_test, digits)

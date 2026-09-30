@@ -532,6 +532,69 @@ test_that("PAR-20: factorial/ancova summaries: one block, fixed decimals, SS typ
   expect_match(comp_a[1], "N = 2186")
 })
 
+test_that("PAR-16: ancova Parameter Estimates use SPSS coding (last category = 0)", {
+  # R's contrasts leaked into the table: education.L/.Q/.C for the ordered
+  # factor, gender1 for contr.sum, and an intercept that is not SPSS's.
+  an <- ancova(survey_data, dv = income, between = education, covariate = age)
+  pe <- an$parameter_estimates
+  expect_identical(pe$parameter, c(
+    "Intercept", "age", "[education=Basic Secondary]",
+    "[education=Intermediate Secondary]", "[education=Academic Secondary]",
+    "[education=University]"
+  ))
+  # ancova_output.txt, Test 1a Parameter Estimates
+  assert_spss(pe$b[1], 5349.320, tier = "display", precision = 3, label = "Intercept B")
+  assert_spss(pe$se[1], 91.774, tier = "display", precision = 3, label = "Intercept SE")
+  assert_spss(pe$b[2], -0.245, tier = "display", precision = 3, label = "age B")
+  assert_spss(pe$se[2], 1.412, tier = "display", precision = 3, label = "age SE")
+  assert_spss(pe$b[3], -2577.931, tier = "display", precision = 3, label = "[education=1] B")
+  assert_spss(pe$se[3], 72.359, tier = "display", precision = 3, label = "[education=1] SE")
+  assert_spss(pe$t[3], -35.627, tier = "display", precision = 3, label = "[education=1] t")
+  assert_spss(pe$ci_lower[3], -2719.830, tier = "display", precision = 3, label = "[education=1] CI lower")
+  assert_spss(pe$ci_upper[3], -2436.032, tier = "display", precision = 3, label = "[education=1] CI upper")
+  assert_spss(pe$partial_eta_sq[3], 0.368, tier = "display", precision = 3, label = "[education=1] eta")
+  assert_spss(pe$b[5], -1112.550, tier = "display", precision = 3, label = "[education=3] B")
+  expect_true(pe$redundant[6])
+  expect_equal(pe$b[6], 0)
+  expect_true(is.na(pe$se[6]))
+  out <- capture.output(print(summary(an)))
+  expect_false(any(grepl("education.L|education1", out)))
+  expect_true(any(grepl("redundant", out, fixed = TRUE)))
+
+  # two factors with interaction (ancova_output.txt, gender x education WITH age)
+  an2 <- ancova(survey_data, dv = income, between = c(gender, education),
+                covariate = age)
+  pe2 <- an2$parameter_estimates
+  b <- function(label) pe2[pe2$parameter == label, , drop = FALSE]
+  assert_spss(b("Intercept")$b, 5363.034, tier = "display", precision = 3, label = "2f Intercept")
+  assert_spss(b("[gender=Male]")$b, -35.274, tier = "display", precision = 3, label = "2f gender=1")
+  assert_spss(b("[gender=Male] * [education=Basic Secondary]")$b, 119.601,
+              tier = "display", precision = 3, label = "2f interaction B")
+  assert_spss(b("[gender=Male] * [education=Basic Secondary]")$se, 145.023,
+              tier = "display", precision = 3, label = "2f interaction SE")
+  expect_true(b("[gender=Female] * [education=Basic Secondary]")$redundant)
+  expect_true(b("[gender=Male] * [education=University]")$redundant)
+  expect_equal(nrow(pe2), 2 + 2 + 4 + 8)
+})
+
+test_that("PAR-16: multi-factor ANCOVA reports main-effect marginal means", {
+  # Only the cell means were reported; SPSS /EMMEANS=TABLES(gender) gives the
+  # unweighted average of the cell means at the covariate means.
+  an2 <- ancova(survey_data, dv = income, between = c(gender, education),
+                covariate = age)
+  mm <- an2$emm_main_effects
+  cells <- an2$estimated_marginal_means
+  expect_setequal(names(mm), c("gender", "education"))
+  expect_equal(mm$gender$mean[mm$gender$gender == "Male"],
+               mean(cells$mean[cells$gender == "Male"]))
+  expect_equal(mm$education$mean[mm$education$education == "University"],
+               mean(cells$mean[cells$education == "University"]))
+  expect_true(all(mm$gender$se > 0))
+  out <- capture.output(print(summary(an2)))
+  expect_true(any(grepl("gender * education", out, fixed = TRUE)))
+  expect_true(any(grepl("^ +Male +[0-9]", out)))
+})
+
 test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles", {
   # The example called summary(result, marginal_means = FALSE), a toggle
   # factorial_anova's summary() does not have (silently ignored).

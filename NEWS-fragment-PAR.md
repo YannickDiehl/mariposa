@@ -108,3 +108,14 @@
   line only; descriptives, parameter estimates and marginal means honour
   `digits`. The `?factorial_anova` examples no longer call a
   non-existent `summary(marginal_means = FALSE)` toggle. (PAR-20, PAR-26)
+* `ancova()` Parameter Estimates follow the SPSS UNIANOVA coding: one row
+  per category ("[education=Basic Secondary]"), the last category of each
+  factor (and every interaction cell involving it) is the reference and
+  shown as a redundant 0, and the intercept is SPSS's. They are now
+  validated against the SPSS reference output. R's internal contrasts
+  leaked into the table before (education.L/.Q/.C for the ordered
+  `education`, gender1, a different intercept). Tiny coefficients print
+  in e-notation instead of "0.000 [0.000, 0.000]". With two or more
+  factors, `ancova()` also reports the main-effect marginal means (SPSS
+  `/EMMEANS=TABLES(factor)`, new element `emm_main_effects`) besides the
+  cell means. (PAR-16, EDGE-25)

@@ -156,3 +156,16 @@
   print_stat_table(df, col_types = stats::setNames(rep("char", ncol(df)), names(df)),
                    col_labels = labels)
 }
+
+#' Coefficients for display: fixed decimals, tiny values in e-notation
+#'
+#' A covariate slope such as 2.46e-05 printed as "0.000 [0.000, 0.000]"
+#' with 3 decimals; values that would round to zero keep their digits.
+#' @noRd
+.fmt_coef <- function(x, digits = 3) {
+  x <- as.numeric(x)
+  out <- fmt_num(x, digits)
+  tiny <- !is.na(x) & x != 0 & abs(x) < 0.5 * 10^(-digits)
+  out[tiny] <- formatC(x[tiny], format = "e", digits = max(digits - 1, 1))
+  out
+}
