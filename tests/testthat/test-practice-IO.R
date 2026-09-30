@@ -341,3 +341,32 @@ test_that("IO-05: explicit selection converts but warns about lost values", {
   expect_false(anyNA(r2$kids))
   expect_warning(to_label(d$kids), "add_non_labelled")
 })
+
+# IO-07: copy_labels() forced the source class onto converted/summarised
+# columns: a to_label()'d factor became int+lbl 1,2,3 with labels 1/5/9.
+test_that("IO-07: copy_labels() copies value labels only to compatible columns", {
+  skip_if_not_installed("haven")
+  src <- tibble::tibble(
+    x = haven::labelled(c(1, 5, 9, 9), labels = c(a = 1, b = 5, c = 9),
+                        label = "Item x"),
+    y = haven::labelled(c(1, 2, 1, 2), labels = c(m = 1, f = 2),
+                        label = "Item y")
+  )
+  conv <- dplyr::mutate(src, x = to_label(x))
+  r <- copy_labels(conv, src)
+  expect_s3_class(r$x, "factor")
+  expect_equal(levels(r$x), c("a", "b", "c"))
+  expect_equal(attr(r$x, "label"), "Item x")
+  # summarised values are no codes: variable label only
+  s <- dplyr::summarise(src, x = mean(as.numeric(x)), y = 1L)
+  r2 <- copy_labels(s, src)
+  expect_false(inherits(r2$x, "haven_labelled"))
+  expect_null(attr(r2$x, "labels"))
+  expect_equal(attr(r2$x, "label"), "Item x")
+  # compatible (plain subset of the codes, integer): labels restored
+  plain <- data.frame(x = c(1L, 9L), y = c(2, 1))
+  r3 <- copy_labels(plain, src)
+  expect_s3_class(r3$x, "haven_labelled")
+  expect_equal(as.numeric(r3$x), c(1, 9))
+  expect_equal(attr(r3$y, "labels"), c(m = 1, f = 2))
+})

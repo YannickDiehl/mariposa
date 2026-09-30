@@ -71,3 +71,9 @@
   unchanged with one message listing them. Selected variables are still
   converted, and whenever values without a label become `NA` a warning
   names the variables and points to `add_non_labelled = TRUE`.
+* `copy_labels()` no longer forces the source's value labels and class
+  onto columns that were converted or summarised: a `to_label()` factor
+  became `int+lbl` 1, 2, 3 carrying the labels 1/5/9 of the source codes,
+  and group means were labelled as if they were codes. Value labels,
+  missing-value metadata and the class are now copied only when the target
+  still holds the source's codes; the variable label is always copied.

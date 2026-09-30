@@ -369,14 +369,19 @@ val_labels <- function(data, ..., .add = FALSE, drop_na = TRUE) {
 #'   the target are left unchanged.
 #'
 #' @details
-#' The following attributes are copied for each shared column:
+#' The variable label (`"label"`) is always copied. The following are
+#' copied only when the target column still holds the source's codes (a
+#' numeric column whose values are observed values or labelled codes of the
+#' source column):
 #' \itemize{
-#'   \item `"label"` — variable label
 #'   \item `"labels"` — value labels
 #'   \item `"na_tag_map"` — tagged NA mapping
 #'   \item `"na_tag_format"` — tagged NA format (spss/stata/sas)
+#'   \item `"na_values"`, `"na_range"` — SPSS missing-value definitions
 #'   \item `"class"` — vector class (e.g., `haven_labelled`)
 #' }
+#' A converted column (e.g. a factor from [to_label()]) or a summarised one
+#' (e.g. group means) keeps its own type and gets the variable label only.
 #'
 #' @seealso [var_label()], [val_labels()]
 #'
@@ -404,32 +409,59 @@ copy_labels <- function(data, source) {
     src <- source[[nm]]
     tgt <- data[[nm]]
 
-    # Copy variable label
+    # Copy variable label (always)
     lbl <- attr(src, "label", exact = TRUE)
     if (!is.null(lbl)) attr(tgt, "label") <- lbl
 
-    # Copy value labels
-    val_lbl <- attr(src, "labels", exact = TRUE)
-    if (!is.null(val_lbl)) attr(tgt, "labels") <- val_lbl
-
-    # Copy tagged NA metadata
-    tag_map <- attr(src, "na_tag_map", exact = TRUE)
-    if (!is.null(tag_map)) attr(tgt, "na_tag_map") <- tag_map
-
-    tag_fmt <- attr(src, "na_tag_format", exact = TRUE)
-    if (!is.null(tag_fmt)) attr(tgt, "na_tag_format") <- tag_fmt
-
-    # Restore class if needed (e.g., haven_labelled)
-    src_class <- class(src)
-    if (!identical(class(tgt), src_class) &&
-        any(grepl("haven_labelled", src_class))) {
-      class(tgt) <- src_class
+    # Value labels, missing-value metadata and the labelled class only when
+    # the target still holds the source's codes. A converted (to_label()
+    # factor) or summarised (means) column used to get the source class
+    # forced onto it: the factor became int+lbl 1, 2, 3 with labels 1/5/9.
+    if (.labels_compatible(tgt, src)) {
+      if (is.integer(tgt) && is.double(src)) tgt <- as.double(tgt)
+      for (a in c("labels", "na_tag_map", "na_tag_format", "na_values",
+                  "na_range")) {
+        val <- attr(src, a, exact = TRUE)
+        if (!is.null(val)) attr(tgt, a) <- val
+      }
+      src_class <- class(src)
+      if (!identical(class(tgt), src_class) &&
+          any(grepl("haven_labelled", src_class))) {
+        class(tgt) <- src_class
+      }
     }
 
     data[[nm]] <- tgt
   }
 
   data
+}
+
+
+#' Can a column take over the value labels of its source column?
+#'
+#' TRUE when the source carries value labels / missing-value metadata and
+#' the target is a numeric (non-factor) vector whose observed values are
+#' codes of the source (its observed values or labelled codes) and whose
+#' tagged NAs are known to the source's na_tag_map.
+#' @noRd
+.labels_compatible <- function(tgt, src) {
+  has_meta <- !is.null(attr(src, "labels", exact = TRUE)) ||
+    !is.null(attr(src, "na_tag_map", exact = TRUE)) ||
+    inherits(src, "haven_labelled")
+  if (!has_meta || !is.numeric(tgt) || is.factor(tgt) || !is.numeric(src)) {
+    return(FALSE)
+  }
+  t_raw <- as.double(.plain_numeric(tgt))
+  s_raw <- as.double(.plain_numeric(src))
+  labels <- attr(src, "labels", exact = TRUE)
+  codes <- c(s_raw[!is.na(s_raw)],
+             if (is.numeric(labels)) as.double(.plain_numeric(labels)))
+  if (!all(t_raw[!is.na(t_raw)] %in% codes)) return(FALSE)
+  t_tags <- .na_tags(t_raw)
+  t_tags <- unique(t_tags[!is.na(t_tags)])
+  length(t_tags) == 0L ||
+    all(t_tags %in% names(attr(src, "na_tag_map", exact = TRUE)))
 }
 
 
