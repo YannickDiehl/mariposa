@@ -24,6 +24,10 @@ spss_values <- list(
     eigenvalues = c(1.600, 1.041, 1.017, 0.980, 0.949, 0.412),  # lines 112-117
     var_explained = c(26.666, 17.358, 16.955, 16.334, 15.814, 6.873),
     cumulative = c(26.666, 44.024, 60.979, 77.313, 93.127, 100.000),
+    # Extraction Sums of Squared Loadings (lines 112-114, middle block)
+    extraction_ss = c(1.600, 1.041, 1.017),
+    extraction_pct = c(26.666, 17.358, 16.955),
+    extraction_cum = c(26.666, 44.024, 60.979),
     communalities = c(political_orientation = 0.786,                # lines 100-105
                        environmental_concern = 0.783,
                        life_satisfaction     = 0.668,
@@ -69,6 +73,19 @@ test_that("Test 1a: EFA 6-variable PCA/Varimax — matches SPSS", {
     assert_spss(r$variance_explained$cumulative_prc[i], spss$cumulative[i],
                 tier = "display", precision = 3,
                 label = sprintf("[1a] component %d cumulative %%", i))
+  }
+
+  # Extraction Sums of Squared Loadings
+  for (i in seq_along(spss$extraction_ss)) {
+    assert_spss(r$extraction_variance$ss_loading[i], spss$extraction_ss[i],
+                tier = "display", precision = 3,
+                label = sprintf("[1a] component %d extraction SS", i))
+    assert_spss(r$extraction_variance$prc_variance[i], spss$extraction_pct[i],
+                tier = "display", precision = 3,
+                label = sprintf("[1a] component %d extraction %% variance", i))
+    assert_spss(r$extraction_variance$cumulative_prc[i], spss$extraction_cum[i],
+                tier = "display", precision = 3,
+                label = sprintf("[1a] component %d extraction cumulative %%", i))
   }
 
   # Communalities (named numeric vector keyed by variable)

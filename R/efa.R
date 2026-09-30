@@ -35,7 +35,12 @@
 #'   \item{loadings}{Component loading matrix (rotated if rotation applied)}
 #'   \item{unrotated_loadings}{Unrotated component matrix}
 #'   \item{eigenvalues}{All eigenvalues from the correlation matrix}
-#'   \item{variance_explained}{Tibble with Total, % of Variance, Cumulative %}
+#'   \item{variance_explained}{Tibble with the initial eigenvalues: Total,
+#'     % of Variance, Cumulative % (one row per variable)}
+#'   \item{extraction_variance}{Tibble with the extraction sums of squared
+#'     loadings of the extracted components/factors (SPSS "Extraction Sums
+#'     of Squared Loadings"). For ML this is the variance the common factors
+#'     explain - the figure the compact print reports.}
 #'   \item{rotation_variance}{Tibble with rotation sums of squared loadings}
 #'   \item{communalities}{Extraction communalities for each variable}
 #'   \item{kmo}{List with overall KMO and per-item MSA values}
@@ -366,6 +371,18 @@ efa <- function(data, ...,
   col_prefix <- ext$col_prefix
   total_var <- k  # For correlation matrix, total variance = k
 
+  # Extraction Sums of Squared Loadings (SPSS "Total Variance Explained",
+  # middle block). For PCA these equal the retained eigenvalues; for ML
+  # they are the variance the common factors actually explain, which is
+  # far below the eigenvalue share of the same number of components.
+  ext_ss <- unname(colSums(raw_loadings^2))
+  extraction_variance <- tibble::tibble(
+    component = seq_len(n_factors_used),
+    ss_loading = ext_ss,
+    prc_variance = ext_ss / total_var * 100,
+    cumulative_prc = cumsum(ext_ss / total_var * 100)
+  )
+
   # ============================================================================
   # ROTATION
   # ============================================================================
@@ -479,6 +496,7 @@ efa <- function(data, ...,
     unrotated_loadings = raw_loadings,
     eigenvalues = eigenvalues,
     variance_explained = variance_explained,
+    extraction_variance = extraction_variance,
     rotation_variance = rotation_variance,
     communalities = communalities,
     initial_communalities = ext$initial_communalities,
@@ -919,6 +937,22 @@ efa <- function(data, ...,
 # HELPERS
 # ============================================================================
 
+#' Extraction sums of squared loadings of a (possibly older) efa result
+#'
+#' Results created before the extraction_variance field existed are
+#' completed from their unrotated loadings.
+#' @param res efa result (or one group's result)
+#' @return tibble(component, ss_loading, prc_variance, cumulative_prc)
+#' @noRd
+.efa_extraction_variance <- function(res) {
+  if (!is.null(res$extraction_variance)) return(res$extraction_variance)
+  ss <- unname(colSums(res$unrotated_loadings^2))
+  k <- nrow(res$unrotated_loadings)
+  tibble::tibble(component = seq_along(ss), ss_loading = ss,
+                 prc_variance = ss / k * 100,
+                 cumulative_prc = cumsum(ss / k * 100))
+}
+
 #' Interpret KMO value
 #' @noRd
 .kmo_interpretation <- function(kmo) {
@@ -996,14 +1030,15 @@ print.efa <- function(x, digits = 3, ...) {
 .print_efa_compact <- function(res, n_vars, extraction_label, rotation_label,
                                weighted_tag, digits) {
   n_factors <- res$n_factors
-  component_label <- if (n_factors == 1) "component" else "components"
+  unit <- if (identical(res$extraction, "ml")) "factor" else "component"
+  component_label <- if (n_factors == 1) unit else paste0(unit, "s")
 
   kmo <- res$kmo$overall
   kmo_interp <- .kmo_interpretation(kmo)
 
-  # Total variance explained by extracted components
-  ve <- res$variance_explained
-  total_var_pct <- ve$cumulative_prc[min(n_factors, nrow(ve))]
+  # Variance explained by the extracted solution (SPSS "Extraction Sums of
+  # Squared Loadings", cumulative %); for ML this is not the eigenvalue share
+  total_var_pct <- .efa_extraction_variance(res)$cumulative_prc[n_factors]
 
   cat(sprintf("Exploratory Factor Analysis: %d items, %d %s (%s/%s)%s\n",
               n_vars, n_factors, component_label,
@@ -1203,39 +1238,7 @@ print.summary.efa <- function(x, ...) {
   # Total Variance Explained
   if (show_var) {
     cat("\nTotal Variance Explained\n")
-    cat(paste(rep("-", 40), collapse = ""), "\n")
-
-    ve <- x$variance_explained
-    n_f <- x$n_factors
-
-    for (i in seq_len(nrow(ve))) {
-      cat(sprintf("  %s%d  Eigenvalue: %s  Variance: %s%%  Cumulative: %s%%\n",
-                  prefix, i,
-                  format(round(ve$eigenvalue[i], digits), nsmall = digits),
-                  format(round(ve$prc_variance[i], digits), nsmall = digits),
-                  format(round(ve$cumulative_prc[i], digits), nsmall = digits)))
-    }
-
-    # Rotation sums if available
-    if (!is.null(x$rotation_variance) && x$rotation != "none") {
-      cat("\nRotation Sums of Squared Loadings\n")
-      cat(paste(rep("-", 40), collapse = ""), "\n")
-      rv <- x$rotation_variance
-      for (i in seq_len(nrow(rv))) {
-        if ("prc_variance" %in% names(rv)) {
-          cat(sprintf("  %s%d  SS Loading: %s  Variance: %s%%  Cumulative: %s%%\n",
-                      prefix, i,
-                      format(round(rv$ss_loading[i], digits), nsmall = digits),
-                      format(round(rv$prc_variance[i], digits), nsmall = digits),
-                      format(round(rv$cumulative_prc[i], digits), nsmall = digits)))
-        } else {
-          # Oblique rotation: only SS loadings (no cumulative)
-          cat(sprintf("  %s%d  SS Loading: %s\n",
-                      prefix, i,
-                      format(round(rv$ss_loading[i], digits), nsmall = digits)))
-        }
-      }
-    }
+    .print_efa_variance_table(x, matrix_label, extraction_full, digits)
   }
 
   # Unrotated matrix
@@ -1301,6 +1304,93 @@ print.summary.efa <- function(x, ...) {
 
     .print_efa_ungrouped(temp, digits)
   }
+}
+
+#' Print SPSS's "Total Variance Explained" table
+#'
+#' One row per variable: Initial Eigenvalues for every component, the
+#' Extraction Sums of Squared Loadings and (when rotated) the Rotation Sums
+#' for the extracted ones - the SPSS FACTOR layout. Oblique rotations show
+#' only the rotation totals, with SPSS's footnote.
+#' @param x efa result (one group)
+#' @param unit_label "Component" (PCA) or "Factor" (ML)
+#' @param extraction_full Extraction method for the footer
+#' @param digits Decimal places
+#' @noRd
+.print_efa_variance_table <- function(x, unit_label, extraction_full, digits) {
+  ve <- x$variance_explained
+  k <- nrow(ve)
+  pad_k <- function(v) c(v, rep(NA_real_, k - length(v)))
+  ev <- .efa_extraction_variance(x)
+
+  groups <- list(
+    list(label = "Initial Eigenvalues",
+         cols = list(ve$eigenvalue, ve$prc_variance, ve$cumulative_prc)),
+    list(label = "Extraction Sums",
+         cols = list(pad_k(ev$ss_loading), pad_k(ev$prc_variance),
+                     pad_k(ev$cumulative_prc)))
+  )
+  rv <- x$rotation_variance
+  oblique <- FALSE
+  if (!is.null(rv) && !identical(x$rotation, "none")) {
+    oblique <- !"prc_variance" %in% names(rv)
+    groups[[3]] <- list(
+      label = "Rotation Sums",
+      cols = if (oblique) list(pad_k(rv$ss_loading)) else
+        list(pad_k(rv$ss_loading), pad_k(rv$prc_variance),
+             pad_k(rv$cumulative_prc))
+    )
+  }
+  sub_labels <- c("Total", "% Var.", "Cum. %")
+
+  # Format cells and size every column to its content
+  row_labels <- as.character(seq_len(k))
+  w0 <- max(nchar(unit_label), nchar(row_labels))
+  groups <- lapply(groups, function(g) {
+    g$cells <- lapply(g$cols, fmt_num, digits = digits)
+    g$heads <- sub_labels[seq_along(g$cols)]
+    g$widths <- mapply(function(h, cl) max(nchar(h), nchar(cl)),
+                       g$heads, g$cells)
+    inner <- sum(g$widths) + length(g$widths) - 1L
+    if (nchar(g$label) > inner) {
+      last <- length(g$widths)
+      g$widths[last] <- g$widths[last] + nchar(g$label) - inner
+      inner <- nchar(g$label)
+    }
+    g$inner <- inner
+    g
+  })
+  total_width <- w0 + sum(vapply(groups, function(g) g$inner + 2L, integer(1)))
+  border <- paste0("  ", strrep("-", total_width))
+
+  line1 <- paste0("  ", strrep(" ", w0), paste0(vapply(groups, function(g) {
+    paste0("  ", pad_utf8(g$label, g$inner))
+  }, character(1)), collapse = ""))
+  line2 <- paste0("  ", pad_utf8(unit_label, w0), paste0(vapply(groups, function(g) {
+    paste0("  ", paste(mapply(pad_utf8, g$heads, g$widths, "right"),
+                       collapse = " "))
+  }, character(1)), collapse = ""))
+
+  cat(border, "\n", sep = "")
+  cat(sub(" +$", "", line1), "\n", sep = "")
+  cat(line2, "\n", sep = "")
+  cat(border, "\n", sep = "")
+  for (i in seq_len(k)) {
+    cells <- vapply(groups, function(g) {
+      paste0("  ", paste(mapply(function(cl, w) pad_utf8(cl[i], w, "right"),
+                                g$cells, g$widths), collapse = " "))
+    }, character(1))
+    cat(sub(" +$", "", paste0("  ", pad_utf8(row_labels[i], w0, "right"),
+                              paste0(cells, collapse = ""))), "\n", sep = "")
+  }
+  cat(border, "\n", sep = "")
+  cat("Sums = sums of squared loadings.\n")
+  cat(sprintf("Extraction Method: %s.\n", extraction_full))
+  if (oblique) {
+    cat(sprintf("When %ss are correlated, sums of squared loadings cannot be added to obtain a total variance.\n",
+                tolower(unit_label)))
+  }
+  invisible(NULL)
 }
 
 #' Print a loading matrix with blank suppression and optional sorting
