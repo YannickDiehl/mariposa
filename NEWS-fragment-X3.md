@@ -48,3 +48,7 @@
   into `NA` (listed under "Total missing") with the base-R warning
   "invalid factor level, NA generated": the weighted branch kept the
   factor as the value column when the tables were combined.
+* Variable pairs are joined by an ASCII "x" in every output: the titles
+  of `chi_square()`, `fisher_test()`, `mcnemar_test()` and `crosstab()`
+  and the chi-square "Table size" line used the multiplication sign
+  (U+00D7), the correlation, factorial and post-hoc output an "x".

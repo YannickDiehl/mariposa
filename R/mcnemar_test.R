@@ -343,7 +343,7 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
 #' @export
 print.mcnemar_test <- function(x, digits = 3, ...) {
   weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
-  pair_label <- paste(x$var1_name, "\u00d7", x$var2_name)
+  pair_label <- paste(x$var1_name, "x", x$var2_name)
   correct <- !isFALSE(x$correct)
 
   for_each_group(x$results, if (isTRUE(x$is_grouped)) x$groups, function(rows, key) {

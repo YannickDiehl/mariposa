@@ -188,6 +188,27 @@ test_that("sweep: weighted frequency() of a factor next to a numeric variable", 
   expect_true(all(c(1, 5) %in% suppressWarnings(as.numeric(fg$results$value))))
 })
 
+# --- EDGE-23: one pair separator ----------------------------------------------
+
+test_that("EDGE-23: variable pairs are joined by ASCII 'x' everywhere", {
+  # chi_square/fisher_test/mcnemar_test/crosstab titles used the
+  # multiplication sign (U+00D7), the correlation, partial-correlation,
+  # factorial and post-hoc output an ASCII "x"; print output is ASCII.
+  d <- survey_data
+  d$hi_gov <- as.integer(d$trust_government >= 4)
+  d$hi_med <- as.integer(d$trust_media >= 4)
+  outs <- c(
+    capture.output(print(chi_square(d, education, gender))),
+    capture.output(print(summary(chi_square(d, education, gender)))),
+    capture.output(print(fisher_test(d, gender, region))),
+    capture.output(print(mcnemar_test(d, hi_gov, hi_med))),
+    capture.output(print(crosstab(d, education, gender)))
+  )
+  expect_false(any(grepl("×", outs, fixed = TRUE)))
+  expect_true(any(grepl("education x gender", outs, fixed = TRUE)))
+  expect_true(any(grepl("Table size: 4 x 2", outs, fixed = TRUE)))
+})
+
 # --- EDGE-23: one group-header style, no trailing blanks in headers -----------
 
 test_that("EDGE-23: verbose group headers share one style without a trailing blank", {

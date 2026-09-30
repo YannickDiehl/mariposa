@@ -273,7 +273,7 @@ fisher_test <- function(data, row, col, weights = NULL,
 #' @export
 print.fisher_test <- function(x, digits = 3, ...) {
   weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
-  pair_label <- paste(x$row_var, "\u00d7", x$col_var)
+  pair_label <- paste(x$row_var, "x", x$col_var)
 
   for_each_group(x$results, if (isTRUE(x$is_grouped)) x$groups, function(rows, key) {
     if (!is.null(key)) cat(sprintf("[%s]\n", .format_group_label(key)))

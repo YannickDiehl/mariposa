@@ -516,7 +516,7 @@ print.summary.crosstab <- function(x, ...) {
   col_lab <- x$col_label %||% x$col_var
 
   # Header
-  title <- paste0("Crosstabulation: ", row_lab, " \u00d7 ", col_lab)
+  title <- paste0("Crosstabulation: ", row_lab, " x ", col_lab)
   cat("\n", title, "\n", sep = "")
   cat(strrep("-", nchar(title, type = "width")), "\n", sep = "")
 

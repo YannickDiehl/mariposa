@@ -662,7 +662,7 @@ test_that("DESC-05: crosstab shows full labels, per-column widths and variable l
   on.exit(options(old))
   out <- capture.output(print(crosstab(d, job, sex)))
   for (l in names(long_labs)) expect_true(any(grepl(l, out, fixed = TRUE)))
-  expect_true(any(grepl("Crosstabulation: Beruf (ISCO-08) × Geschlecht", out,
+  expect_true(any(grepl("Crosstabulation: Beruf (ISCO-08) x Geschlecht", out,
                         fixed = TRUE)))
   expect_true(any(grepl("Geschlecht", out[grepl("^\\|", out)])))  # spanner
   hdr <- out[grepl("MANN", out) & grepl("^\\|", out)][1]

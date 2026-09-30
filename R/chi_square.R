@@ -231,7 +231,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
              " only one observed category")
     }
     cli_warn(c(
-      "Chi-squared test not computed for {.var {var_names[1]}} \u00d7 {.var {var_names[2]}}{where}.",
+      "Chi-squared test not computed for {.var {var_names[1]}} x {.var {var_names[2]}}{where}.",
       "x" = "{reason}."
     ))
     return(empty_row(reason))
@@ -413,7 +413,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
   print_stat_table(effect_table, digits = digits, indent = 0,
                    col_types = c(Value = "num"),
                    col_labels = c(p = "p value", stars = ""))
-  cat(sprintf("Table size: %d\u00d7%d | N = %s\n", as.integer(rows),
+  cat(sprintf("Table size: %d x %d | N = %s\n", as.integer(rows),
               as.integer(cols), fmt_int(n)))
   if (!show_gamma) {
     cat("Note: Gamma is shown for two ordinal variables (ordered factor or numeric) only.\n")
@@ -470,7 +470,7 @@ chi_square <- function(data, ..., weights = NULL, correct = FALSE) {
 #' @method print chi_square
 print.chi_square <- function(x, digits = 3, ...) {
   weighted_tag <- if (!is.null(x$weights)) " [Weighted]" else ""
-  var_label <- paste(x$variables[1], "\u00d7", x$variables[2])
+  var_label <- paste(x$variables[1], "x", x$variables[2])
 
   if (isTRUE(x$is_grouped)) {
     groups <- unique(x$results[x$groups])
@@ -609,7 +609,7 @@ print.summary.chi_square <- function(x, ...) {
 
   cat("\n")
   test_info <- list(
-    "Variables" = paste(x$variables[1], "\u00d7", x$variables[2]),
+    "Variables" = paste(x$variables[1], "x", x$variables[2]),
     "Grouped by" = if (isTRUE(x$is_grouped)) paste(x$groups, collapse = ", "),
     "Weights variable" = x$weights,
     "Continuity correction" = if (isTRUE(x$correct)) "Yates' correction applied (2x2 tables)" else NULL
