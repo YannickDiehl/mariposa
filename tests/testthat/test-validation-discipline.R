@@ -269,6 +269,12 @@ test_that("validation discipline: no forbidden patterns in SPSS-validation tests
 
 
 test_that("validation discipline: exception registry matches markdown", {
+  # .claude/ is maintainer-local (gitignored): a public checkout such as the
+  # strict-validation CI job has no VALIDATION_EXCEPTIONS.md to compare
+  # with; the registry's code/test references are still checked below.
+  if (!file.exists(exceptions_md_path)) {
+    skip("VALIDATION_EXCEPTIONS.md is not part of this checkout (.claude/ is local).")
+  }
   md_ids <- extract_exc_ids_from_md(exceptions_md_path)
 
   # Source the helper to load the R-side registry
@@ -312,7 +318,14 @@ test_that("validation discipline: exception registry matches markdown", {
 
 
 test_that("validation discipline: every exception is referenced in R/ and tests/", {
-  md_ids <- extract_exc_ids_from_md(exceptions_md_path)
+  # IDs from the markdown registry and from exception_registry, so the
+  # check also runs where .claude/ is absent (public checkout, CI)
+  registry_env <- new.env()
+  if (file.exists("helper-validation-tolerances.R")) {
+    source("helper-validation-tolerances.R", local = registry_env)
+  }
+  md_ids <- union(extract_exc_ids_from_md(exceptions_md_path),
+                  names(registry_env$exception_registry))
 
   if (length(md_ids) == 0) {
     succeed("No active exceptions registered; nothing to verify.")
