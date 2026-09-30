@@ -3,6 +3,11 @@
 # =============================================================================
 # Purpose: Validate mariposa::wilcoxon_test() against SPSS v29 NPAR /WILCOXON.
 # Reference output: tests/spss_reference/outputs/wilcoxon_test_output.txt
+#   Part A (survey_data):            Tests 1a-1c, 3a-3b (unweighted, asserted)
+#                                    Tests 2a-2b, 4a-4b (weighted, not SPSS parity)
+#   Part B (longitudinal_data_wide): Tests 5a-5c (unweighted, asserted)
+# Every asserted section also checks the "Based on ... ranks" footnote
+# against z_based_on.
 #
 # Charter reference: .claude/VALIDATION_CHARTER.md
 #
@@ -69,7 +74,8 @@ spss_values <- list(
       n_ties = 89L,                                                     # wilcoxon_test_output.txt:245
       n_total = 435L,                                                   # row total at line 246
       z = -2.727,                                                       # wilcoxon_test_output.txt:258
-      p = 0.006                                                         # wilcoxon_test_output.txt:259
+      p = 0.006,                                                        # wilcoxon_test_output.txt:259
+      based_on = "positive ranks"                                       # wilcoxon_test_output.txt:263
     ),
     West = list(
       n_neg = 764L, mean_rank_neg = 705.10, sum_rank_neg = 538697.50,   # wilcoxon_test_output.txt:247
@@ -77,7 +83,8 @@ spss_values <- list(
       n_ties = 413L,                                                    # wilcoxon_test_output.txt:249
       n_total = 1792L,                                                  # row total at line 250
       z = -4.346,                                                       # wilcoxon_test_output.txt:260
-      p = "<.001"                                                       # wilcoxon_test_output.txt:261
+      p = "<.001",                                                      # wilcoxon_test_output.txt:261
+      based_on = "positive ranks"                                       # wilcoxon_test_output.txt:263
     )
   ),
 
@@ -89,7 +96,8 @@ spss_values <- list(
       n_ties = 93L,                                                     # wilcoxon_test_output.txt:294
       n_total = 444L,                                                   # wilcoxon_test_output.txt:295
       z = -11.635,                                                      # wilcoxon_test_output.txt:307
-      p = "<.001"                                                       # wilcoxon_test_output.txt:308
+      p = "<.001",                                                      # wilcoxon_test_output.txt:308
+      based_on = "negative ranks"                                       # wilcoxon_test_output.txt:312
     ),
     West = list(
       n_neg = 291L,  mean_rank_neg = 531.02, sum_rank_neg = 154526.50,  # wilcoxon_test_output.txt:296
@@ -97,7 +105,57 @@ spss_values <- list(
       n_ties = 383L,                                                    # wilcoxon_test_output.txt:298
       n_total = 1811L,                                                  # wilcoxon_test_output.txt:299
       z = -23.191,                                                      # wilcoxon_test_output.txt:309
-      p = "<.001"                                                       # wilcoxon_test_output.txt:310
+      p = "<.001",                                                      # wilcoxon_test_output.txt:310
+      based_on = "negative ranks"                                       # wilcoxon_test_output.txt:312
+    )
+  ),
+
+  # ======================================================================
+  # Part B — longitudinal_data_wide (wilcoxon_test_output.txt:412-547),
+  # SPSS computes diff = score_Tj - score_Ti; no tied pairs
+  # ======================================================================
+
+  # ---- Test 5a: score_T1 WITH score_T2 ----------------------------------
+  test_5a_T1_T2 = list(
+    n_neg = 27, mean_rank_neg = 40.19, sum_rank_neg = 1085.00,          # wilcoxon_test_output.txt:440
+    n_pos = 78, mean_rank_pos = 57.44, sum_rank_pos = 4480.00,          # wilcoxon_test_output.txt:441
+    n_ties = 0,                                                         # wilcoxon_test_output.txt:442
+    n_total = 105,                                                      # wilcoxon_test_output.txt:443
+    z = -5.427,                                                         # wilcoxon_test_output.txt:451
+    p = "<.001",                                                        # wilcoxon_test_output.txt:452
+    based_on = "negative ranks"                                         # wilcoxon_test_output.txt:454
+  ),
+
+  # ---- Test 5b: score_T1 WITH score_T3 ----------------------------------
+  test_5b_T1_T3 = list(
+    n_neg = 21, mean_rank_neg = 30.95, sum_rank_neg = 650.00,           # wilcoxon_test_output.txt:483
+    n_pos = 75, mean_rank_pos = 53.41, sum_rank_pos = 4006.00,          # wilcoxon_test_output.txt:484
+    n_ties = 0,                                                         # wilcoxon_test_output.txt:485
+    n_total = 96,                                                       # wilcoxon_test_output.txt:486
+    z = -6.132,                                                         # wilcoxon_test_output.txt:494
+    p = "<.001",                                                        # wilcoxon_test_output.txt:495
+    based_on = "negative ranks"                                         # wilcoxon_test_output.txt:497
+  ),
+
+  # ---- Test 5c: score_T1 WITH score_T2, split by group ------------------
+  test_5c_T1_T2_grouped = list(
+    Control = list(
+      n_neg = 18, mean_rank_neg = 21.94, sum_rank_neg = 395.00,         # wilcoxon_test_output.txt:526
+      n_pos = 33, mean_rank_pos = 28.21, sum_rank_pos = 931.00,         # wilcoxon_test_output.txt:527
+      n_ties = 0,                                                       # wilcoxon_test_output.txt:528
+      n_total = 51,                                                     # wilcoxon_test_output.txt:529
+      z = -2.512,                                                       # wilcoxon_test_output.txt:541
+      p = 0.012,                                                        # wilcoxon_test_output.txt:542
+      based_on = "negative ranks"                                       # wilcoxon_test_output.txt:546
+    ),
+    Treatment = list(
+      n_neg = 9,  mean_rank_neg = 17.89, sum_rank_neg = 161.00,         # wilcoxon_test_output.txt:530
+      n_pos = 45, mean_rank_pos = 29.42, sum_rank_pos = 1324.00,        # wilcoxon_test_output.txt:531
+      n_ties = 0,                                                       # wilcoxon_test_output.txt:532
+      n_total = 54,                                                     # wilcoxon_test_output.txt:533
+      z = -5.007,                                                       # wilcoxon_test_output.txt:543
+      p = "<.001",                                                      # wilcoxon_test_output.txt:544
+      based_on = "negative ranks"                                       # wilcoxon_test_output.txt:546
     )
   )
 )
@@ -118,10 +176,8 @@ compare_wilcoxon <- function(row, spss, scenario) {
   assert_spss(as.numeric(row$Z), spss$z,
               tier = "display", precision = 3,
               label = sprintf("[%s] Z", scenario))
-  if (!is.null(spss$based_on)) {
-    expect_identical(row$z_based_on, spss$based_on,
-                     label = sprintf("[%s] Z based on", scenario))
-  }
+  expect_identical(row$z_based_on, spss$based_on,
+                   label = sprintf("[%s] Z based on", scenario))
   assert_spss(as.numeric(row$p_value), spss$p,
               tier = "display", precision = 3, what = "p_value",
               label = sprintf("[%s] p-value", scenario))
@@ -153,11 +209,11 @@ compare_wilcoxon <- function(row, spss, scenario) {
               label = sprintf("[%s] sum of ranks (positive)", scenario))
 }
 
-extract_grouped_row <- function(result, region) {
+extract_grouped_row <- function(result, level, by = "region") {
   r <- result$results
-  r <- r[r$region == region, , drop = FALSE]
+  r <- r[r[[by]] == level, , drop = FALSE]
   if (nrow(r) != 1L) {
-    stop(sprintf("expected 1 row for region=%s", region), call. = FALSE)
+    stop(sprintf("expected 1 row for %s=%s", by, level), call. = FALSE)
   }
   r
 }
@@ -168,6 +224,7 @@ extract_grouped_row <- function(result, region) {
 # =============================================================================
 
 data(survey_data, envir = environment())
+data(longitudinal_data_wide, envir = environment())
 
 
 # =============================================================================
@@ -216,6 +273,34 @@ test_that("Test 3b: Wilcoxon trust_gov / trust_science, grouped by region — ma
     row <- extract_grouped_row(r, rg)
     compare_wilcoxon(row, spss_values$test_3b_gov_science_grouped[[rg]],
                      sprintf("3b: trust_gov / trust_science [%s]", rg))
+  }
+})
+
+
+# =============================================================================
+# PART B — longitudinal_data_wide (unweighted; ungrouped + split by group)
+# =============================================================================
+
+test_that("Test 5a: Wilcoxon score_T1 / score_T2 — matches SPSS", {
+  r <- longitudinal_data_wide |> wilcoxon_test(score_T1, score_T2)
+  compare_wilcoxon(r$results, spss_values$test_5a_T1_T2,
+                   "5a: score_T1 / score_T2")
+})
+
+test_that("Test 5b: Wilcoxon score_T1 / score_T3 — matches SPSS", {
+  r <- longitudinal_data_wide |> wilcoxon_test(score_T1, score_T3)
+  compare_wilcoxon(r$results, spss_values$test_5b_T1_T3,
+                   "5b: score_T1 / score_T3")
+})
+
+test_that("Test 5c: Wilcoxon score_T1 / score_T2, grouped by group — matches SPSS", {
+  r <- longitudinal_data_wide |>
+    group_by(group) |>
+    wilcoxon_test(score_T1, score_T2)
+  for (g in c("Control", "Treatment")) {
+    row <- extract_grouped_row(r, g, by = "group")
+    compare_wilcoxon(row, spss_values$test_5c_T1_T2_grouped[[g]],
+                     sprintf("5c: score_T1 / score_T2 [%s]", g))
   }
 })
 
