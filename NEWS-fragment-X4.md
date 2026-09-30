@@ -20,3 +20,16 @@
   Squared Loadings" are now the sums of squares of the structure matrix, as
   SPSS reports them (they were taken from the pattern matrix: 1.604 / 1.065
   / 1.045 instead of SPSS 1.599 / 1.039 / 1.021).
+* `efa()` varimax and oblimin rotations now use SPSS FACTOR's own
+  algorithms and stopping rules (Kaiser's cyclic pairwise varimax; the
+  Jennrich-Sampson direct oblimin, delta = 0; at most 25 iterations).
+  `stats::varimax()` stopped earlier and missed SPSS's component
+  transformation matrix by up to .004 (2-factor solution: 26.653 % instead
+  of SPSS 26.655 % for the first rotated component);
+  `GPArotation::oblimin()` iterated past SPSS's stopping point (weighted
+  solution: pattern loadings off by up to .002). The rotated factors are
+  reflected to a positive sum and ordered by their sums of squares as in
+  SPSS. Every varimax, oblimin and promax reference solution (unweighted,
+  weighted, per region) now matches SPSS, including SPSS's iteration
+  counts, which `summary()` prints as SPSS does ("Rotation converged in 4
+  iterations."). Oblimin no longer needs the GPArotation package.

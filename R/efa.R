@@ -17,10 +17,13 @@
 #'   Default \code{NULL} uses the Kaiser criterion (eigenvalue > 1). A single
 #'   component cannot be rotated; it is shown unrotated with SPSS's note.
 #' @param rotation Rotation method: \code{"varimax"} (default, orthogonal),
-#'   \code{"oblimin"} (oblique, allows correlated factors),
-#'   \code{"promax"} (oblique, power-based; computed as SPSS
-#'   \code{/ROTATION PROMAX(4)} with a Kaiser-normalized target, which
-#'   differs from \code{stats::promax()}), or \code{"none"}.
+#'   \code{"oblimin"} (oblique direct oblimin, delta = 0, allows correlated
+#'   factors), \code{"promax"} (oblique, power 4), or \code{"none"}. All
+#'   rotations use Kaiser normalization and SPSS FACTOR's own algorithms and
+#'   stopping rules (at most 25 iterations, as SPSS \code{/CRITERIA
+#'   ITERATE(25)}), so they reproduce SPSS's rotated matrices; they differ
+#'   slightly from \code{stats::varimax()}, \code{stats::promax()} and
+#'   \code{GPArotation::oblimin()}.
 #' @param extraction Extraction method: \code{"pca"} (default, Principal
 #'   Component Analysis) or \code{"ml"} (Maximum Likelihood, enables
 #'   goodness-of-fit testing, assumes multivariate normality).
@@ -61,6 +64,10 @@
 #'   \item{pattern_matrix}{Pattern matrix (oblimin/promax only, NULL otherwise)}
 #'   \item{structure_matrix}{Structure matrix (oblimin/promax only, NULL otherwise)}
 #'   \item{factor_correlations}{Factor correlation matrix (oblimin/promax only, NULL otherwise)}
+#'   \item{rotation_iterations, rotation_converged}{Iterations of the
+#'     rotation as SPSS counts them ("Rotation converged in 4 iterations";
+#'     for promax those of its varimax step) and whether it converged;
+#'     NULL without rotation}
 #'   \item{variables}{Character vector of variable names}
 #'   \item{variable_labels}{Named character vector with the variable labels
 #'     (\code{NA} where a variable has none); \code{summary()} shows them
@@ -144,15 +151,11 @@
 #'     political_orientation, environmental_concern, life_satisfaction,
 #'     trust_government, trust_media, trust_science)
 #'
-#' # With Oblimin rotation (requires GPArotation package)
-#' \donttest{
-#' if (requireNamespace("GPArotation", quietly = TRUE)) {
-#'   efa(survey_data,
-#'       political_orientation, environmental_concern, life_satisfaction,
-#'       trust_government, trust_media, trust_science,
-#'       rotation = "oblimin")
-#' }
-#' }
+#' # With Oblimin rotation
+#' efa(survey_data,
+#'     political_orientation, environmental_concern, life_satisfaction,
+#'     trust_government, trust_media, trust_science,
+#'     rotation = "oblimin")
 #'
 #' # Maximum Likelihood extraction
 #' efa(survey_data,
@@ -226,16 +229,6 @@ efa <- function(data, ...,
   if (identical(use, "listwise")) use <- "complete"
   use <- .efa_match_choice(use, c("pairwise", "complete"), "use",
                            note = "{.val listwise} is accepted as an alias of {.val complete}.")
-
-  # Check GPArotation availability for oblimin
-  if (rotation == "oblimin") {
-    if (!requireNamespace("GPArotation", quietly = TRUE)) {
-      cli_abort(c(
-        "Package {.pkg GPArotation} is required for oblimin rotation.",
-        "i" = "Install it with: {.code install.packages(\"GPArotation\")}"
-      ))
-    }
-  }
 
   # Get variable names using tidyselect
   vars <- .process_variables(data, ...)
@@ -451,6 +444,8 @@ efa <- function(data, ...,
   structure_matrix <- NULL
   factor_correlations <- NULL
   rotation_variance <- NULL
+  rotation_iterations <- NULL
+  rotation_converged <- NULL
 
   if (n_factors_used < 2 || rotation == "none") {
     # No rotation possible or requested
@@ -467,8 +462,13 @@ efa <- function(data, ...,
     )
 
   } else if (rotation == "varimax") {
-    vm <- stats::varimax(raw_loadings, normalize = TRUE)
-    rotated_loadings <- as.matrix(unclass(vm$loadings))
+    # SPSS's cyclic pairwise varimax (see .efa_varimax(); stats::varimax()
+    # stopped early and missed SPSS's transformation matrix by up to .004)
+    vm <- .efa_varimax(raw_loadings)
+    .efa_warn_rotation(vm, "Varimax", group_label)
+    rotation_iterations <- vm$iterations
+    rotation_converged <- vm$converged
+    rotated_loadings <- vm$loadings
     rownames(rotated_loadings) <- var_names
     colnames(rotated_loadings) <- paste0(col_prefix, seq_len(n_factors_used))
     rotation_used <- "varimax"
@@ -483,14 +483,18 @@ efa <- function(data, ...,
     )
 
   } else if (rotation == "oblimin") {
-    ob <- GPArotation::oblimin(raw_loadings, normalize = TRUE)
-    pattern_matrix <- ob$loadings
+    # SPSS's direct oblimin (see .efa_oblimin(); GPArotation::oblimin()
+    # iterated to the exact optimum and differed from SPSS by up to .002)
+    ob <- .efa_oblimin(raw_loadings)
+    .efa_warn_rotation(ob, "Oblimin", group_label)
+    rotation_iterations <- ob$iterations
+    rotation_converged <- ob$converged
+    pattern_matrix <- ob$pattern
     rownames(pattern_matrix) <- var_names
     colnames(pattern_matrix) <- paste0(col_prefix, seq_len(n_factors_used))
-    class(pattern_matrix) <- "matrix"
 
     # Factor correlation matrix (Phi)
-    factor_correlations <- ob$Phi
+    factor_correlations <- ob$phi
     rownames(factor_correlations) <- colnames(factor_correlations) <- paste0(col_prefix, seq_len(n_factors_used))
 
     # Structure matrix = Pattern * Phi
@@ -514,6 +518,9 @@ efa <- function(data, ...,
     # SPSS FACTOR /ROTATION PROMAX(4) (Kaiser-normalized target; see
     # .efa_promax() for why stats::promax() differs)
     pm <- .efa_promax(raw_loadings, power = 4)
+    .efa_warn_rotation(pm, "Promax", group_label)
+    rotation_iterations <- pm$iterations
+    rotation_converged <- pm$converged
     col_names <- paste0(col_prefix, seq_len(n_factors_used))
     pattern_matrix <- pm$pattern
     dimnames(pattern_matrix) <- list(var_names, col_names)
@@ -563,6 +570,8 @@ efa <- function(data, ...,
     uniquenesses = ext$uniquenesses,
     rotation = rotation_used,
     rotation_requested = rotation,
+    rotation_iterations = rotation_iterations,
+    rotation_converged = rotation_converged,
     extraction = extraction,
     n_factors = n_factors_used,
     correlation_matrix = cor_mat,
@@ -773,7 +782,7 @@ efa <- function(data, ...,
 #' @description
 #' IBM SPSS Statistics Algorithms, FACTOR, "Promax Rotation"
 #' (Hendrickson & White, 1964):
-#' 1. varimax rotation with Kaiser normalization: Lambda_R;
+#' 1. varimax rotation with Kaiser normalization (.efa_varimax()): Lambda_R;
 #' 2. target P with p_ij = |b_ij|^(k+1) / b_ij, where b_ij are the rows of
 #'    Lambda_R normalized to unit length (Kaiser normalization);
 #' 3. least-squares fit L = (Lambda_R' Lambda_R)^-1 Lambda_R' P;
@@ -788,10 +797,12 @@ efa <- function(data, ...,
 #' run to its printed precision.
 #' @param L Unrotated loading matrix (variables x factors, >= 2 factors)
 #' @param power Promax power k (SPSS default 4)
-#' @return list(pattern, phi)
+#' @return list(pattern, phi, iterations, converged); iterations and
+#'   convergence are those of the varimax step (SPSS's footnote)
 #' @noRd
 .efa_promax <- function(L, power = 4) {
-  V <- unclass(stats::varimax(L, normalize = TRUE)$loadings)
+  vm <- .efa_varimax(L)
+  V <- vm$loadings
   h <- sqrt(rowSums(V^2))
   h[h == 0] <- 1                     # a variable without common variance
   B <- V / h
@@ -803,7 +814,191 @@ efa <- function(data, ...,
   pattern <- V %*% sweep(Q, 2, c_inv, "*")
   phi <- QQi / outer(c_inv, c_inv)
   diag(phi) <- 1
-  list(pattern = unname(pattern), phi = unname(phi))
+  list(pattern = unname(pattern), phi = unname(phi),
+       iterations = vm$iterations, converged = vm$converged,
+       maxit = vm$maxit)
+}
+
+
+#' Varimax rotation as SPSS FACTOR computes it
+#'
+#' @description
+#' IBM SPSS Statistics Algorithms, FACTOR, "Orthogonal Rotations" (Kaiser's
+#' cyclic algorithm, Harman 1976):
+#' - rows normalized by the square root of the communalities (Kaiser);
+#' - every iteration rotates each pair of factors (j < k) by the angle
+#'   P = atan2(X, Y) / 4 with u = l_j^2 - l_k^2, v = 2 l_j l_k,
+#'   X = D - 2AB/n, Y = C - (A^2 - B^2)/n (A = sum u, B = sum v,
+#'   C = sum(u^2 - v^2), D = sum 2uv);
+#' - iteration stops when the varimax criterion
+#'   SV = sum_j (n sum_i l_ij^4 - (sum_i l_ij^2)^2) / n^2 grows by at most
+#'   1e-5, or after `maxit` iterations (SPSS /CRITERIA ITERATE, default 25);
+#'   SPSS counts the final check as an iteration;
+#' - the rotated factors are de-normalized, reflected to a positive sum and
+#'   ordered by their sums of squared loadings (descending).
+#' stats::varimax() uses a different (SVD) algorithm with a relative stopping
+#' rule that ends earlier: its transformation matrices missed SPSS's by up
+#' to .004 (efa_output.txt Test 1d). This version reproduces every Component
+#' Transformation Matrix and every rotation sum of squares of the SPSS
+#' reference runs.
+#' @param L Unrotated loading matrix (variables x factors, >= 2 factors)
+#' @param maxit Maximum number of iterations (SPSS default 25)
+#' @param eps Convergence criterion on the varimax criterion (SPSS: 1e-5)
+#' @return list(loadings, rotmat, iterations, converged, maxit)
+#' @noRd
+.efa_varimax <- function(L, maxit = 25L, eps = 1e-5) {
+  L <- unname(as.matrix(L))
+  n <- nrow(L)
+  m <- ncol(L)
+  h <- sqrt(rowSums(L^2))
+  h[h == 0] <- 1
+  A <- L / h
+  Tm <- diag(m)
+  criterion <- function(A) sum(n * colSums(A^4) - colSums(A^2)^2) / n^2
+
+  converged <- FALSE
+  sv_old <- NA_real_
+  iterations <- 0L
+  for (iteration in seq_len(maxit)) {
+    iterations <- iteration
+    sv <- criterion(A)
+    if (iteration > 1L && sv - sv_old <= eps) {
+      converged <- TRUE
+      break
+    }
+    sv_old <- sv
+    for (j in seq_len(m - 1L)) {
+      for (k in (j + 1L):m) {
+        u <- A[, j]^2 - A[, k]^2
+        v <- 2 * A[, j] * A[, k]
+        a <- sum(u)
+        b <- sum(v)
+        X <- sum(2 * u * v) - 2 * a * b / n
+        Y <- sum(u^2 - v^2) - (a^2 - b^2) / n
+        angle <- atan2(X, Y) / 4
+        if (abs(sin(angle)) <= 1e-15) next
+        cs <- cos(angle)
+        sn <- sin(angle)
+        rot <- matrix(c(cs, sn, -sn, cs), 2)
+        A[, c(j, k)] <- A[, c(j, k)] %*% rot
+        Tm[, c(j, k)] <- Tm[, c(j, k)] %*% rot
+      }
+    }
+  }
+  R <- A * h
+  flip <- colSums(R) < 0
+  R[, flip] <- -R[, flip]
+  Tm[, flip] <- -Tm[, flip]
+  ord <- order(-colSums(R^2))
+  list(loadings = R[, ord, drop = FALSE], rotmat = Tm[, ord, drop = FALSE],
+       iterations = iterations, converged = converged, maxit = maxit)
+}
+
+
+#' Direct oblimin rotation (delta = 0) as SPSS FACTOR computes it
+#'
+#' @description
+#' IBM SPSS Statistics Algorithms, FACTOR, "Oblique Rotations" (Jennrich &
+#' Sampson, 1966), with Kaiser normalization:
+#' - one factor p at a time is replaced by (f_p + a f_q) / sqrt(A),
+#'   A = 1 + 2 a c_pq + a^2, for every other factor q: the pattern columns
+#'   become sqrt(A) l_p and l_q - a l_p, the correlations of factor p
+#'   (c_ip + a c_iq) / sqrt(A);
+#' - a minimizes the quartimin criterion
+#'   F = sum_i [(sum_j l_ij^2)^2 - sum_j l_ij^4] (a quartic in a, solved
+#'   through the roots of its cubic derivative);
+#' - iteration stops when an iteration lowers F by less than 1e-4 of its
+#'   start value (SPSS RCONVERGE), or after `maxit` iterations.
+#' GPArotation::oblimin() iterates to the exact optimum instead and differed
+#' from SPSS by up to .002 (efa_output.txt Test 2b); this version reproduces
+#' the pattern, structure and correlation matrices and SPSS's iteration
+#' counts of all oblimin reference runs (and needs no extra package).
+#' @param L Unrotated loading matrix (variables x factors, >= 2 factors)
+#' @param maxit Maximum number of iterations (SPSS default 25)
+#' @param eps Relative convergence criterion (SPSS RCONVERGE .0001)
+#' @return list(pattern, phi, iterations, converged, maxit)
+#' @noRd
+.efa_oblimin <- function(L, maxit = 25L, eps = 1e-4) {
+  L <- unname(as.matrix(L))
+  m <- ncol(L)
+  h <- sqrt(rowSums(L^2))
+  h[h == 0] <- 1
+  B <- L / h
+  C <- diag(m)
+  criterion <- function(B) {
+    s <- rowSums(B^2)
+    sum(s^2) - sum(B^4)
+  }
+  f_start <- criterion(B)
+  f_old <- f_start
+
+  converged <- FALSE
+  iterations <- 0L
+  for (iteration in seq_len(maxit)) {
+    iterations <- iteration
+    for (p in seq_len(m)) {
+      for (q in seq_len(m)[-p]) {
+        lp <- B[, p]
+        lq <- B[, q]
+        cpq <- C[p, q]
+        s <- rowSums(B[, -c(p, q), drop = FALSE]^2)
+        # F(a) - const = sum_i [ lp^2 A(a) Q(a) + s (lp^2 A(a) + Q(a)) ] with
+        # A(a) = 1 + 2 cpq a + a^2 and Q(a) = (lq - a lp)^2
+        lp2 <- lp^2
+        b0 <- lq^2
+        b1 <- -2 * lp * lq
+        b2 <- lp2
+        coef <- c(
+          sum(lp2 * b0) + sum(s * (lp2 + b0)),
+          sum(lp2 * (b1 + 2 * cpq * b0)) + sum(s * (2 * cpq * lp2 + b1)),
+          sum(lp2 * (b2 + 2 * cpq * b1 + b0)) + sum(s * (lp2 + b2)),
+          sum(lp2 * (2 * cpq * b2 + b1)),
+          sum(lp2 * b2)
+        )
+        if (coef[5] <= 0) next
+        roots <- polyroot(coef[-1] * seq_len(4))
+        roots <- Re(roots[abs(Im(roots)) < 1e-8 * max(1, Mod(roots))])
+        roots <- roots[1 + 2 * cpq * roots + roots^2 > 0]
+        if (length(roots) == 0) next
+        value <- vapply(roots, function(a) sum(coef * a^(0:4)), numeric(1))
+        a <- roots[which.min(value)]
+        A <- 1 + 2 * cpq * a + a^2
+        B[, p] <- sqrt(A) * lp
+        B[, q] <- lq - a * lp
+        new_c <- (C[p, ] + a * C[q, ]) / sqrt(A)
+        C[p, ] <- new_c
+        C[, p] <- new_c
+        C[p, p] <- 1
+      }
+    }
+    f_new <- criterion(B)
+    if (f_old - f_new < f_start * eps) {
+      converged <- TRUE
+      break
+    }
+    f_old <- f_new
+  }
+  list(pattern = B * h, phi = C, iterations = iterations,
+       converged = converged, maxit = maxit)
+}
+
+
+#' Warn when a rotation stopped at its iteration limit
+#'
+#' SPSS: "Rotation failed to converge in 25 iterations." The solution after
+#' the last iteration is kept (as SPSS prints it).
+#' @param rot Result of .efa_varimax() / .efa_oblimin() / .efa_promax()
+#' @param label Rotation name for the message
+#' @param group_label Group label (grouped analyses) or NULL
+#' @noRd
+.efa_warn_rotation <- function(rot, label, group_label = NULL) {
+  if (isTRUE(rot$converged)) return(invisible(NULL))
+  in_group <- if (is.null(group_label)) "" else paste0(" (group ", group_label, ")")
+  cli_warn(c(
+    "!" = "{label} rotation failed to converge in {rot$maxit} iterations{in_group}.",
+    "i" = "The solution after the last iteration is shown; interpret it with caution."
+  ))
+  invisible(NULL)
 }
 
 
@@ -1666,6 +1861,7 @@ print.summary.efa <- function(x, ...) {
       .print_loading_matrix(x$loadings, blank, sort_loadings, digits, labels)
       cat(sprintf("Extraction Method: %s.\n", extraction_full))
       cat("Rotation Method: Varimax with Kaiser Normalization.\n")
+      .print_rotation_convergence(x)
     }
 
   } else if (x$rotation %in% c("oblimin", "promax")) {
@@ -1677,6 +1873,7 @@ print.summary.efa <- function(x, ...) {
       .print_loading_matrix(x$pattern_matrix, blank, sort_loadings, digits, labels)
       cat(sprintf("Extraction Method: %s.\n", extraction_full))
       cat(sprintf("Rotation Method: %s with Kaiser Normalization.\n", rot_label))
+      .print_rotation_convergence(x)
     }
 
     if (show_structure) {
@@ -1692,6 +1889,20 @@ print.summary.efa <- function(x, ...) {
       print(fc, quote = FALSE)
     }
   }
+}
+
+#' SPSS's rotation footnote ("Rotation converged in 4 iterations.")
+#' @param x efa result (one group)
+#' @noRd
+.print_rotation_convergence <- function(x) {
+  it <- x$rotation_iterations
+  if (is.null(it)) return(invisible(NULL))
+  if (isTRUE(x$rotation_converged)) {
+    cat(sprintf("Rotation converged in %s iterations.\n", it))
+  } else {
+    cat(sprintf("Rotation failed to converge in %s iterations.\n", it))
+  }
+  invisible(NULL)
 }
 
 #' Print EFA results for grouped data

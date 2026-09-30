@@ -104,8 +104,8 @@ test_that("X4-PROMAX: the promax target is built from Kaiser-normalized loadings
   # were .055/.155 instead of SPSS -.002/-.012 (efa_ml_promax_output.txt P1).
   r <- .six_items(survey_data, rotation = "promax")
 
-  # SPSS algorithm, step by step
-  V <- unclass(stats::varimax(r$unrotated_loadings, normalize = TRUE)$loadings)
+  # SPSS algorithm, step by step, on SPSS's varimax solution
+  V <- unname(.six_items(survey_data, rotation = "varimax")$loadings)
   B <- V / sqrt(rowSums(V^2))
   P <- abs(B)^(4 + 1) / B
   L <- solve(t(V) %*% V) %*% t(V) %*% P
@@ -132,8 +132,61 @@ test_that("X4-PROMAX: oblique rotation sums of squares come from the structure m
   r <- .six_items(survey_data, rotation = "promax")
   expect_equal(r$rotation_variance$ss_loading,
                unname(colSums(r$structure_matrix^2)))
-  skip_if_not_installed("GPArotation")
   o <- .six_items(survey_data, rotation = "oblimin")
   expect_equal(o$rotation_variance$ss_loading,
                unname(colSums(o$structure_matrix^2)))
+})
+
+# --- X4-VARIMAX / X4-OBLIMIN: SPSS's rotation algorithms ----------------------
+
+.varimax_criterion <- function(L) {
+  A <- L / sqrt(rowSums(L^2))
+  n <- nrow(A)
+  sum(n * colSums(A^4) - colSums(A^2)^2) / n^2
+}
+
+test_that("X4-VARIMAX: SPSS's cyclic varimax, reflected and ordered", {
+  # stats::varimax() stopped early (relative criterion) and missed SPSS's
+  # Component Transformation Matrix by up to .004 (efa_output.txt 1d); it
+  # also kept the unrotated factor order where SPSS orders the rotated
+  # factors by their sums of squares and reflects negative-sum factors.
+  r <- .six_items(survey_data, n_factors = 2)
+  T_r <- qr.solve(r$unrotated_loadings, r$loadings)
+  expect_equal(unname(crossprod(T_r)), diag(2), tolerance = 1e-10)
+  # at the varimax optimum up to SPSS's criterion (improvement <= 1e-5)
+  best <- unclass(stats::varimax(r$unrotated_loadings, eps = 1e-14)$loadings)
+  expect_lt(.varimax_criterion(best) - .varimax_criterion(r$loadings), 1e-5)
+  expect_identical(r$rotation_iterations, 3L)
+})
+
+test_that("X4-VARIMAX: a rotation that hits the iteration limit warns", {
+  L <- .six_items(survey_data)$unrotated_loadings
+  vm <- mariposa:::.efa_varimax(L, maxit = 1L)
+  expect_false(vm$converged)
+  expect_warning(mariposa:::.efa_warn_rotation(vm, "Varimax", "region = East"),
+                 "Varimax rotation failed to converge in 1 iterations \\(group region = East\\)")
+  expect_silent(mariposa:::.efa_warn_rotation(mariposa:::.efa_varimax(L), "Varimax"))
+})
+
+test_that("X4-OBLIMIN: SPSS's direct oblimin needs no GPArotation", {
+  # GPArotation::oblimin() (a Suggests package, required before) iterated
+  # to the exact optimum; SPSS stops when the quartimin criterion improves
+  # by less than 1e-4 of its start value (2b differed by up to .002).
+  r <- .six_items(survey_data, rotation = "oblimin")
+  quartimin <- function(P) {
+    B <- P / sqrt(rowSums(P^2))
+    sum(rowSums(B^2)^2 - rowSums(B^4))
+  }
+  expect_lt(quartimin(r$pattern_matrix), quartimin(r$unrotated_loadings))
+  expect_equal(unname(diag(r$factor_correlations)), rep(1, 3))
+  expect_equal(unname(r$structure_matrix),
+               unname(r$pattern_matrix %*% r$factor_correlations))
+  # the pattern reproduces the unrotated common-factor space:
+  # P Phi P' = L L' (same model-implied correlations)
+  expect_equal(unname(r$pattern_matrix %*% r$factor_correlations %*% t(r$pattern_matrix)),
+               unname(tcrossprod(r$unrotated_loadings)), tolerance = 1e-10)
+  expect_identical(r$rotation_iterations, 6L)
+  skip_if_not_installed("GPArotation")
+  gpa <- GPArotation::oblimin(r$unrotated_loadings, normalize = TRUE)
+  expect_lt(max(abs(unname(r$pattern_matrix) - unname(unclass(gpa$loadings)))), 0.005)
 })
