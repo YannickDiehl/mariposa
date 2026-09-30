@@ -19,7 +19,8 @@
 #' @param group The grouping variable for comparison (unquoted or a string)
 #' @param weights Optional survey weights for population-representative
 #'   results. Must be numeric and non-negative (the package-wide weights
-#'   policy).
+#'   policy). Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param center How to measure center: \code{"mean"} (default) or
 #'   \code{"median"} (more robust). For \code{ancova()} results only
 #'   \code{"mean"} is available: as in SPSS UNIANOVA, the test is computed on

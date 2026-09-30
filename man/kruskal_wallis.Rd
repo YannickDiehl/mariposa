@@ -15,7 +15,9 @@ multiple variables or use helpers like \code{starts_with("satisfaction")}}
 \item{group}{The categorical variable that defines your groups (e.g., education,
 employment). Must have at least 2 groups (3+ for meaningful use).}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{conf.level}{Not used. Rank tests report no confidence interval (SPSS
 \code{NPAR TESTS} neither); kept for backward compatibility.}

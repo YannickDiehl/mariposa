@@ -24,10 +24,10 @@
 #'   weights and grouping variables are never used as predictors (a
 #'   selection such as \code{where(is.numeric)} drops them with a message).
 #'   Character predictors are entered as factors.
-#' @param weights Optional survey weights (unquoted variable name, or an
-#'   expression such as \code{sampling_weight * 2}). When specified,
-#'   weighted maximum likelihood estimation is used, matching SPSS WEIGHT BY
-#'   behavior.
+#' @param weights Optional survey weights. When specified, weighted maximum
+#'   likelihood estimation is used, matching SPSS WEIGHT BY behavior. Give a
+#'   column name (unquoted or as a string), an expression such as
+#'   \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param conf.level Confidence level for odds ratio intervals (default 0.95).
 #' @param factors How factor predictors are entered into the model:
 #'   \code{"dummy"} (default, matches base R \code{glm()}) expands a factor

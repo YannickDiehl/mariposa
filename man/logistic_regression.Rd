@@ -31,10 +31,10 @@ weights and grouping variables are never used as predictors (a
 selection such as \code{where(is.numeric)} drops them with a message).
 Character predictors are entered as factors.}
 
-\item{weights}{Optional survey weights (unquoted variable name, or an
-expression such as \code{sampling_weight * 2}). When specified,
-weighted maximum likelihood estimation is used, matching SPSS WEIGHT BY
-behavior.}
+\item{weights}{Optional survey weights. When specified, weighted maximum
+likelihood estimation is used, matching SPSS WEIGHT BY behavior. Give a
+column name (unquoted or as a string), an expression such as
+\code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{conf.level}{Confidence level for odds ratio intervals (default 0.95).}
 

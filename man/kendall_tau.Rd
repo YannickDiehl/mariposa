@@ -21,7 +21,9 @@ correlation or more for a correlation matrix. You can use helpers like
 \code{starts_with("trust")}. Numeric variables or ordered factors
 (ranked by their level order).}
 
-\item{weights}{Optional survey weights for population-representative results.}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{alternative}{Direction of the test:
 \itemize{

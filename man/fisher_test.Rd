@@ -21,7 +21,9 @@ fisher_test(
 
 \item{col}{The column variable (categorical)}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{simulate.p.value}{Compute the p-value by Monte Carlo simulation
 instead of exactly? (Default: FALSE). For large tables (many rows and

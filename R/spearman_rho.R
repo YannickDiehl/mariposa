@@ -16,11 +16,12 @@
 #'   \code{starts_with("trust")}. Numeric variables or ordered factors
 #'   (ranked by their level order).
 #' @param weights Optional survey weights. Following the SPSS NONPAR CORR
-#'   convention, weights are used only to filter cases (rows with weight
-#'   <= 0 or NA are dropped); the rank correlation itself is computed
-#'   unweighted on the remaining sample. For design-based weighted
-#'   Spearman use \code{survey::svyolr()} or
-#'   \code{wCorr::weightedCorr(method = "Spearman")}.
+#'   convention, weights are used only to filter cases (rows with weight <= 0 or
+#'   NA are dropped); the rank correlation itself is computed unweighted on the
+#'   remaining sample. For design-based weighted Spearman use
+#'   \code{survey::svyolr()} or \code{wCorr::weightedCorr(method = "Spearman")}.
+#'   Give a column name (unquoted or as a string), an expression such as
+#'   \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param alternative Direction of the test:
 #'   \itemize{
 #'     \item \code{"two.sided"} (default): Two-tailed test

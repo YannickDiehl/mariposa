@@ -16,7 +16,9 @@
 #'   tidyselect helpers like \code{starts_with("trust")}.
 #' @param group The variable that defines your two groups (e.g., gender, region).
 #'   Must have exactly two categories. Leave empty for one-sample tests.
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param var.equal Should we assume equal variances? (Default: FALSE)
 #'   \itemize{
 #'     \item \code{FALSE}: Safer, works even if groups vary differently (Welch's test)

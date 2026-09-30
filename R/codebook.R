@@ -285,7 +285,9 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... Optional: specific variables to include. If empty, all variables
 #'   are shown. Supports tidyselect helpers like `starts_with("trust")`.
-#' @param weights Optional survey weights for weighted frequency calculations
+#' @param weights Optional survey weights for weighted frequency calculations.
+#'   Give a column name (unquoted or as a string), an expression such as
+#'   \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param show_id Show variable position number? (Default: TRUE)
 #' @param show_type Show data type? (Default: TRUE)
 #' @param show_labels Show variable labels? (Default: TRUE)

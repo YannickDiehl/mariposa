@@ -22,8 +22,9 @@
 #' @param between Character vector or unquoted variable names specifying the
 #'   between-subjects factors (2-3 factors). These must be categorical variables
 #'   (factor, character, or labelled numeric).
-#' @param weights Optional survey weights for population-representative results
-#'   (unquoted variable name)
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param ss_type Deprecated; only 3 (Type III, the SPSS default) is
 #'   implemented. Passing 2 issues a warning and computes Type III.
 #'

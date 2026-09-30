@@ -19,7 +19,9 @@
 #' @param data Your survey data (data frame or tibble)
 #' @param var1 First dichotomous variable (0/1 or two-level factor)
 #' @param var2 Second dichotomous variable (0/1 or two-level factor)
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param correct Logical, whether to apply continuity correction (default: TRUE)
 #' @param ... Additional arguments (currently unused)
 #'

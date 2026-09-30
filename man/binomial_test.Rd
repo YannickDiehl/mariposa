@@ -18,7 +18,9 @@ It refers to Group 1, the category of the first valid case in the data
 is one-tailed in the direction of the observed proportion, as SPSS
 reports it.}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{conf.level}{Confidence level for intervals (Default: 0.95 = 95 percent)}
 }

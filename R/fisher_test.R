@@ -19,7 +19,9 @@
 #' @param data Your survey data (data frame or tibble)
 #' @param row The row variable (categorical)
 #' @param col The column variable (categorical)
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param simulate.p.value Compute the p-value by Monte Carlo simulation
 #'   instead of exactly? (Default: FALSE). For large tables (many rows and
 #'   columns, large N) the exact network algorithm can run out of memory

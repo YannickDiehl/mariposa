@@ -13,9 +13,11 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The categorical variables you want to analyze. You can list multiple
 #'   variables separated by commas, or use helpers like \code{starts_with("trust")}
-#' @param weights Optional survey weights for population-representative results.
-#'   Without weights, you get sample frequencies. With weights, you get
-#'   population estimates.
+#' @param weights Optional survey weights for population-representative
+#'   results. Without weights, you get sample frequencies. With weights, you get
+#'   population estimates. Give a column name (unquoted or as a string), an
+#'   expression such as \code{sampling_weight * 2}, or a numeric vector with one
+#'   weight per row.
 #' @param sort_frq How to order the results:
 #'   \itemize{
 #'     \item \code{"none"} (default): Keep original order

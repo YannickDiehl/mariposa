@@ -12,9 +12,10 @@ center(data, ..., weights = NULL, suffix = NULL, na.rm = TRUE)
 \item{...}{Variables to center (tidyselect). Only used when \code{data}
 is a data frame.}
 
-\item{weights}{Optional survey weights (unquoted column name or numeric
-vector). When provided, the weighted mean is subtracted instead of the
-unweighted mean.}
+\item{weights}{Optional survey weights. When provided, the weighted mean is
+subtracted instead of the unweighted mean. Give a column name (unquoted or
+as a string), an expression such as \code{sampling_weight * 2}, or a
+numeric vector with one weight per row.}
 
 \item{suffix}{A character string appended to column names (e.g.,
 \code{"_c"}). If \code{NULL} (default), original columns are overwritten.}

@@ -17,7 +17,9 @@ goodman_gamma(data, ..., weights = NULL)
 
 \item{...}{Exactly two categorical variables, as in \code{chi_square()}}
 
-\item{weights}{Optional survey weights}
+\item{weights}{Optional survey weights. Give a column name (unquoted or as
+a string), an expression such as \code{sampling_weight * 2}, or a numeric
+vector with one weight per row.}
 }
 \value{
 A numeric vector with the effect size (one element per group for

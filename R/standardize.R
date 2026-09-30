@@ -32,9 +32,11 @@
 #'     \item{\code{"gmd"}}{Gini's Mean Difference: \code{(x - mean) / gmd}.
 #'       A robust alternative.}
 #'   }
-#' @param weights Optional survey weights (unquoted column name or numeric
-#'   vector). When provided, weighted mean and weighted SD are used for
-#'   standardization. Only supported for methods \code{"sd"} and \code{"2sd"}.
+#' @param weights Optional survey weights. When provided, weighted mean and
+#'   weighted SD are used for standardization. Only supported for methods
+#'   \code{"sd"} and \code{"2sd"}. Give a column name (unquoted or as a string),
+#'   an expression such as \code{sampling_weight * 2}, or a numeric vector with
+#'   one weight per row.
 #' @param suffix A character string appended to column names (e.g.,
 #'   \code{"_z"}). If \code{NULL} (default), the original columns are
 #'   overwritten.
@@ -287,9 +289,10 @@ std <- function(data, ..., method = "sd", weights = NULL, suffix = NULL,
 #' @param data A data frame or numeric vector.
 #' @param ... Variables to center (tidyselect). Only used when \code{data}
 #'   is a data frame.
-#' @param weights Optional survey weights (unquoted column name or numeric
-#'   vector). When provided, the weighted mean is subtracted instead of the
-#'   unweighted mean.
+#' @param weights Optional survey weights. When provided, the weighted mean is
+#'   subtracted instead of the unweighted mean. Give a column name (unquoted or
+#'   as a string), an expression such as \code{sampling_weight * 2}, or a
+#'   numeric vector with one weight per row.
 #' @param suffix A character string appended to column names (e.g.,
 #'   \code{"_c"}). If \code{NULL} (default), original columns are overwritten.
 #' @param na.rm Remove missing values before computing the mean?

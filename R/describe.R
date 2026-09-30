@@ -15,8 +15,11 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The numeric variables you want to summarize. List them separated by
 #'   commas, or use helpers like \code{starts_with("trust")}
-#' @param weights Optional survey weights for population-representative results.
-#'   Without weights, you describe your sample. With weights, you describe the population.
+#' @param weights Optional survey weights for population-representative
+#'   results. Without weights, you describe your sample. With weights, you
+#'   describe the population. Give a column name (unquoted or as a string), an
+#'   expression such as \code{sampling_weight * 2}, or a numeric vector with one
+#'   weight per row.
 #' @param show Which statistics to display:
 #'   \itemize{
 #'     \item \code{"short"} (default): Essential stats (mean, median, SD, range, IQR, skewness)

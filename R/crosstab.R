@@ -13,7 +13,9 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param row The variable for table rows (e.g., education, age_group)
 #' @param col The variable for table columns (e.g., region, gender)
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param percentages Which percentages to show:
 #'   \itemize{
 #'     \item \code{"row"} (default): Percentages across each row (adds to 100% horizontally)

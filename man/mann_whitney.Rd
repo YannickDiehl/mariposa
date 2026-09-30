@@ -23,7 +23,9 @@ multiple variables or use helpers like \code{starts_with("satisfaction")}}
 \item{group}{The categorical variable that defines your two groups (e.g., gender,
 treatment/control). Must have exactly two groups.}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{mu}{The hypothesized location shift of group 1 against group 2
 (Default: 0, meaning no difference; this is the SPSS test). As in

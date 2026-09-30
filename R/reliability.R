@@ -14,7 +14,9 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The items to analyze. Use bare column names separated by commas,
 #'   or tidyselect helpers like \code{starts_with("trust")}.
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param na.rm Remove missing values before calculating? (Default: TRUE).
 #'   Uses listwise deletion (only complete cases across all items).
 #'

@@ -11,7 +11,9 @@ chi_square(data, ..., weights = NULL, correct = FALSE)
 
 \item{...}{Two categorical variables to test (e.g., gender, region)}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{correct}{Apply Yates' continuity correction to a 2x2 table?
 (Default: FALSE). The corrected statistic is reported as

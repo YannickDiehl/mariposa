@@ -21,7 +21,9 @@ crosstab(
 
 \item{col}{The variable for table columns (e.g., region, gender)}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{percentages}{Which percentages to show:
 \itemize{

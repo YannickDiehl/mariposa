@@ -13,7 +13,9 @@ mcnemar_test(data, var1, var2, weights = NULL, correct = TRUE, ...)
 
 \item{var2}{Second dichotomous variable (0/1 or two-level factor)}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{correct}{Logical, whether to apply continuity correction (default: TRUE)}
 

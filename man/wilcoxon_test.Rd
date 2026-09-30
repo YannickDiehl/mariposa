@@ -15,7 +15,9 @@ with one row per subject and the two measurements in separate columns}
 \item{y}{The second measurement variable (e.g., post-test, trust in media).
 The difference is computed as \code{y - x}}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{conf.level}{Not used. Rank tests report no confidence interval (SPSS
 \code{NPAR TESTS} neither); kept for backward compatibility.}

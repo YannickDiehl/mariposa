@@ -29,7 +29,9 @@
 #'   goodness-of-fit testing, assumes multivariate normality). ML uses
 #'   SPSS's starting values, bounds a Heywood variable's communality at
 #'   .999 as SPSS does and keeps SPSS's factor order.
-#' @param weights Optional survey weights for population-representative results.
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param use How to handle missing data for correlation computation:
 #'   \code{"pairwise"} (default, matches SPSS) or \code{"complete"} (listwise;
 #'   \code{"listwise"} is accepted as an alias).

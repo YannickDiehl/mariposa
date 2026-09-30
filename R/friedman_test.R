@@ -20,7 +20,9 @@
 #'   with one row per subject and each measurement in a separate column
 #' @param ... The measurement variables to compare (at least 3). You can list
 #'   them individually or use helpers like \code{starts_with("trust_")}
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param conf.level Not used. Rank tests report no confidence interval (SPSS
 #'   \code{NPAR TESTS} neither); kept for backward compatibility.
 #'

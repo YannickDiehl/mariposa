@@ -12,8 +12,10 @@ w_kurtosis(data, ..., weights = NULL, na.rm = TRUE, excess = TRUE)
 \item{...}{The numeric variables you want to analyze. You can list multiple
 variables or use helpers like \code{starts_with("trust")}}
 
-\item{weights}{Survey weights to make results representative of your population.
-Without weights, you get the simple sample kurtosis.}
+\item{weights}{Survey weights to make results representative of your
+population. Without weights, you get the simple sample kurtosis. Give a
+column name (unquoted or as a string), an expression such as
+\code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{na.rm}{Remove missing values before calculating? (Default: TRUE).
 With \code{FALSE}, the result for a variable that contains missing

@@ -24,8 +24,10 @@ character indicators give the level that marks a mention, e.g.
 \code{counted = "yes"}; a value that does not occur among their
 levels is an error.}
 
-\item{weights}{Optional survey weights (unquoted variable name),
-treated as frequency weights matching SPSS \code{WEIGHT BY}.}
+\item{weights}{Optional survey weights, treated as frequency weights
+matching SPSS \code{WEIGHT BY}. Give a column name (unquoted or as a
+string), an expression such as \code{sampling_weight * 2}, or a numeric
+vector with one weight per row.}
 }
 \value{
 An object of class \code{"multiple_response"} whose

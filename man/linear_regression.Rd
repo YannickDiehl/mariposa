@@ -34,9 +34,10 @@ weights and grouping variables are never used as predictors (a
 selection such as \code{where(is.numeric)} drops them with a message).
 Character predictors are entered as factors.}
 
-\item{weights}{Optional survey weights (unquoted variable name, or an
-expression such as \code{sampling_weight * 2}). When specified,
-weighted least squares (WLS) is used, matching SPSS WEIGHT BY.}
+\item{weights}{Optional survey weights. When specified, weighted least
+squares (WLS) is used, matching SPSS WEIGHT BY. Give a column name
+(unquoted or as a string), an expression such as
+\code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{use}{How to handle missing data: \code{"listwise"} (default) drops any
 case with a missing value on any variable (matching SPSS /MISSING LISTWISE).

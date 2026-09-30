@@ -18,8 +18,10 @@ w_quantile(
 \item{...}{The numeric variables you want to analyze. You can list multiple
 variables or use helpers like \code{starts_with("income")}}
 
-\item{weights}{Survey weights to make results representative of your population.
-Without weights, you get the simple sample quantiles.}
+\item{weights}{Survey weights to make results representative of your
+population. Without weights, you get the simple sample quantiles. Give a
+column name (unquoted or as a string), an expression such as
+\code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{probs}{Which percentiles to calculate, as proportions between 0 and 1.
 Default: \code{c(0, 0.25, 0.5, 0.75, 1)} for the minimum, 25th percentile,

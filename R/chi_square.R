@@ -13,7 +13,9 @@
 #'
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... Two categorical variables to test (e.g., gender, region)
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param correct Apply Yates' continuity correction to a 2x2 table?
 #'   (Default: FALSE). The corrected statistic is reported as
 #'   \code{chi_squared}; as in SPSS (which prints "Pearson Chi-Square" and
@@ -734,7 +736,9 @@ print.summary.chi_square <- function(x, ...) {
 #'
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... Exactly two categorical variables, as in \code{chi_square()}
-#' @param weights Optional survey weights
+#' @param weights Optional survey weights. Give a column name (unquoted or as
+#'   a string), an expression such as \code{sampling_weight * 2}, or a numeric
+#'   vector with one weight per row.
 #'
 #' @return A numeric vector with the effect size (one element per group for
 #'   grouped data).

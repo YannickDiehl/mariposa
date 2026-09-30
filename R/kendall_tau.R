@@ -14,7 +14,9 @@
 #'   correlation or more for a correlation matrix. You can use helpers like
 #'   \code{starts_with("trust")}. Numeric variables or ordered factors
 #'   (ranked by their level order).
-#' @param weights Optional survey weights for population-representative results.
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param alternative Direction of the test:
 #'   \itemize{
 #'     \item \code{"two.sided"} (default): Two-tailed test

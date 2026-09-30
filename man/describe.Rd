@@ -20,8 +20,11 @@ describe(
 \item{...}{The numeric variables you want to summarize. List them separated by
 commas, or use helpers like \code{starts_with("trust")}}
 
-\item{weights}{Optional survey weights for population-representative results.
-Without weights, you describe your sample. With weights, you describe the population.}
+\item{weights}{Optional survey weights for population-representative
+results. Without weights, you describe your sample. With weights, you
+describe the population. Give a column name (unquoted or as a string), an
+expression such as \code{sampling_weight * 2}, or a numeric vector with one
+weight per row.}
 
 \item{show}{Which statistics to display:
 \itemize{

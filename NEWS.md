@@ -1144,6 +1144,10 @@ reference output showed mariposa was wrong.
 
 ### Across functions
 
+* The `weights` argument of every analysis function documents the forms it
+  accepts since this release: a column name (unquoted or as a string), an
+  expression such as `sampling_weight * 2`, or a numeric vector with one
+  weight per row.
 * Selecting a grouping variable of `group_by()` data (explicitly or through
   a helper such as `where(is.numeric)`) no longer analyses it within its
   own groups. `pearson_cor()`, `spearman_rho()` and `kendall_tau()` warned

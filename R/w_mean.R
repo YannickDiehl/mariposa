@@ -8,8 +8,10 @@
 #' @param data Your survey data (a data frame or tibble)
 #' @param ... The numeric variables you want to average. You can list multiple
 #'   variables or use helpers like \code{starts_with("income")}
-#' @param weights Survey weights to make the average representative of your population.
-#'   Without weights, you get the simple sample average.
+#' @param weights Survey weights to make the average representative of your
+#'   population. Without weights, you get the simple sample average. Give a
+#'   column name (unquoted or as a string), an expression such as
+#'   \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param na.rm Remove missing values before calculating? (Default: TRUE).
 #'   With \code{FALSE}, the result for a variable that contains missing
 #'   values is \code{NA} (as in base R).

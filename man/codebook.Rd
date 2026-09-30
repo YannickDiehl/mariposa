@@ -28,7 +28,9 @@ codebook(
 \item{...}{Optional: specific variables to include. If empty, all variables
 are shown. Supports tidyselect helpers like \code{starts_with("trust")}.}
 
-\item{weights}{Optional survey weights for weighted frequency calculations}
+\item{weights}{Optional survey weights for weighted frequency calculations.
+Give a column name (unquoted or as a string), an expression such as
+\code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{show_id}{Show variable position number? (Default: TRUE)}
 

@@ -21,7 +21,9 @@
 #'   variables or use helpers like \code{starts_with("income")}
 #' @param group The categorical variable that defines your groups (e.g., education,
 #'   region, age_group). Must have at least 3 groups for ANOVA.
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param var.equal Deprecated and ignored (a warning is issued when set to
 #'   FALSE). Like SPSS ONEWAY, the classical ANOVA table and Welch's robust
 #'   test are always both computed and displayed.

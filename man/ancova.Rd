@@ -18,8 +18,9 @@ between-subjects factors (1-3 factors). These must be categorical variables
 \item{covariate}{Unquoted variable names of the continuous covariates to control
 for. Use \code{c(age, income)} for multiple covariates.}
 
-\item{weights}{Optional survey weights for population-representative results
-(unquoted variable name)}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{ss_type}{Deprecated; only 3 (Type III, the SPSS default) is
 implemented. Passing 2 issues a warning and computes Type III.}

@@ -24,7 +24,9 @@
 #'   (as in SPSS). With 0.5 the test is two-tailed; with any other value it
 #'   is one-tailed in the direction of the observed proportion, as SPSS
 #'   reports it.
-#' @param weights Optional survey weights for population-representative results
+#' @param weights Optional survey weights for population-representative
+#'   results. Give a column name (unquoted or as a string), an expression such
+#'   as \code{sampling_weight * 2}, or a numeric vector with one weight per row.
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95 percent)
 #'
 #' @return Test results showing whether the proportion differs from expected,

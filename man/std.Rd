@@ -23,9 +23,11 @@ outliers.}
 A robust alternative.}
 }}
 
-\item{weights}{Optional survey weights (unquoted column name or numeric
-vector). When provided, weighted mean and weighted SD are used for
-standardization. Only supported for methods \code{"sd"} and \code{"2sd"}.}
+\item{weights}{Optional survey weights. When provided, weighted mean and
+weighted SD are used for standardization. Only supported for methods
+\code{"sd"} and \code{"2sd"}. Give a column name (unquoted or as a string),
+an expression such as \code{sampling_weight * 2}, or a numeric vector with
+one weight per row.}
 
 \item{suffix}{A character string appended to column names (e.g.,
 \code{"_z"}). If \code{NULL} (default), the original columns are

@@ -14,8 +14,11 @@
 #' @param ... The variables you want to analyze. Works best with categorical or
 #'   discrete numeric variables. You can list multiple variables or use helpers
 #'   like \code{starts_with("trust")}
-#' @param weights Survey weights to make results representative of your population.
-#'   Without weights, the mode is simply the most frequent value in your sample.
+#' @param weights Survey weights to make results representative of your
+#'   population. Without weights, the mode is simply the most frequent value in
+#'   your sample. Give a column name (unquoted or as a string), an expression
+#'   such as \code{sampling_weight * 2}, or a numeric vector with one weight per
+#'   row.
 #' @param na.rm Remove missing values before calculating? (Default: TRUE).
 #'   With \code{FALSE}, the result for a variable that contains missing
 #'   values is \code{NA} (as in base R).

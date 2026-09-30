@@ -39,7 +39,8 @@ variables or use tidyselect helpers like \code{starts_with("trust")}.}
 
 \item{weights}{Optional survey weights for population-representative
 results. Must be numeric and non-negative (the package-wide weights
-policy).}
+policy). Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 
 \item{center}{How to measure center: \code{"mean"} (default) or
 \code{"median"} (more robust). For \code{ancova()} results only

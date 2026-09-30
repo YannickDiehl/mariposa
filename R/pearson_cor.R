@@ -14,13 +14,15 @@
 #' @param ... The numeric variables you want to correlate. List two for a single
 #'   correlation or more for a correlation matrix.
 #' @param weights Optional survey weights for population-representative
-#'   results. Following SPSS CORRELATIONS, the weighted degrees of freedom
-#'   use \code{n = sum(w)} (not Kish's effective sample size). This is
-#'   appropriate for normalized survey weights with mean \eqn{\approx 1}.
-#'   For raw expansion weights (e.g., summing to millions of population
-#'   units), the resulting standard errors and confidence intervals will
-#'   be drastically too narrow — in that case, normalize weights so that
-#'   \code{sum(w) == n}, or use the survey package for design-based inference.
+#'   results. Following SPSS CORRELATIONS, the weighted degrees of freedom use
+#'   \code{n = sum(w)} (not Kish's effective sample size). This is appropriate
+#'   for normalized survey weights with mean \eqn{\approx 1}. For raw expansion
+#'   weights (e.g., summing to millions of population units), the resulting
+#'   standard errors and confidence intervals will be drastically too narrow —
+#'   in that case, normalize weights so that \code{sum(w) == n}, or use the
+#'   survey package for design-based inference. Give a column name (unquoted or
+#'   as a string), an expression such as \code{sampling_weight * 2}, or a
+#'   numeric vector with one weight per row.
 #' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
 #' @param alternative Direction of the test: \code{"two.sided"} (default),
 #'   \code{"less"}, or \code{"greater"}. A one-sided test gets the matching

@@ -36,9 +36,11 @@ fre(data, ..., weights = NULL, sort_frq = "none", show_na = TRUE,
 \item{...}{The categorical variables you want to analyze. You can list multiple
 variables separated by commas, or use helpers like \code{starts_with("trust")}}
 
-\item{weights}{Optional survey weights for population-representative results.
-Without weights, you get sample frequencies. With weights, you get
-population estimates.}
+\item{weights}{Optional survey weights for population-representative
+results. Without weights, you get sample frequencies. With weights, you get
+population estimates. Give a column name (unquoted or as a string), an
+expression such as \code{sampling_weight * 2}, or a numeric vector with one
+weight per row.}
 
 \item{sort_frq}{How to order the results:
 \itemize{

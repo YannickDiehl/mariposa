@@ -22,7 +22,9 @@ frequencies: they are divided by their sum. Proportions (all values
 below 1) must sum to 1; a sum within 0.01 of 1 (e.g. 0.995 from
 rounding) is rescaled with a message.}
 
-\item{weights}{Optional survey weights for population-representative results}
+\item{weights}{Optional survey weights for population-representative
+results. Give a column name (unquoted or as a string), an expression such
+as \code{sampling_weight * 2}, or a numeric vector with one weight per row.}
 }
 \value{
 Test results showing whether observed frequencies match expected,
