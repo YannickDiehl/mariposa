@@ -152,6 +152,13 @@ crosstab.data.frame <- function(data, row, col,
   # Build label maps before any subsetting (preserves attributes)
   row_label_map <- .build_label_map(data[[row_var]])
   col_label_map <- .build_label_map(data[[col_var]])
+  # Variable labels for the title and spanner (as SPSS shows them)
+  var_label_of <- function(v) {
+    lb <- attr(v, "label", exact = TRUE)
+    if (is.null(lb) || !nzchar(lb[1])) NULL else as.character(lb[1])
+  }
+  row_label <- var_label_of(data[[row_var]])
+  col_label <- var_label_of(data[[col_var]])
 
   # Extract variables
   row_data <- data[[row_var]]
@@ -267,6 +274,8 @@ crosstab.data.frame <- function(data, row, col,
     adj_residuals = adj_residuals,
     row_var = row_var,
     col_var = col_var,
+    row_label = row_label,
+    col_label = col_label,
     row_levels = rownames(tab_matrix),
     col_levels = colnames(tab_matrix),
     row_label_map = row_label_map,
@@ -498,13 +507,18 @@ print.summary.crosstab <- function(x, ...) {
 # print.summary.crosstab)
 .print_single_crosstab <- function(x, digits = 1, show_table = TRUE,
                                    show_percentages = TRUE,
-                                   show_residuals = FALSE) {
+                                   show_residuals = FALSE,
+                                   width = getOption("width", 80)) {
   show_residuals <- show_residuals && !is.null(x$adj_residuals)
 
+  # Variable labels as SPSS shows them (names when a variable has none)
+  row_lab <- x$row_label %||% x$row_var
+  col_lab <- x$col_label %||% x$col_var
+
   # Header
-  title <- paste0("Crosstabulation: ", x$row_var, " \u00d7 ", x$col_var)
+  title <- paste0("Crosstabulation: ", row_lab, " × ", col_lab)
   cat("\n", title, "\n", sep = "")
-  cat(paste(rep("-", nchar(title)), collapse = ""), "\n")
+  cat(strrep("-", nchar(title, type = "width")), "\n", sep = "")
 
   # Info section ("Counts only" when summary(percentages = FALSE) hides
   # the percentage sub-rows)
@@ -531,159 +545,193 @@ print.summary.crosstab <- function(x, ...) {
 
   if (!show_table) return(invisible(NULL))
 
-  # Apply value labels if available
-  display_row_levels <- .apply_labels(x$row_levels, x$row_label_map)
-  display_col_levels <- .apply_labels(x$col_levels, x$col_label_map)
+  # Full category labels (they used to be cut at 20 characters, so eight
+  # ALLBUS ISCO rows all read "FUEHRUNGSKRAEFTE,...")
+  display_row_levels <- .apply_labels(x$row_levels, x$row_label_map, max_width = Inf)
+  display_col_levels <- .apply_labels(x$col_levels, x$col_label_map, max_width = Inf)
 
-  # Get dimensions
   n_rows <- length(x$row_levels)
   n_cols <- length(x$col_levels)
-
-  # Determine percentage sub-labels for width calculation
-  pct_sub_labels <- c()
-  if (!is.null(x$row_pct))   pct_sub_labels <- c(pct_sub_labels, "  row %")
-  if (!is.null(x$col_pct))   pct_sub_labels <- c(pct_sub_labels, "  col %")
-  if (!is.null(x$total_pct)) pct_sub_labels <- c(pct_sub_labels, "  total %")
-  if (show_residuals)        pct_sub_labels <- c(pct_sub_labels, "  adj.res.")
-
-  # Row label column width (interior between | delimiters)
-  all_first_col <- c(display_row_levels, "Total", x$row_var, pct_sub_labels)
-  row_label_width <- max(12, max(nchar(all_first_col)) + 2)
-
-  # Data column width (interior between | delimiters)
-  max_count <- max(c(x$table, x$row_totals, x$col_totals, x$total))
-  count_chars <- nchar(sprintf("%.0f", max_count))
-  pct_chars <- digits + 5  # "100.0%" = 6 chars at digits=1
-  header_chars <- max(nchar(c(display_col_levels, "Total")))
-  data_col_width <- max(8, max(count_chars, pct_chars, header_chars) + 2)
-
-  # --- Local helper closures ---
-
-  # Horizontal line: +------------+--------+--------+
-  ct_line <- function(char = "-") {
-    parts <- c(paste(rep(char, row_label_width), collapse = ""))
-    for (k in seq_len(n_cols + 1)) {
-      parts <- c(parts, paste(rep(char, data_col_width), collapse = ""))
-    }
-    cat("+", paste(parts, collapse = "+"), "+\n", sep = "")
-  }
-
-  # Spanning header row: |            |       region             |
-  ct_spanning_row <- function(label, spanning_text) {
-    label_cell <- pad_utf8(paste0(" ", label), row_label_width)
-    span_width <- (n_cols + 1) * data_col_width + n_cols
-    text_len <- nchar(spanning_text, type = "chars")
-    left_pad <- max(1, (span_width - text_len) %/% 2)
-    centered <- paste0(paste(rep(" ", left_pad), collapse = ""), spanning_text)
-    span_cell <- pad_utf8(centered, span_width)
-    cat("|", label_cell, "|", span_cell, "|\n", sep = "")
-  }
-
-  # Data row: | Label      |    800 |    300 |   1100 |
-  ct_row <- function(label, values) {
-    label_cell <- pad_utf8(paste0(" ", label), row_label_width)
-    value_cells <- vapply(values, function(v) {
-      pad_utf8(paste0(v, " "), data_col_width, "right")
-    }, character(1))
-    cat("|", label_cell, "|", paste(value_cells, collapse = "|"), "|\n", sep = "")
-  }
-
-  # Format percentage value
   fmt_pct <- function(value) sprintf(paste0("%.", digits, "f%%"), value)
+  cnt <- function(value) sprintf("%.0f", value)
 
-  # --- Table header ---
-  ct_line()
-  ct_spanning_row("", x$col_var)
-  ct_row(x$row_var, c(display_col_levels, "Total"))
-  ct_line()
-
-  # --- Data rows ---
+  # --- Table body as data: one block per row category + the Total block --
+  blocks <- list()
   for (i in seq_len(n_rows)) {
-    # Count row
-    count_vals <- c(
-      vapply(seq_len(n_cols), function(j) sprintf("%.0f", x$table[i, j]), character(1)),
-      sprintf("%.0f", x$row_totals[i])
-    )
-    ct_row(display_row_levels[i], count_vals)
-
-    # Row percentage sub-row
+    lines <- list(list(label = display_row_levels[i], main = TRUE,
+                       cells = c(cnt(x$table[i, ]), cnt(x$row_totals[i]))))
     if (show_percentages && !is.null(x$row_pct)) {
-      pct_vals <- c(
-        vapply(seq_len(n_cols), function(j) fmt_pct(x$row_pct[i, j]), character(1)),
-        fmt_pct(100)
-      )
-      ct_row("  row %", pct_vals)
+      lines[[length(lines) + 1]] <- list(label = "  row %", main = FALSE,
+                                         cells = c(fmt_pct(x$row_pct[i, ]), fmt_pct(100)))
     }
-
-    # Column percentage sub-row
     if (show_percentages && !is.null(x$col_pct)) {
-      row_of_total <- (x$row_totals[i] / x$total) * 100
-      pct_vals <- c(
-        vapply(seq_len(n_cols), function(j) fmt_pct(x$col_pct[i, j]), character(1)),
-        fmt_pct(row_of_total)
-      )
-      ct_row("  col %", pct_vals)
+      lines[[length(lines) + 1]] <- list(label = "  col %", main = FALSE,
+                                         cells = c(fmt_pct(x$col_pct[i, ]),
+                                                   fmt_pct(x$row_totals[i] / x$total * 100)))
     }
-
-    # Total percentage sub-row
     if (show_percentages && !is.null(x$total_pct)) {
-      row_total_pct <- (x$row_totals[i] / x$total) * 100
-      pct_vals <- c(
-        vapply(seq_len(n_cols), function(j) fmt_pct(x$total_pct[i, j]), character(1)),
-        fmt_pct(row_total_pct)
-      )
-      ct_row("  total %", pct_vals)
+      lines[[length(lines) + 1]] <- list(label = "  total %", main = FALSE,
+                                         cells = c(fmt_pct(x$total_pct[i, ]),
+                                                   fmt_pct(x$row_totals[i] / x$total * 100)))
     }
-
     # Adjusted standardized residual sub-row (SPSS /CELLS=ASRESID; SPSS
     # prints 1 decimal). No value in the Total column - residuals are
     # defined per cell, not for marginals.
     if (show_residuals) {
-      res_vals <- c(
-        vapply(seq_len(n_cols), function(j) {
-          if (is.na(x$adj_residuals[i, j])) "" else sprintf("%.1f", x$adj_residuals[i, j])
-        }, character(1)),
-        ""
-      )
-      ct_row("  adj.res.", res_vals)
+      res <- x$adj_residuals[i, ]
+      lines[[length(lines) + 1]] <- list(label = "  adj.res.", main = FALSE,
+                                         cells = c(ifelse(is.na(res), "", sprintf("%.1f", res)), ""))
     }
-
-    # Separator between row groups (= before Total)
-    if (i < n_rows) ct_line()
+    blocks[[i]] <- lines
   }
-
-  # --- Total row ---
-  ct_line("=")
-  total_vals <- c(
-    vapply(seq_len(n_cols), function(j) sprintf("%.0f", x$col_totals[j]), character(1)),
-    sprintf("%.0f", x$total)
-  )
-  ct_row("Total", total_vals)
 
   # Total row's percentage sub-rows: every requested type, as SPSS prints
   # them for its Total row - % within the row variable and % of total are
   # the column shares, % within the column variable is 100% per column
-  # (the old code printed the column shares labelled "col %" and nothing
-  # for row/total percentages)
-  col_share <- vapply(seq_len(n_cols), function(j) {
-    fmt_pct((x$col_totals[j] / x$total) * 100)
-  }, character(1))
+  col_share <- fmt_pct(x$col_totals / x$total * 100)
+  total_lines <- list(list(label = "Total", main = TRUE,
+                           cells = c(cnt(x$col_totals), cnt(x$total))))
   if (show_percentages && !is.null(x$row_pct)) {
-    ct_row("  row %", c(col_share, fmt_pct(100)))
+    total_lines[[length(total_lines) + 1]] <- list(label = "  row %", main = FALSE,
+                                                   cells = c(col_share, fmt_pct(100)))
   }
   if (show_percentages && !is.null(x$col_pct)) {
-    ct_row("  col %", c(rep(fmt_pct(100), n_cols), fmt_pct(100)))
+    total_lines[[length(total_lines) + 1]] <- list(label = "  col %", main = FALSE,
+                                                   cells = rep(fmt_pct(100), n_cols + 1))
   }
   if (show_percentages && !is.null(x$total_pct)) {
-    ct_row("  total %", c(col_share, fmt_pct(100)))
+    total_lines[[length(total_lines) + 1]] <- list(label = "  total %", main = FALSE,
+                                                   cells = c(col_share, fmt_pct(100)))
   }
 
-  ct_line()
+  # --- Column widths: each column sized to its own content ---------------
+  dw <- function(s) nchar(s, type = "width")
+  all_lines <- c(unlist(blocks, recursive = FALSE), total_lines)
+  n_cells <- n_cols + 1L
+  cell_w <- vapply(seq_len(n_cells), function(j) {
+    max(dw(vapply(all_lines, function(l) l$cells[j], character(1))), 1L)
+  }, numeric(1))
+  col_heads <- c(display_col_levels, "Total")
+  head_w <- pmax(cell_w, dw(col_heads))
+
+  sub_labels <- vapply(Filter(function(l) !l$main, all_lines), function(l) l$label, character(1))
+  first_min <- max(dw(c(sub_labels, "Total")), 1L)
+  first_w <- max(first_min, dw(display_row_levels), dw(row_lab))
+  table_width <- function(fw, hw) 1L + (fw + 3L) + sum(hw + 3L)
+
+  # Too wide for the console: first wrap the column headings (at spaces,
+  # hyphens, commas, slashes), then the row labels
+  if (table_width(first_w, head_w) > width) {
+    word_w <- vapply(col_heads, function(h) max(dw(.ct_words(h))), numeric(1))
+    head_w <- pmax(cell_w, pmin(head_w, word_w))
+  }
+  if (table_width(first_w, head_w) > width) {
+    avail <- width - table_width(0L, head_w)
+    first_w <- max(first_min, 12L, min(first_w, avail))
+  }
+
+  # --- Header: spanner (column variable label) + column headings ---------
+  head_lines <- lapply(seq_len(n_cells), function(j) .ct_wrap(col_heads[j], head_w[j]))
+  n_head <- max(lengths(head_lines))
+  span_inner <- sum(head_w + 2L) + (n_cells - 1L)
+  span_lines <- .ct_wrap(col_lab, span_inner - 2L)
+  row_head <- .ct_wrap(row_lab, first_w)
+  n_top <- max(length(span_lines), length(row_head) - n_head)
+  first_lines <- c(rep("", n_top + n_head - length(row_head)), row_head)
+
+  cell <- function(s, w, left = FALSE) {
+    paste0(" ", pad_utf8(s, w, align = if (left) "left" else "right"), " ")
+  }
+  rule <- function(ch = "-") {
+    cat("+", strrep(ch, first_w + 2L), "+",
+        paste(strrep(ch, head_w + 2L), collapse = "+"), "+\n", sep = "")
+  }
+  emit <- function(label, cells) {
+    cat("|", cell(label, first_w, left = TRUE), "|",
+        paste(vapply(seq_len(n_cells), function(j) cell(cells[j], head_w[j]),
+                     character(1)), collapse = "|"),
+        "|\n", sep = "")
+  }
+
+  rule()
+  for (k in seq_len(n_top)) {
+    txt <- if (k <= length(span_lines)) span_lines[k] else ""
+    left_pad <- max(0L, (span_inner - dw(txt)) %/% 2L)
+    cat("|", cell(first_lines[k], first_w, left = TRUE), "|",
+        pad_utf8(paste0(strrep(" ", left_pad), txt), span_inner), "|\n", sep = "")
+  }
+  for (k in seq_len(n_head)) {
+    heads <- vapply(head_lines, function(h) {
+      c(rep("", n_head - length(h)), h)[k]
+    }, character(1))
+    emit(first_lines[n_top + k], heads)
+  }
+  rule()
+
+  # --- Body: long row labels wrap onto continuation lines ----------------
+  emit_block <- function(lines) {
+    for (l in lines) {
+      lab <- if (l$main) .ct_wrap(l$label, first_w) else l$label
+      emit(lab[1], l$cells)
+      for (extra in lab[-1]) emit(extra, rep("", n_cells))
+    }
+  }
+  for (i in seq_len(n_rows)) {
+    emit_block(blocks[[i]])
+    if (i < n_rows) rule()
+  }
+  rule("=")
+  emit_block(total_lines)
+  rule()
 
   if (show_residuals) {
     cat("adj.res. = adjusted standardized residual; |adj.res.| > 2 marks cells\n")
     cat("deviating from independence (use chi_square() for the overall test).\n")
   }
+  invisible(NULL)
+}
+
+#' Break a label into pieces at spaces, hyphens, commas and slashes
+#' @noRd
+.ct_words <- function(text) {
+  if (is.na(text)) return("NA")
+  w <- regmatches(text, gregexpr("[^ ,/-]*[,/-]*", text))[[1]]
+  w <- trimws(w)
+  w[nzchar(w)]
+}
+
+#' Wrap a crosstab label to a display width
+#'
+#' Breaks after spaces, hyphens, commas and slashes ("VOLKS-," /
+#' "HAUPTSCHULE"); a piece longer than the width is split hard.
+#' @noRd
+.ct_wrap <- function(text, width) {
+  if (is.na(text)) text <- "NA"
+  width <- max(1L, width)
+  if (nchar(text, type = "width") <= width) return(text)
+  pieces <- regmatches(text, gregexpr("[^ ,/-]*[ ,/-]*", text))[[1]]
+  pieces <- pieces[nzchar(pieces)]
+  lines <- character(0)
+  cur <- ""
+  for (p in pieces) {
+    cand <- paste0(cur, p)
+    if (!nzchar(cur) || nchar(trimws(cand, "right"), type = "width") <= width) {
+      cur <- cand
+    } else {
+      lines <- c(lines, trimws(cur, "right"))
+      cur <- p
+    }
+  }
+  lines <- c(lines, trimws(cur, "right"))
+  out <- character(0)
+  for (ln in lines) {
+    while (nchar(ln, type = "width") > width) {
+      out <- c(out, substr(ln, 1, width))
+      ln <- substr(ln, width + 1, nchar(ln))
+    }
+    out <- c(out, ln)
+  }
+  out
 }
 
 

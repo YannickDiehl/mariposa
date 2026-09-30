@@ -641,3 +641,47 @@ test_that("DESC-21: weighted crosstab reports valid and missing cases as sums of
   ru <- crosstab(survey_data, life_satisfaction, gender)
   expect_equal(ru$n_missing, sum(is.na(survey_data$life_satisfaction)))
 })
+
+
+# --- DESC-05: crosstab labels, widths and title ---------------------------------
+
+test_that("DESC-05: crosstab shows full labels, per-column widths and variable labels", {
+  # Category labels were cut at 20 characters (eight ALLBUS ISCO rows all
+  # read "FUEHRUNGSKRAEFTE,..."), every column took the width of the
+  # widest label (sex x educ: 182 characters at width 80), and the title
+  # and spanner showed variable names instead of variable labels.
+  skip_if_not_installed("haven")
+  long_labs <- c("FUEHRUNGSKRAEFTE IN DER PRODUKTION" = 1,
+                 "FUEHRUNGSKRAEFTE IM VERTRIEB" = 2,
+                 "FUEHRUNGSKRAEFTE IN DER VERWALTUNG" = 3)
+  d <- tibble::tibble(
+    job = haven::labelled(rep(c(1, 2, 3), 20), long_labs, label = "Beruf (ISCO-08)"),
+    sex = haven::labelled(rep(c(1, 2), 30), c(MANN = 1, FRAU = 2), label = "Geschlecht")
+  )
+  old <- options(width = 200)
+  on.exit(options(old))
+  out <- capture.output(print(crosstab(d, job, sex)))
+  for (l in names(long_labs)) expect_true(any(grepl(l, out, fixed = TRUE)))
+  expect_true(any(grepl("Crosstabulation: Beruf (ISCO-08) × Geschlecht", out,
+                        fixed = TRUE)))
+  expect_true(any(grepl("Geschlecht", out[grepl("^\\|", out)])))  # spanner
+  hdr <- out[grepl("MANN", out) & grepl("^\\|", out)][1]
+  cells <- strsplit(hdr, "|", fixed = TRUE)[[1]]
+  expect_lt(nchar(cells[3]), 12)                     # own width, not 36
+
+  # Narrow console: long labels wrap (nothing is cut) and the table fits
+  options(width = 60)
+  out2 <- capture.output(print(crosstab(d, job, sex)))
+  tab2 <- out2[grepl("^[|+]", out2)]
+  expect_true(all(nchar(tab2) <= 60))
+  expect_false(any(grepl("...", out2, fixed = TRUE)))
+  first <- trimws(vapply(strsplit(tab2[grepl("^\\|", tab2)], "|", fixed = TRUE),
+                         `[`, "", 2))
+  expect_true(any(grepl("VERWALTUNG", first)))
+
+  # Long column labels wrap in the header: gender x education fits 80
+  options(width = 80)
+  out3 <- capture.output(print(crosstab(survey_data, gender, education)))
+  expect_true(all(nchar(out3[grepl("^[|+]", out3)]) <= 80))
+  expect_true(any(grepl("Intermediate", out3)))
+})

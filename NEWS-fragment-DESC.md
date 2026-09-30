@@ -122,3 +122,11 @@
 * Weighted `crosstab()` reports missing cases like SPSS's Case Processing
   Summary: as the sum of their weights (it printed an unweighted count
   next to the weighted "N (valid)").
+* `crosstab()` output: category labels are shown in full (they were cut
+  at 20 characters, so eight ALLBUS ISCO categories all read
+  "FUEHRUNGSKRAEFTE,..."), each column is as wide as its own content
+  (every column took the width of the widest label: sex x educ was 182
+  characters wide), long column headings and row labels wrap when the
+  table would be wider than the console, and the title and the column
+  spanner show the variable labels, as SPSS does, instead of the
+  variable names.
