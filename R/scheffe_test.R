@@ -131,7 +131,7 @@ scheffe_test.default <- function(x, conf.level = 0.95, ...) {
   cls <- paste(class(x), collapse = "/")
   cli_abort(c(
     "{.fn scheffe_test} is not available for objects of class {.cls {cls}}.",
-    "i" = "Scheffe's test requires results from {.fn oneway_anova}.",
+    "i" = "Scheffe's test requires results from {.fn oneway_anova} or {.fn factorial_anova}.",
     "i" = "Example: {.code oneway_anova(data, dv, group) |> scheffe_test()}"
   ))
 }

@@ -136,3 +136,13 @@
   that cannot be analysed (e.g. no variance, a factor with one level) is
   skipped with a warning naming the group. The weighting of each group's
   fit is that of an ungrouped call. (PAR-04, EDGE-02)
+* Clear errors for arguments that do not exist: `t_test(paired = TRUE)`
+  explains that paired t-tests are not supported and points to
+  `wilcoxon_test()` (was: "Can't select columns with TRUE");
+  `t_test(x = , y = )` explains that variables come from `data` (was:
+  "Variable x is not numeric"); `normality_test(weights = )` says the
+  tests are unweighted by design and `normality_test(group = )` points to
+  `group_by()` (was: "Variable weights/group is not numeric"). The
+  errors of `tukey_test()`, `scheffe_test()` and `levene_test()` for
+  unsupported objects now mention `factorial_anova()` results, which work
+  as well. (PAR-23, PAR-24)

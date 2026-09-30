@@ -188,6 +188,24 @@ t_test <- function(data, ..., group = NULL, weights = NULL,
   is_grouped <- inherits(data, "grouped_df")
   grp_vars <- if (is_grouped) dplyr::group_vars(data) else NULL
 
+  # Arguments t.test() users try that t_test() does not have: they would
+  # land in `...` and fail inside tidyselect ("Can't select columns with
+  # TRUE", "Variable x is not numeric")
+  dot_names <- names(rlang::enquos(...))
+  if ("paired" %in% dot_names) {
+    cli_abort(c(
+      "Paired t-tests are not supported by {.fn t_test}.",
+      "i" = "For paired (repeated) measurements use {.fn wilcoxon_test} (Wilcoxon signed-rank test).",
+      "i" = "Or test the differences against 0: compute {.code diff = after - before}, then {.code t_test(data, diff, mu = 0)}."
+    ))
+  }
+  if (any(c("x", "y") %in% dot_names)) {
+    cli_abort(c(
+      "{.fn t_test} takes the variables from {.arg data}, not {.arg x}/{.arg y} vectors.",
+      "i" = "Use {.code t_test(data, variable, group = grouping_variable)} (two groups) or {.code t_test(data, variable, mu = value)} (one sample)."
+    ))
+  }
+
   # Select variables using centralized helper
   vars <- .process_variables(data, ...)
   var_names <- names(vars)

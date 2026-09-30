@@ -680,6 +680,38 @@ test_that("PAR-04: factorial_anova() and ancova() honour group_by()", {
   expect_false(any(fc$anova_table$region == "East"))
 })
 
+test_that("PAR-23: unsupported arguments give clear errors", {
+  # t_test(paired = TRUE) -> "Can't select columns with TRUE";
+  # t_test(x =, y =) -> "Variable x is not numeric";
+  # normality_test(weights =) / (group =) -> "Variable weights/group is not numeric".
+  err <- tryCatch(t_test(survey_data, trust_government, trust_media, paired = TRUE),
+                  error = conditionMessage)
+  expect_match(err, "[Pp]aired")
+  expect_match(err, "wilcoxon_test")
+  expect_false(grepl("Can't select", err, fixed = TRUE))
+
+  err2 <- tryCatch(t_test(survey_data, x = survey_data$age, y = survey_data$income),
+                   error = conditionMessage)
+  expect_match(err2, "data")
+  expect_false(grepl("is not numeric", err2, fixed = TRUE))
+
+  err3 <- tryCatch(normality_test(survey_data, income, weights = sampling_weight),
+                   error = conditionMessage)
+  expect_match(err3, "unweighted")
+  err4 <- tryCatch(normality_test(survey_data, income, group = region),
+                   error = conditionMessage)
+  expect_match(err4, "group_by")
+})
+
+test_that("PAR-24: post-hoc / levene default methods mention factorial_anova()", {
+  # "Tukey HSD requires results from oneway_anova()" although
+  # factorial_anova() results work as well.
+  for (f in list(tukey_test, scheffe_test, levene_test)) {
+    err <- tryCatch(f(lm(age ~ income, data = survey_data)), error = conditionMessage)
+    expect_match(err, "factorial_anova")
+  }
+})
+
 test_that("PAR-26: ?factorial_anova examples only use existing summary() toggles", {
   # The example called summary(result, marginal_means = FALSE), a toggle
   # factorial_anova's summary() does not have (silently ignored).

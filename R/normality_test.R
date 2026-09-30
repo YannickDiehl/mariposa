@@ -119,6 +119,22 @@ normality_test <- function(data, ...) {
     cli_abort("{.arg data} must be a data frame or tibble.")
   }
 
+  # weights = / group = would be taken as tidyselect renames and fail with
+  # "Variable weights is not numeric"
+  dot_names <- names(rlang::enquos(...))
+  if (any(c("weights", "weight") %in% dot_names)) {
+    cli_abort(c(
+      "{.fn normality_test} does not take weights.",
+      "i" = "Like SPSS EXAMINE (Tests of Normality) the tests are unweighted by design."
+    ))
+  }
+  if ("group" %in% dot_names) {
+    cli_abort(c(
+      "{.fn normality_test} has no {.arg group} argument.",
+      "i" = "To test within groups use {.code data |> group_by(group) |> normality_test(variable)}."
+    ))
+  }
+
   vars <- .process_variables(data, ...)
   var_names <- names(vars)
 
