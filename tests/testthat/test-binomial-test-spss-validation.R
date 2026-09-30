@@ -44,6 +44,8 @@ spss_values <- list(
     counts = c(Male = 1194L, Female = 1306L),   # swapped from SPSS line 9-10
     n_total = 2500L,                             # binomial_test_output.txt:11
     test_prop = 0.50,                            # binomial_test_output.txt:9
+    obs_prop1 = 0.52,                            # binomial_test_output.txt:9
+    obs_prop2 = 0.48,                            # binomial_test_output.txt:10
     p = 0.026                                    # binomial_test_output.txt:9 (matches)
   ),
 
@@ -53,6 +55,8 @@ spss_values <- list(
     counts = c(East = 485L, West = 2015L),       # binomial_test_output.txt:19-20
     n_total = 2500L,                             # binomial_test_output.txt:21
     test_prop = 0.50,                            # binomial_test_output.txt:19
+    obs_prop1 = 0.19,                            # binomial_test_output.txt:19
+    obs_prop2 = 0.81,                            # binomial_test_output.txt:20
     p = "<.001"                                  # binomial_test_output.txt:19 (".000")
   ),
 
@@ -63,6 +67,8 @@ spss_values <- list(
     counts = c(High = 1397L, Low = 1024L),       # binomial_test_output.txt:29-30
     n_total = 2421L,                             # binomial_test_output.txt:31
     test_prop = 0.50,                            # binomial_test_output.txt:29
+    obs_prop1 = 0.58,                            # binomial_test_output.txt:29
+    obs_prop2 = 0.42,                            # binomial_test_output.txt:30
     p = "<.001"                                  # binomial_test_output.txt:29
   ),
 
@@ -73,7 +79,10 @@ spss_values <- list(
     group1 = "High",                             # binomial_test_output.txt:39
     counts = c(High = 1397L, Low = 1024L),       # binomial_test_output.txt:39-40
     n_total = 2421L,                             # binomial_test_output.txt:41
-    test_prop = 0.60,                            # binomial_test_output.txt:39
+    test_prop = 0.6,                             # binomial_test_output.txt:39
+    obs_prop1 = 0.6,                             # binomial_test_output.txt:39
+    obs_prop2 = 0.4,                             # binomial_test_output.txt:40
+    prop_precision = 1,                          # SPSS prints the proportions with 1 decimal here
     p = 0.011,                                   # binomial_test_output.txt:39 (Exact Sig. 1-tailed)
     alternative = "less"                         # binomial_test_output.txt:42
   ),
@@ -83,9 +92,15 @@ spss_values <- list(
   test_3a_gender_by_region = list(
     East = list(group1 = "Female",                                          # binomial_test_output.txt:74 (swapped label "Male")
                 counts = c(Male = 238L, Female = 247L), n_total = 485L,
+                test_prop = 0.50,                                           # binomial_test_output.txt:74
+                obs_prop1 = 0.51,                                           # binomial_test_output.txt:74
+                obs_prop2 = 0.49,                                           # binomial_test_output.txt:75
                 p = 0.716),
     West = list(group1 = "Male",                                            # binomial_test_output.txt:77 (swapped label "Female")
                 counts = c(Male = 956L, Female = 1059L), n_total = 2015L,
+                test_prop = 0.50,                                           # binomial_test_output.txt:77
+                obs_prop1 = 0.47,                                           # binomial_test_output.txt:77
+                obs_prop2 = 0.53,                                           # binomial_test_output.txt:78
                 p = 0.023)
   ),
 
@@ -93,9 +108,15 @@ spss_values <- list(
   test_3b_high_life_by_region = list(
     East = list(group1 = "High",                                            # binomial_test_output.txt:87
                 counts = c(High = 271L, Low = 194L), n_total = 465L,       # binomial_test_output.txt:87-89
+                test_prop = 0.50,                                           # binomial_test_output.txt:87
+                obs_prop1 = 0.58,                                           # binomial_test_output.txt:87
+                obs_prop2 = 0.42,                                           # binomial_test_output.txt:88
                 p = "<.001"),                                                # binomial_test_output.txt:87
     West = list(group1 = "Low",                                             # binomial_test_output.txt:90
                 counts = c(High = 1126L, Low = 830L), n_total = 1956L,     # binomial_test_output.txt:90-92
+                test_prop = 0.50,                                           # binomial_test_output.txt:90
+                obs_prop1 = 0.42,                                           # binomial_test_output.txt:90
+                obs_prop2 = 0.58,                                           # binomial_test_output.txt:91
                 p = "<.001")                                                 # binomial_test_output.txt:90
   )
 )
@@ -122,6 +143,16 @@ compare_binomial <- function(row, spss, scenario) {
   assert_spss(as.numeric(row$p_value), spss$p,
               tier = "display", precision = 3, what = "p_value",
               label = sprintf("[%s] p-value", scenario))
+
+  # Observed Prop. of Group 1 / Group 2 and Test Prop., at the decimals SPSS
+  # prints (2, or 1 in Test 1d)
+  prop_precision <- spss$prop_precision %||% 2
+  for (key in c("obs_prop1", "obs_prop2", "test_prop")) {
+    if (is.null(spss[[key]])) next
+    assert_spss(as.numeric(row[[key]]), spss[[key]],
+                tier = "display", precision = prop_precision,
+                label = sprintf("[%s] %s", scenario, key))
+  }
 
   # Total N: exact integer
   assert_spss_count(as.numeric(row$n_total), spss$n_total,
