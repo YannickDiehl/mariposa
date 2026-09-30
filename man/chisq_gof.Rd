@@ -33,6 +33,9 @@ including:
 \item Chi-square statistic (\code{chi_squared}) and p-value for each variable
 \item Degrees of freedom
 \item Frequency table with observed, expected, and residual counts
+(\code{frequencies}; expected counts and residuals unrounded, printed
+with one decimal like SPSS; for grouped data one long table with the
+group columns and \code{Variable})
 \item Sample size (N)
 }
 }

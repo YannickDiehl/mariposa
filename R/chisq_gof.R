@@ -38,6 +38,9 @@
 #' - Chi-square statistic (\code{chi_squared}) and p-value for each variable
 #' - Degrees of freedom
 #' - Frequency table with observed, expected, and residual counts
+#'   (\code{frequencies}; expected counts and residuals unrounded, printed
+#'   with one decimal like SPSS; for grouped data one long table with the
+#'   group columns and \code{Variable})
 #' - Sample size (N)
 #'
 #' @details
@@ -234,12 +237,13 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
     df_val <- k - 1
     p_value <- pchisq(chi_sq, df = df_val, lower.tail = FALSE)
 
-    # Build frequency detail table
+    # Build frequency detail table (unrounded; printed with 1 decimal,
+    # halves up as SPSS: 121.25 -> 121.3, where round() gave 121.2)
     freq_df <- data.frame(
       category = names(freq_tbl),
       observed = as.integer(freq_tbl),
-      expected = round(expected_freq, 1),
-      residual = round(as.numeric(freq_tbl) - expected_freq, 1),
+      expected = expected_freq,
+      residual = as.numeric(freq_tbl) - expected_freq,
       stringsAsFactors = FALSE
     )
 
@@ -268,11 +272,17 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
     data_list <- dplyr::group_split(data)
     group_keys_df <- dplyr::group_keys(data)
 
+    freq_parts <- list()
     results_list <- lapply(seq_along(data_list), function(i) {
       key <- group_keys_df[i, , drop = FALSE]
       var_results <- lapply(var_names, function(vn) {
         tryCatch({
           res <- perform_single_gof(data_list[[i]], vn, expected, key)
+          # SPSS SPLIT FILE prints a Frequencies table per group as well
+          freq_parts[[length(freq_parts) + 1]] <<- cbind(
+            key[rep(1, nrow(res$freq_table)), , drop = FALSE],
+            Variable = vn, res$freq_table, stringsAsFactors = FALSE
+          )
           cbind(
             key,
             data.frame(
@@ -306,7 +316,11 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
       is_grouped = TRUE,
       groups = grp_vars,
       expected = expected,
-      frequencies = NULL
+      frequencies = if (length(freq_parts)) {
+        out <- do.call(rbind, freq_parts)
+        rownames(out) <- NULL
+        out
+      }
     )
 
   } else {
@@ -517,8 +531,22 @@ print.summary.chisq_gof <- function(x, ...) {
         group_results <- group_results[.group_match(group_results[[g]], group_values[[g]]), ]
       }
 
+      cat("\n")
+      if (show_freq && is.data.frame(x$frequencies)) {
+        group_freq <- x$frequencies
+        for (g in names(group_values)) {
+          group_freq <- group_freq[.group_match(group_freq[[g]], group_values[[g]]), ]
+        }
+        for (vn in x$variables) {
+          freq <- group_freq[group_freq$Variable == vn, , drop = FALSE]
+          if (nrow(freq) > 0) {
+            cat(sprintf("  %s - Frequency Table:\n", vn))
+            .print_gof_frequencies(freq)
+          }
+        }
+      }
+
       if (nrow(group_results) > 0 && show_results) {
-        cat("\n")
         .print_gof_table(group_results, digits)
       }
     }

@@ -851,3 +851,19 @@ test_that("mcnemar_test with expansion weights is instant", {
   expect_lt(elapsed, 5)
   expect_true(is.finite(r$results$exact_p))
 })
+
+test_that("chisq_gof prints expected counts and residuals half up like SPSS", {
+  # Was: round() stored 121.25 as 121.2 and -0.25 as -0.2 (SPSS: 121.3, -.3,
+  # chisq_gof_output.txt:360-363); grouped calls returned no frequencies.
+  east <- dplyr::filter(survey_data, region == "East")
+  r <- chisq_gof(east, education)
+  expect_equal(r$frequencies$expected[1], 485 / 4)
+  out <- capture.output(print(summary(r)))
+  expect_true(any(grepl("121.3", out, fixed = TRUE)))
+  expect_true(any(grepl("-0.3", out, fixed = TRUE)))
+  g <- chisq_gof(dplyr::group_by(survey_data, region), education)
+  expect_s3_class(g$frequencies, "data.frame")
+  expect_setequal(as.character(g$frequencies$region), c("East", "West"))
+  out <- capture.output(print(summary(g)))
+  expect_true(any(grepl("503.8", out, fixed = TRUE)))
+})

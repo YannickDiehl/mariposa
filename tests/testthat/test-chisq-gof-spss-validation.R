@@ -11,8 +11,9 @@
 # same reason.
 #
 # Frequencies table: chisq_gof() returns Observed N / Expected N / Residual
-# ($frequencies) for an ungrouped call only; grouped calls return the test
-# statistics per group.
+# ($frequencies) for ungrouped and (since 0.7.4) grouped calls; expected
+# counts and residuals are unrounded and print half up like SPSS (East:
+# 121.25 -> 121.3, -0.25 -> -.3).
 # =============================================================================
 
 library(testthat)
@@ -89,6 +90,30 @@ spss_values <- list(
                 df = 1L,             # chisq_gof_output.txt:422
                 p = 0.022,           # chisq_gof_output.txt:423
                 n = 2015L)           # chisq_gof_output.txt:413
+  ),
+  grouped_freq_education = list(
+    East = rbind(
+      `Basic Secondary`        = c(170, 121.3, 48.8),     # chisq_gof_output.txt:360
+      `Intermediate Secondary` = c(121, 121.3, -0.3),     # chisq_gof_output.txt:361
+      `Academic Secondary`     = c(115, 121.3, -6.3),     # chisq_gof_output.txt:362
+      University               = c(79, 121.3, -42.3)      # chisq_gof_output.txt:363
+    ),
+    West = rbind(
+      `Basic Secondary`        = c(671, 503.8, 167.3),    # chisq_gof_output.txt:365
+      `Intermediate Secondary` = c(508, 503.8, 4.3),      # chisq_gof_output.txt:366
+      `Academic Secondary`     = c(516, 503.8, 12.3),     # chisq_gof_output.txt:367
+      University               = c(320, 503.8, -183.8)    # chisq_gof_output.txt:368
+    )
+  ),
+  grouped_freq_gender = list(
+    East = rbind(
+      Male   = c(238, 242.5, -4.5),     # chisq_gof_output.txt:409
+      Female = c(247, 242.5, 4.5)       # chisq_gof_output.txt:410
+    ),
+    West = rbind(
+      Male   = c(956, 1007.5, -51.5),   # chisq_gof_output.txt:412
+      Female = c(1059, 1007.5, 51.5)    # chisq_gof_output.txt:413
+    )
   )
 )
 
@@ -127,12 +152,17 @@ compare_gof_frequencies <- function(freq, spss, scenario) {
   }
 }
 
-compare_gof_grouped <- function(r, spss, scenario) {
+compare_gof_grouped <- function(r, spss, scenario, spss_freq = NULL) {
   expect_identical(as.character(r$results$region), names(spss),
                    label = sprintf("[%s] split-file group order", scenario))
   for (i in seq_along(names(spss))) {
     compare_gof(r$results[i, ], spss[[i]],
                 sprintf("%s %s", scenario, names(spss)[i]))
+  }
+  for (rg in names(spss_freq)) {
+    freq <- r$frequencies[as.character(r$frequencies$region) == rg, ]
+    compare_gof_frequencies(freq, spss_freq[[rg]],
+                            sprintf("%s %s", scenario, rg))
   }
 }
 
@@ -178,10 +208,12 @@ test_that("Test 1f: chisq_gof interview_mode with /EXPECTED=5 3 2 — matches SP
 
 test_that("Test 3 grouped: chisq_gof education by region — matches SPSS", {
   r <- survey_data |> group_by(region) |> chisq_gof(education)
-  compare_gof_grouped(r, spss_values$grouped_education, "education by region")
+  compare_gof_grouped(r, spss_values$grouped_education, "education by region",
+                      spss_values$grouped_freq_education)
 })
 
 test_that("Test 3 grouped: chisq_gof gender by region — matches SPSS", {
   r <- survey_data |> group_by(region) |> chisq_gof(gender)
-  compare_gof_grouped(r, spss_values$grouped_gender, "gender by region")
+  compare_gof_grouped(r, spss_values$grouped_gender, "gender by region",
+                      spss_values$grouped_freq_gender)
 })

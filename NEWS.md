@@ -544,6 +544,11 @@ reference output showed mariposa was wrong.
 
 ### Non-parametric and categorical tests
 
+* `chisq_gof()`: expected counts and residuals are stored unrounded and
+  printed half up like SPSS (`round()` gave 121.2 and -0.2 where SPSS
+  prints 121.3 and -.3), and grouped calls return and print the
+  Frequencies table of every group as SPSS SPLIT FILE does (it was
+  `NULL`).
 * Exact tests with expansion (population) weights: the 2x2 Fisher
   p-value and the exact McNemar/binomial p-values come from distribution
   tails instead of enumerating every possible table, with the same result
