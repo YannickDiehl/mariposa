@@ -94,3 +94,10 @@
   by level name or number (it was compared with the level names only, so
   `ref = 1` silently returned all dummies), and a `ref` that matches no
   category is an error.
+* `row_count()` counts value sets and missing values: `count = c(4, 5)`
+  was recycled over the cells (wrong counts without a warning), and
+  `count = NA` always returned 0. It now counts cells equal to any listed
+  value (SPSS `COUNT n = v1 TO v5 (4, 5)`), `NA` counts missing values
+  (SPSS `MISSING`), and SPSS missing codes of imported data (e.g. -9, a
+  tagged NA after `read_spss()`) are counted when listed - they were
+  always 0.

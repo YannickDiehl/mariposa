@@ -170,9 +170,15 @@ row_sums <- function(data, ..., min_valid = NULL, na.rm = TRUE) {
 #'
 #' @param data Your survey data (a data frame or tibble).
 #' @param ... The variables to check. Supports tidyselect.
-#' @param count The value to count.
+#' @param count The value(s) to count: one value (\code{count = 5}) or a
+#'   set (\code{count = c(4, 5)} counts cells equal to 4 or 5, like SPSS's
+#'   \code{COUNT n = v1 TO v5 (4, 5)}). \code{NA} counts missing values
+#'   (SPSS keyword \code{MISSING}). Missing codes of imported data (e.g.
+#'   -9 read by \code{\link{read_spss}()} as a tagged NA) are counted when
+#'   listed, as SPSS's \code{COUNT} counts user-missing values.
 #' @param na.rm If \code{TRUE} (default), \code{NA} values are ignored.
-#'   If \code{FALSE}, any row containing \code{NA} returns \code{NA}.
+#'   If \code{FALSE}, any row containing a missing value that is not
+#'   counted returns \code{NA}.
 #'
 #' @return An integer vector with one value per row — the count of how
 #'   often \code{count} appears.
@@ -185,6 +191,13 @@ row_sums <- function(data, ..., min_valid = NULL, na.rm = TRUE) {
 #' survey_data <- survey_data %>%
 #'   mutate(n_top = row_count(., trust_government, trust_media,
 #'                            trust_science, count = 5))
+#'
+#' # Top-2 box (4 or 5) and number of missing answers per respondent
+#' survey_data <- survey_data %>%
+#'   mutate(n_top2 = row_count(., trust_government, trust_media,
+#'                             trust_science, count = c(4, 5)),
+#'          n_miss = row_count(., trust_government, trust_media,
+#'                             trust_science, count = NA))
 #'
 #' @seealso [row_sums()] for row-wise sums, [row_means()] for row-wise means
 #'
@@ -199,22 +212,31 @@ row_count <- function(data, ..., count, na.rm = TRUE) {
   if (missing(count)) {
     cli::cli_abort("{.arg count} is required. Specify the value to count.")
   }
+  if (length(count) == 0L || !(is.numeric(count) || all(is.na(count)))) {
+    cli::cli_abort(c(
+      "{.arg count} must be one or more numeric values (or {.val NA}).",
+      "i" = "For example {.code count = 5}, {.code count = c(4, 5)} or {.code count = NA}."
+    ))
+  }
 
   mat <- .row_op_matrix(data, ...)
 
-  matches <- mat == count
+  # Missing codes of imported data (tagged NAs, e.g. -9) are counted when
+  # listed in `count`, like SPSS's COUNT counts user-missing values: match
+  # against the original codes. NA in `count` counts every missing value
+  # (SPSS keyword MISSING).
+  codes <- .row_op_codes(data, colnames(mat), mat)
+  count_vals <- as.double(count[!is.na(count)])
+  matches <- matrix(codes %in% count_vals, nrow = nrow(mat))
+  if (anyNA(count)) matches <- matches | is.na(mat)
 
-  if (isTRUE(na.rm)) {
-    # NA == count gives NA; treat as "not a match"
-    matches[is.na(matches)] <- FALSE
-    as.integer(rowSums(matches))
-  } else {
-    # If any value in the row is NA, return NA
-    has_na <- rowSums(is.na(mat)) > 0L
-    result <- as.integer(rowSums(matches, na.rm = TRUE))
+  result <- as.integer(rowSums(matches))
+  if (!isTRUE(na.rm) && !anyNA(count)) {
+    # A row with a value that is missing and not counted returns NA
+    has_na <- rowSums(is.na(codes)) > 0L
     result[has_na] <- NA_integer_
-    result
   }
+  result
 }
 
 
@@ -248,6 +270,21 @@ row_count <- function(data, ..., count, na.rm = TRUE) {
 
     as.matrix(data[, var_names, drop = FALSE])
   }
+}
+
+
+#' Matrix of original codes: tagged NAs of imported columns replaced by
+#' their missing codes (na_tag_map), everything else as in `mat`
+#' @noRd
+.row_op_codes <- function(data, var_names, mat) {
+  codes <- mat
+  for (j in seq_along(var_names)) {
+    x <- data[[var_names[j]]]
+    if (is.numeric(attr(x, "na_tag_map", exact = TRUE))) {
+      codes[, j] <- as.double(untag_na(x))
+    }
+  }
+  codes
 }
 
 

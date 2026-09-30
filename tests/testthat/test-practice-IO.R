@@ -437,3 +437,26 @@ test_that("IO-09: to_dummy() ref works for factors (name or position)", {
   expect_error(to_dummy(survey_data, gender, ref = "Other"), "ref")
   expect_error(to_dummy(c(1, 2, 3), ref = 9), "ref")
 })
+
+# IO-10 (= SCALE-10): row_count(count = c(4, 5)) silently recycled the
+# vector over the cells; count = NA returned 0. SCALE-11: count = -9 was
+# always 0 on read_spss() data because -9 is a tagged NA there.
+test_that("IO-10: row_count() counts value sets and missing values", {
+  d <- data.frame(a = c(4, 5, 1, NA), b = c(5, 1, 4, NA), c = c(1, 5, NA, 2))
+  expect_equal(row_count(d, a, b, c, count = c(4, 5)), c(2L, 2L, 1L, 0L))
+  expect_equal(row_count(d, a, b, c, count = NA), c(0L, 0L, 1L, 2L))
+  expect_equal(row_count(d, a, b, c, count = c(5, NA)), c(1L, 2L, 1L, 2L))
+  expect_equal(row_count(d, a, b, c, count = 4), c(1L, 0L, 1L, 0L))
+  expect_error(row_count(d, a, b, count = "x"), "count")
+})
+
+test_that("SCALE-11: row_count() counts SPSS missing codes of imported data", {
+  skip_if_not_installed("haven")
+  d <- tibble::tibble(
+    q1 = set_na(c(1, -9, 3, -8), -9, -8),
+    q2 = set_na(c(-9, -9, 2, 1), -9, -8)
+  )
+  expect_equal(row_count(d, q1, q2, count = -9), c(1L, 2L, 0L, 0L))
+  expect_equal(row_count(d, q1, q2, count = c(-9, -8)), c(1L, 2L, 0L, 1L))
+  expect_equal(row_count(d, q1, q2, count = NA), c(1L, 2L, 0L, 1L))
+})
