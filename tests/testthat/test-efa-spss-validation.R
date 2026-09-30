@@ -4,8 +4,9 @@
 # Purpose: Validate mariposa::efa() against SPSS v29 FACTOR.
 # Reference: efa_output.txt
 #
-# Validates KMO, Bartlett's, eigenvalues, variance explained, communalities.
-# PCA + Varimax (default). ML/Promax handled in separate ref file (skipped).
+# Validates KMO, Bartlett's, eigenvalues, variance explained, communalities
+# (PCA + Varimax, efa_output.txt) and the PCA + Promax pattern, structure and
+# component correlation matrices (efa_ml_promax_output.txt, Tests P1-P4).
 # =============================================================================
 
 library(testthat)
@@ -106,9 +107,10 @@ test_that("Test 1a: EFA 6-variable PCA/Varimax — matches SPSS", {
 # factor correlations follow from the reflected solution. The signed SPSS
 # cells below (all loadings SPSS prints at BLANK(.40)) pin that convention.
 # PCA loadings are exact eigen results -> Display tier on the signed value.
-# Oblique pattern matrices / factor correlations differ from SPSS in the
-# third decimal (iteration criteria), so only their signs are asserted
-# (a sign is an integer: Spec tier, exact).
+# Oblimin pattern matrices / factor correlations differ from SPSS in the
+# third decimal (SPSS stops its pairwise iterations early), so only their
+# signs are asserted (a sign is an integer: Spec tier, exact). Promax values
+# are asserted in full below.
 
 spss_cells <- function(...) {
   x <- matrix(c(...), ncol = 3, byrow = TRUE)
@@ -147,12 +149,7 @@ spss_signs <- list(
     "political_orientation", 1, -0.884, "environmental_concern", 1,  0.880,
     "trust_media",           2,  0.641, "life_satisfaction",     2,  0.542,
     "life_satisfaction",     3, -0.510, "trust_science",         3,  0.689,
-    "trust_government",      2,  0.432, "trust_government",      3,  0.449),
-  # efa_ml_promax_output.txt:779-787 (Test P1, Pattern Matrix, PCA + Promax)
-  tp1_pattern = spss_cells(
-    "political_orientation", 1, -0.887, "environmental_concern", 1,  0.885,
-    "trust_science",         2,  0.763, "trust_government",      2,  0.565,
-    "life_satisfaction",     3,  0.789, "trust_media",           3,  0.621)
+    "trust_government",      2,  0.432, "trust_government",      3,  0.449)
 )
 
 assert_loading_values <- function(mat, cells, tag) {
@@ -212,8 +209,136 @@ test_that("Signs 3a: each region's component matrix matches SPSS signs", {
                         spss_signs$t3a_west_component, "3a West component matrix")
 })
 
-test_that("Signs P1: PCA + promax pattern matrix matches SPSS signs", {
-  r <- six_items(survey_data, rotation = "promax")
-  assert_loading_signs(r$pattern_matrix, spss_signs$tp1_pattern,
-                       "P1 pattern matrix")
+test_that("Test 1b: oblimin rotation sums of squared loadings match SPSS", {
+  skip_if_not_installed("GPArotation")
+  # efa_output.txt:263-272 (Test 1b, Rotation Sums of Squared Loadings: the
+  # column sums of squares of the structure matrix)
+  r <- six_items(survey_data, rotation = "oblimin")
+  expected <- c(1.599, 1.041, 1.022)
+  for (j in seq_along(expected)) {
+    assert_spss(r$rotation_variance$ss_loading[j], expected[j],
+                tier = "display", precision = 3,
+                label = sprintf("[1b] rotation SS component %d", j))
+  }
+})
+
+
+# =============================================================================
+# PCA + PROMAX (efa_ml_promax_output.txt, Tests P1-P4)
+# =============================================================================
+# SPSS FACTOR /ROTATION PROMAX(4): varimax, Kaiser-normalized target,
+# least-squares fit (IBM SPSS Statistics Algorithms, FACTOR "Promax
+# Rotation"). Every loading SPSS prints at BLANK(.40), the complete
+# component correlation matrix and the rotation sums of squared loadings
+# (structure matrix) are asserted. Weighted scenarios (P2, P4) use
+# WEIGHT BY sampling_weight.
+
+spss_promax <- list(
+  # efa_ml_promax_output.txt:753-811 (Test P1, unweighted, ungrouped)
+  P1 = list(weighted = FALSE, region = NULL,
+    pattern = spss_cells(
+      "political_orientation", 1, -0.887, "environmental_concern", 1,  0.885,
+      "trust_science",         2,  0.763, "trust_government",      2,  0.565,
+      "life_satisfaction",     3,  0.789, "trust_media",           3,  0.621),
+    structure = spss_cells(
+      "political_orientation", 1, -0.887, "environmental_concern", 1,  0.884,
+      "trust_science",         2,  0.764, "trust_government",      2,  0.564,
+      "life_satisfaction",     3,  0.791, "trust_media",           3,  0.617),
+    phi = c(`1-2` = -0.002, `1-3` = 0.020, `2-3` = -0.012),
+    rotation_ss = c(1.599, 1.039, 1.021)),
+  # efa_ml_promax_output.txt:1256-1314 (Test P2, weighted, ungrouped)
+  P2 = list(weighted = TRUE, region = NULL,
+    pattern = spss_cells(
+      "political_orientation", 1, -0.886, "environmental_concern", 1,  0.884,
+      "trust_science",         2,  0.752, "trust_government",      2,  0.541,
+      "life_satisfaction",     3,  0.828, "trust_media",           3,  0.536),
+    structure = spss_cells(
+      "political_orientation", 1, -0.885, "environmental_concern", 1,  0.883,
+      "trust_science",         2,  0.754, "trust_government",      2,  0.538,
+      "life_satisfaction",     3,  0.828, "trust_media",           3,  0.532),
+    phi = c(`1-2` = -0.009, `1-3` = 0.035, `2-3` = -0.007),
+    rotation_ss = c(1.598, 1.043, 1.021)),
+  # efa_ml_promax_output.txt:1701-1766 (Test P3, unweighted, region = East)
+  P3_East = list(weighted = FALSE, region = "East",
+    pattern = spss_cells(
+      "political_orientation", 1,  0.894, "environmental_concern", 1, -0.894,
+      "trust_media",           2,  0.673, "trust_science",         2,  0.583,
+      "life_satisfaction",     2, -0.568, "trust_government",      3,  0.969),
+    structure = spss_cells(
+      "political_orientation", 1,  0.895, "environmental_concern", 1, -0.893,
+      "trust_media",           2,  0.673, "trust_science",         2,  0.586,
+      "life_satisfaction",     2, -0.566, "trust_government",      3,  0.969),
+    phi = c(`1-2` = 0.037, `1-3` = -0.015, `2-3` = 0.006),
+    rotation_ss = c(1.604, 1.120, 1.008)),
+  # efa_ml_promax_output.txt:1850-1915 (Test P3, unweighted, region = West)
+  P3_West = list(weighted = FALSE, region = "West",
+    pattern = spss_cells(
+      "political_orientation", 1, -0.886, "environmental_concern", 1,  0.881,
+      "life_satisfaction",     2,  0.737, "trust_media",           2,  0.695,
+      "trust_science",         3,  0.785, "trust_government",      3,  0.626),
+    structure = spss_cells(
+      "political_orientation", 1, -0.886, "environmental_concern", 1,  0.881,
+      "life_satisfaction",     2,  0.737, "trust_media",           2,  0.695,
+      "trust_science",         3,  0.783, "trust_government",      3,  0.629),
+    phi = c(`1-2` = 0.028, `1-3` = 0.016, `2-3` = -0.001),
+    rotation_ss = c(1.599, 1.043, 1.037)),
+  # efa_ml_promax_output.txt:2334-2399 (Test P4, weighted, region = East)
+  P4_East = list(weighted = TRUE, region = "East",
+    pattern = spss_cells(
+      "environmental_concern", 1, -0.894, "political_orientation", 1,  0.894,
+      "trust_media",           2,  0.672, "trust_science",         2,  0.600,
+      "life_satisfaction",     2, -0.562, "trust_government",      3,  0.964),
+    structure = spss_cells(
+      "political_orientation", 1,  0.895, "environmental_concern", 1, -0.893,
+      "trust_media",           2,  0.669, "trust_science",         2,  0.606,
+      "life_satisfaction",     2, -0.560, "trust_government",      3,  0.963),
+    phi = c(`1-2` = 0.041, `1-3` = -0.019, `2-3` = 0.022),
+    rotation_ss = c(1.604, 1.133, 1.012)),
+  # efa_ml_promax_output.txt:2483-2548 (Test P4, weighted, region = West)
+  P4_West = list(weighted = TRUE, region = "West",
+    pattern = spss_cells(
+      "political_orientation", 1, -0.885, "environmental_concern", 1,  0.881,
+      "life_satisfaction",     2,  0.741, "trust_media",           2,  0.675,
+      "trust_science",         3,  0.802, "trust_government",      3,  0.598),
+    structure = spss_cells(
+      "political_orientation", 1, -0.885, "environmental_concern", 1,  0.879,
+      "life_satisfaction",     2,  0.740, "trust_media",           2,  0.674,
+      "trust_science",         3,  0.801, "trust_government",      3,  0.599),
+    phi = c(`1-2` = 0.045, `1-3` = 0.012, `2-3` = -0.006),
+    rotation_ss = c(1.598, 1.045, 1.034))
+)
+
+promax_fit <- function(ref) {
+  d <- if (is.null(ref$region)) survey_data else dplyr::group_by(survey_data, region)
+  r <- if (ref$weighted) {
+    six_items(d, rotation = "promax", weights = sampling_weight)
+  } else {
+    six_items(d, rotation = "promax")
+  }
+  if (is.null(ref$region)) return(r)
+  regions <- vapply(r$groups, function(g) as.character(g$group_values$region),
+                    character(1))
+  r$groups[[which(regions == ref$region)]]
+}
+
+test_that("Tests P1-P4: PCA + promax matrices match SPSS", {
+  for (id in names(spss_promax)) {
+    ref <- spss_promax[[id]]
+    r <- promax_fit(ref)
+    assert_loading_values(r$pattern_matrix, ref$pattern,
+                          sprintf("%s pattern matrix", id))
+    assert_loading_values(r$structure_matrix, ref$structure,
+                          sprintf("%s structure matrix", id))
+    for (nm in names(ref$phi)) {
+      ij <- as.integer(strsplit(nm, "-")[[1]])
+      assert_spss(r$factor_correlations[ij[1], ij[2]], ref$phi[[nm]],
+                  tier = "display", precision = 3,
+                  label = sprintf("[%s] component correlation %s", id, nm))
+    }
+    for (j in seq_along(ref$rotation_ss)) {
+      assert_spss(r$rotation_variance$ss_loading[j], ref$rotation_ss[j],
+                  tier = "display", precision = 3,
+                  label = sprintf("[%s] rotation SS component %d", id, j))
+    }
+  }
 })

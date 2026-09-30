@@ -18,7 +18,9 @@
 #'   component cannot be rotated; it is shown unrotated with SPSS's note.
 #' @param rotation Rotation method: \code{"varimax"} (default, orthogonal),
 #'   \code{"oblimin"} (oblique, allows correlated factors),
-#'   \code{"promax"} (oblique, power-based), or \code{"none"}.
+#'   \code{"promax"} (oblique, power-based; computed as SPSS
+#'   \code{/ROTATION PROMAX(4)} with a Kaiser-normalized target, which
+#'   differs from \code{stats::promax()}), or \code{"none"}.
 #' @param extraction Extraction method: \code{"pca"} (default, Principal
 #'   Component Analysis) or \code{"ml"} (Maximum Likelihood, enables
 #'   goodness-of-fit testing, assumes multivariate normality).
@@ -43,7 +45,9 @@
 #'     loadings of the extracted components/factors (SPSS "Extraction Sums
 #'     of Squared Loadings"). For ML this is the variance the common factors
 #'     explain - the figure the compact print reports.}
-#'   \item{rotation_variance}{Tibble with rotation sums of squared loadings}
+#'   \item{rotation_variance}{Tibble with rotation sums of squared loadings
+#'     (for the oblique rotations the column sums of squares of the
+#'     structure matrix, as SPSS reports them)}
 #'   \item{communalities}{Extraction communalities for each variable}
 #'   \item{kmo}{List with overall KMO and per-item MSA values}
 #'   \item{bartlett}{List with chi_sq, df, and p_value}
@@ -498,41 +502,38 @@ efa <- function(data, ...,
     rotated_loadings <- pattern_matrix
     rotation_used <- "oblimin"
 
-    # Rotation sums of squared loadings (for oblimin, just SS of pattern)
-    rot_ss <- colSums(pattern_matrix^2)
+    # Rotation sums of squared loadings (oblique: SS only, no cumulative),
+    # from the structure matrix as in SPSS (efa_output.txt Test 1b:
+    # 1.599 / 1.041 / 1.022; the pattern matrix gave 1.600 / 1.043 / 1.025)
     rotation_variance <- tibble::tibble(
       component = seq_len(n_factors_used),
-      ss_loading = rot_ss
+      ss_loading = unname(colSums(structure_matrix^2))
     )
 
   } else if (rotation == "promax") {
-    pm <- stats::promax(raw_loadings, m = 4)  # m=4 matches SPSS Kappa=4 default
-    pattern_matrix <- unclass(pm$loadings)
-    rownames(pattern_matrix) <- var_names
-    colnames(pattern_matrix) <- paste0(col_prefix, seq_len(n_factors_used))
-
-    # Compute factor correlations (Phi) from rotation matrix
-    rotmat <- pm$rotmat
-    Phi_raw <- solve(t(rotmat) %*% rotmat)
-    D <- diag(1 / sqrt(diag(Phi_raw)))
-    factor_correlations <- D %*% Phi_raw %*% D
-    rownames(factor_correlations) <- colnames(factor_correlations) <-
-      paste0(col_prefix, seq_len(n_factors_used))
+    # SPSS FACTOR /ROTATION PROMAX(4) (Kaiser-normalized target; see
+    # .efa_promax() for why stats::promax() differs)
+    pm <- .efa_promax(raw_loadings, power = 4)
+    col_names <- paste0(col_prefix, seq_len(n_factors_used))
+    pattern_matrix <- pm$pattern
+    dimnames(pattern_matrix) <- list(var_names, col_names)
+    factor_correlations <- pm$phi
+    dimnames(factor_correlations) <- list(col_names, col_names)
 
     # Structure matrix = Pattern * Phi
     structure_matrix <- pattern_matrix %*% factor_correlations
-    rownames(structure_matrix) <- var_names
-    colnames(structure_matrix) <- paste0(col_prefix, seq_len(n_factors_used))
+    dimnames(structure_matrix) <- list(var_names, col_names)
 
     # For promax, the "loadings" returned are the pattern matrix
     rotated_loadings <- pattern_matrix
     rotation_used <- "promax"
 
-    # Rotation sums of squared loadings (oblique: SS only, no cumulative)
-    rot_ss <- colSums(pattern_matrix^2)
+    # Rotation sums of squared loadings (oblique: SS only, no cumulative).
+    # SPSS takes them from the structure matrix (efa_ml_promax_output.txt P1:
+    # 1.599 / 1.039 / 1.021); the pattern matrix overstates them.
     rotation_variance <- tibble::tibble(
       component = seq_len(n_factors_used),
-      ss_loading = rot_ss
+      ss_loading = unname(colSums(structure_matrix^2))
     )
   }
 
@@ -764,6 +765,45 @@ efa <- function(data, ...,
   flip <- colSums(L) < 0
   L[, flip] <- -L[, flip]
   L
+}
+
+
+#' Promax rotation as SPSS FACTOR computes it
+#'
+#' @description
+#' IBM SPSS Statistics Algorithms, FACTOR, "Promax Rotation"
+#' (Hendrickson & White, 1964):
+#' 1. varimax rotation with Kaiser normalization: Lambda_R;
+#' 2. target P with p_ij = |b_ij|^(k+1) / b_ij, where b_ij are the rows of
+#'    Lambda_R normalized to unit length (Kaiser normalization);
+#' 3. least-squares fit L = (Lambda_R' Lambda_R)^-1 Lambda_R' P;
+#' 4. Q = L D with D = diag(L'L)^-1/2 (unit-length columns);
+#' 5. C = diag((Q'Q)^-1)^-1/2; pattern = Lambda_R Q C^-1, factor
+#'    correlations = C (Q'Q)^-1 C.
+#' stats::promax() skips the row normalization in step 2 (its target is
+#' built from the raw varimax loadings), which moved pattern loadings by up
+#' to .03 and the factor correlations from SPSS -.002 / -.012 to .055 /
+#' .155 (efa_ml_promax_output.txt, Test P1). This version reproduces every
+#' PCA + promax pattern, structure and correlation matrix of that reference
+#' run to its printed precision.
+#' @param L Unrotated loading matrix (variables x factors, >= 2 factors)
+#' @param power Promax power k (SPSS default 4)
+#' @return list(pattern, phi)
+#' @noRd
+.efa_promax <- function(L, power = 4) {
+  V <- unclass(stats::varimax(L, normalize = TRUE)$loadings)
+  h <- sqrt(rowSums(V^2))
+  h[h == 0] <- 1                     # a variable without common variance
+  B <- V / h
+  P <- sign(B) * abs(B)^power        # = |b|^(k+1) / b, 0 for b = 0
+  Lm <- solve(crossprod(V), crossprod(V, P))
+  Q <- sweep(Lm, 2, sqrt(colSums(Lm^2)), "/")
+  QQi <- solve(crossprod(Q))
+  c_inv <- sqrt(diag(QQi))           # diagonal of C^-1
+  pattern <- V %*% sweep(Q, 2, c_inv, "*")
+  phi <- QQi / outer(c_inv, c_inv)
+  diag(phi) <- 1
+  list(pattern = unname(pattern), phi = unname(phi))
 }
 
 

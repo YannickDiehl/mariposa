@@ -89,3 +89,51 @@ test_that("X4-ANCOVA-LEVENE: levene_test() works on ancova() results", {
   expect_equal(levene_test(w)$results$F_statistic, w$levene_test$f)
   expect_identical(levene_test(w)$weights, "sampling_weight")
 })
+
+# --- X4-PROMAX: SPSS FACTOR promax rotation -----------------------------------
+
+.six_items <- function(d, ...) {
+  efa(d, political_orientation, environmental_concern, life_satisfaction,
+      trust_government, trust_media, trust_science, ...)
+}
+
+test_that("X4-PROMAX: the promax target is built from Kaiser-normalized loadings", {
+  # stats::promax() raises the RAW varimax loadings to the power k; SPSS
+  # (IBM SPSS Statistics Algorithms, FACTOR "Promax Rotation") first divides
+  # every row by its length (Kaiser normalization). The factor correlations
+  # were .055/.155 instead of SPSS -.002/-.012 (efa_ml_promax_output.txt P1).
+  r <- .six_items(survey_data, rotation = "promax")
+
+  # SPSS algorithm, step by step
+  V <- unclass(stats::varimax(r$unrotated_loadings, normalize = TRUE)$loadings)
+  B <- V / sqrt(rowSums(V^2))
+  P <- abs(B)^(4 + 1) / B
+  L <- solve(t(V) %*% V) %*% t(V) %*% P
+  Q <- L %*% diag(1 / sqrt(diag(t(L) %*% L)))
+  QQi <- solve(t(Q) %*% Q)
+  C <- diag(1 / sqrt(diag(QQi)))
+  pattern <- V %*% Q %*% solve(C)
+  phi <- C %*% QQi %*% t(C)
+
+  expect_equal(unname(r$pattern_matrix), unname(pattern), tolerance = 1e-8)
+  expect_equal(unname(r$factor_correlations), unname(phi), tolerance = 1e-8)
+  expect_equal(unname(r$structure_matrix), unname(pattern %*% phi), tolerance = 1e-8)
+  # not stats::promax()
+  old <- unclass(stats::promax(r$unrotated_loadings, m = 4)$loadings)
+  expect_gt(max(abs(unname(r$pattern_matrix) - unname(old))), 0.01)
+  expect_identical(dimnames(r$pattern_matrix),
+                   list(r$variables, paste0("PC", 1:3)))
+})
+
+test_that("X4-PROMAX: oblique rotation sums of squares come from the structure matrix", {
+  # SPSS "Rotation Sums of Squared Loadings" for correlated factors are the
+  # column sums of squares of the STRUCTURE matrix (P1: 1.599, 1.039, 1.021;
+  # the pattern matrix gave 1.604, 1.065, 1.045).
+  r <- .six_items(survey_data, rotation = "promax")
+  expect_equal(r$rotation_variance$ss_loading,
+               unname(colSums(r$structure_matrix^2)))
+  skip_if_not_installed("GPArotation")
+  o <- .six_items(survey_data, rotation = "oblimin")
+  expect_equal(o$rotation_variance$ss_loading,
+               unname(colSums(o$structure_matrix^2)))
+})
