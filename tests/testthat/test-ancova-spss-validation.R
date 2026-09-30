@@ -68,3 +68,60 @@ test_that("Test 1a: ancova income ~ age (covariate) + education — matches SPSS
     }
   }
 })
+
+
+# =============================================================================
+# LEVENE'S TEST OF EQUALITY OF ERROR VARIANCES (unweighted scenarios)
+# =============================================================================
+# SPSS UNIANOVA tests the absolute residuals of the full model (covariates +
+# factors) across the design cells. The weighted (/REGWGT) scenarios 2a, 2b,
+# 4a, 4b, 6a are not asserted: the weighted path is pending an SPSS
+# reference run with WEIGHT BY.
+# p printed as ".000" by SPSS -> Spec sentinel "<.001" (Charter §4).
+
+spss_levene <- list(
+  # ancova_output.txt:47 (Test 1a: income BY education WITH age)
+  t1a = list(dv = "income", between = "education", cov = "age",
+             f = 103.953, df1 = 3L, df2 = 2182L, p = "<.001"),
+  # ancova_output.txt:131 (Test 1b: life_satisfaction BY gender WITH age)
+  t1b = list(dv = "life_satisfaction", between = "gender", cov = "age",
+             f = 1.306, df1 = 1L, df2 = 2419L, p = 0.253),
+  # ancova_output.txt:215 (Test 1c: life_satisfaction BY education WITH political_orientation)
+  t1c = list(dv = "life_satisfaction", between = "education",
+             cov = "political_orientation",
+             f = 24.350, df1 = 3L, df2 = 2224L, p = "<.001"),
+  # ancova_output.txt:495 (Test 3a: income BY gender education WITH age)
+  t3a = list(dv = "income", between = c("gender", "education"), cov = "age",
+             f = 45.006, df1 = 7L, df2 = 2178L, p = "<.001"),
+  # ancova_output.txt:603 (Test 3b: life_satisfaction BY gender region WITH age)
+  t3b = list(dv = "life_satisfaction", between = c("gender", "region"), cov = "age",
+             f = 1.562, df1 = 3L, df2 = 2417L, p = 0.197),
+  # ancova_output.txt:923 (Test 5a: income BY education WITH age political_orientation)
+  t5a = list(dv = "income", between = "education",
+             cov = c("age", "political_orientation"),
+             f = 97.401, df1 = 3L, df2 = 2004L, p = "<.001")
+)
+
+test_that("Levene (unweighted 1a-1c, 3a-3b, 5a): matches SPSS UNIANOVA", {
+  for (id in names(spss_levene)) {
+    s <- spss_levene[[id]]
+    r <- ancova(survey_data, dv = !!rlang::sym(s$dv), between = !!s$between,
+                covariate = !!s$cov)
+    lev <- r$levene_test
+    assert_spss(lev$f, s$f, tier = "display", precision = 3,
+                label = sprintf("[%s] Levene F", id))
+    assert_spss_count(lev$df1, s$df1, label = sprintf("[%s] Levene df1", id))
+    assert_spss_count(lev$df2, s$df2, label = sprintf("[%s] Levene df2", id))
+    assert_spss(lev$p, s$p, tier = "display", precision = 3, what = "p_value",
+                label = sprintf("[%s] Levene p", id))
+
+    # levene_test() on the ancova result reports the same test
+    lt <- levene_test(r)$results
+    assert_spss(lt$F_statistic, s$f, tier = "display", precision = 3,
+                label = sprintf("[%s] levene_test(ancova) F", id))
+    assert_spss_count(lt$df2, s$df2,
+                      label = sprintf("[%s] levene_test(ancova) df2", id))
+    assert_spss(lt$p_value, s$p, tier = "display", precision = 3, what = "p_value",
+                label = sprintf("[%s] levene_test(ancova) p", id))
+  }
+})

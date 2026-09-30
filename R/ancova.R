@@ -41,7 +41,10 @@
 #'   \item{emm_main_effects}{For 2+ factors: named list of tibbles with the
 #'     adjusted main-effect means (unweighted average of the cell means, as
 #'     SPSS \code{/EMMEANS=TABLES(factor)}); NULL for one factor}
-#'   \item{levene_test}{Tibble with Levene's test results}
+#'   \item{levene_test}{Tibble with Levene's test of equality of error
+#'     variances (f, df1, df2, p): as in SPSS UNIANOVA, a one-way ANOVA of
+#'     the absolute residuals of the ANCOVA model across the cells of the
+#'     design. Also available as \code{levene_test(result)}.}
 #'   \item{r_squared}{R-squared and Adjusted R-squared}
 #'   \item{model}{The underlying lm model object}
 #'   \item{call_info}{List with metadata (dv, factors, covariates, weighted, etc.)}
@@ -325,8 +328,8 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
   # LEVENE'S TEST
   # ============================================================================
 
-  levene_result <- .compute_factorial_levene(data_complete, dv_name,
-                                              between_names, w_name)
+  levene_result <- .compute_ancova_levene(model, data_complete, dv_name,
+                                          between_names, w_name)
 
   # ============================================================================
   # R-SQUARED
@@ -384,6 +387,40 @@ ancova <- function(data, dv, between, covariate, weights = NULL, ss_type = 3) {
 # ==============================================================================
 # INTERNAL HELPERS
 # ==============================================================================
+
+#' Levene's test of equality of error variances for ANCOVA
+#'
+#' SPSS UNIANOVA (/PRINT HOMOGENEITY) tests the equality of the ERROR
+#' variances of the fitted model: a one-way ANOVA of the absolute residuals
+#' of the full model (covariates and all factor terms) across the cells of
+#' the design. Centring the DV on the raw cell means instead ignores the
+#' covariates and differs from SPSS as soon as a covariate matters
+#' (life_satisfaction BY gender WITH age: 1.277 instead of SPSS 1.306).
+#' Without covariates the two coincide, so factorial_anova() keeps its
+#' cell-mean version. Reproduces every unweighted Levene test in
+#' tests/spss_reference/outputs/ancova_output.txt.
+#'
+#' The weighted (/REGWGT) path is deliberately unchanged
+#' (.compute_factorial_levene(): sqrt(w) * |y - weighted cell mean|) until
+#' the pending SPSS reference run for weighted analyses.
+#' @param model The fitted lm of the ANCOVA
+#' @param data The complete cases the model was fitted on
+#' @return Tibble with f, df1, df2, p
+#' @noRd
+.compute_ancova_levene <- function(model, data, dv_name, between_names, w_name) {
+  if (!is.null(w_name)) {
+    return(.compute_factorial_levene(data, dv_name, between_names, w_name))
+  }
+  z <- abs(unname(stats::residuals(model)))
+  g <- interaction(data[between_names], drop = TRUE, sep = "_")
+  levene_aov <- summary(stats::aov(z ~ g))[[1]]
+  tibble::tibble(
+    f = levene_aov["g", "F value"],
+    df1 = as.integer(levene_aov["g", "Df"]),
+    df2 = as.integer(levene_aov["Residuals", "Df"]),
+    p = levene_aov["g", "Pr(>F)"]
+  )
+}
 
 #' Grouped ANCOVA: one fit per group_by() group (see .factorial_anova_grouped)
 #' @noRd

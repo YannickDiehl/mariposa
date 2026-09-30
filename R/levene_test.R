@@ -13,14 +13,18 @@
 #'
 #' @param x Either your data (a data frame, optionally grouped with
 #'   \code{group_by()}) or test results from \code{t_test()},
-#'   \code{oneway_anova()} or \code{factorial_anova()}
+#'   \code{oneway_anova()}, \code{factorial_anova()} or \code{ancova()}
 #' @param ... Variables to test (when using a data frame). List several
 #'   variables or use tidyselect helpers like \code{starts_with("trust")}.
 #' @param group The grouping variable for comparison (unquoted or a string)
 #' @param weights Optional survey weights for population-representative
 #'   results. Must be numeric and non-negative (the package-wide weights
 #'   policy).
-#' @param center How to measure center: \code{"mean"} (default) or \code{"median"} (more robust)
+#' @param center How to measure center: \code{"mean"} (default) or
+#'   \code{"median"} (more robust). For \code{ancova()} results only
+#'   \code{"mean"} is available: as in SPSS UNIANOVA, the test is computed on
+#'   the absolute residuals of the ANCOVA model (covariates and factors),
+#'   compared across the cells of the design.
 #'
 #' @return Test results showing:
 #' - Whether groups have equal variances (p-value)
@@ -126,7 +130,7 @@ levene_test.default <- function(x, ...) {
   cls <- paste(class(x), collapse = "/")
   cli_abort(c(
     "{.fn levene_test} is not available for objects of class {.cls {cls}}.",
-    "i" = "Levene's test works with {.fn oneway_anova}, {.fn factorial_anova}, {.fn t_test}, or directly on a data frame.",
+    "i" = "Levene's test works with {.fn oneway_anova}, {.fn factorial_anova}, {.fn ancova}, {.fn t_test}, or directly on a data frame.",
     "i" = "Example: {.code oneway_anova(data, dv, group) |> levene_test()}"
   ))
 }
@@ -275,6 +279,61 @@ levene_test.t_test <- function(x, center = c("mean", "median"), ...) {
   }
 
   .levene_from_result(x, center)
+}
+
+#' @rdname levene_test
+#' @export
+levene_test.ancova <- function(x, center = c("mean", "median"), ...) {
+  center <- rlang::arg_match(center)
+  if (center != "mean") {
+    cli_abort(c(
+      "Only the mean-based Levene test is available for {.fn ancova} results.",
+      "i" = "SPSS UNIANOVA tests the absolute residuals of the ANCOVA model, centred on their cell means; there is no median-based version for a model with covariates.",
+      "i" = "For a median-based (Brown-Forsythe) test of the raw values use {.code levene_test(data, dv, group = factor, center = \"median\")}."
+    ))
+  }
+
+  info <- x$call_info
+  design <- paste(info$factors, collapse = " * ")
+  # The test itself is computed by ancova() (.compute_ancova_levene: the
+  # residuals of the full model, as SPSS UNIANOVA /PRINT HOMOGENEITY)
+  rows <- function(lev) {
+    if (is.null(lev) || nrow(lev) == 0) return(NULL)
+    tibble::tibble(
+      Variable = info$dv,
+      F_statistic = lev$f,
+      df1 = lev$df1,
+      df2 = lev$df2,
+      p_value = lev$p,
+      conclusion = ifelse(is.na(lev$p), NA_character_,
+                          ifelse(lev$p > 0.05, "Variances equal", "Variances unequal"))
+    )
+  }
+
+  is_grouped <- isTRUE(x$is_grouped)
+  results <- if (is_grouped) {
+    dplyr::bind_rows(lapply(seq_along(x$group_results), function(i) {
+      res <- rows(x$group_results[[i]]$levene_test)
+      if (is.null(res)) return(NULL)
+      dplyr::bind_cols(x$group_keys[rep(i, nrow(res)), , drop = FALSE], res)
+    }))
+  } else {
+    rows(x$levene_test)
+  }
+
+  structure(
+    list(
+      results = results,
+      variables = info$dv,
+      group = design,
+      weights = x$weights,
+      center = center,
+      is_grouped = is_grouped,
+      groups = if (is_grouped) x$groups else NULL,
+      original_test = x
+    ),
+    class = "levene_test"
+  )
 }
 
 #' Levene test on the data stored in a t_test / oneway_anova result
@@ -731,7 +790,7 @@ print.summary.levene_test <- function(x, ...) {
   is_grouped <- isTRUE(x$is_grouped)
   if (!is_grouped && is.null(x$original_test)) return(character(0))
 
-  factorial <- inherits(x$original_test, "factorial_anova")
+  factorial <- inherits(x$original_test, c("factorial_anova", "ancova"))
   two_groups <- !factorial && all(res$df1[tested] == 1)
 
   status <- if (is_grouped || nrow(res) > 1) {
