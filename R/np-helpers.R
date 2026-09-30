@@ -281,3 +281,55 @@
   c(if (x == 0) 0 else stats::qbeta(alpha, x, n - x + 1),
     if (x == n) 1 else stats::qbeta(1 - alpha, x + 1, n - x))
 }
+
+#' Two-sided Fisher exact p-value of a 2x2 table
+#'
+#' The p-value stats::fisher.test() reports (and SPSS's "Exact Sig.
+#' (2-sided)"): the probability of all tables with the observed margins
+#' that are at most as likely as the observed one (relative tolerance
+#' 1e-7). The hypergeometric density is unimodal, so these tables form
+#' the two tails around the mode; their ends are found by bisection and
+#' the tails summed with phyper(). The cost does not grow with the counts
+#' (fisher.test() evaluates the whole support: minutes and gigabytes once
+#' weighted counts reach billions).
+#'
+#' @param tbl 2x2 table of counts
+#' @return Numeric p-value
+#' @noRd
+.fisher_2x2_p <- function(tbl) {
+  m <- sum(tbl[, 1])
+  n <- sum(tbl[, 2])
+  k <- sum(tbl[1, ])
+  x <- tbl[1, 1]
+  lo <- max(0, k - n)
+  hi <- min(k, m)
+  ld <- function(i) stats::dhyper(i, m, n, k, log = TRUE)
+  cut <- ld(x) + log(1 + 1e-7)
+  mode <- floor((k + 1) * (m + 1) / (m + n + 2))
+  if (ld(mode) <= cut) return(1)
+  # Last value of the rising side [lo, mode] at most as likely as x
+  a <- lo - 1
+  if (ld(lo) <= cut) {
+    left <- lo
+    right <- mode
+    while (right - left > 1) {
+      mid <- floor((left + right) / 2)
+      if (ld(mid) <= cut) left <- mid else right <- mid
+    }
+    a <- left
+  }
+  # First value of the falling side [mode, hi] at most as likely as x
+  b <- hi + 1
+  if (ld(hi) <= cut) {
+    left <- mode
+    right <- hi
+    while (right - left > 1) {
+      mid <- floor((left + right) / 2)
+      if (ld(mid) <= cut) right <- mid else left <- mid
+    }
+    b <- right
+  }
+  p_low <- if (a >= lo) stats::phyper(a, m, n, k) else 0
+  p_high <- if (b <= hi) stats::phyper(b - 1, m, n, k, lower.tail = FALSE) else 0
+  min(1, p_low + p_high)
+}

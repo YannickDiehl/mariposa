@@ -534,6 +534,13 @@ reference output showed mariposa was wrong.
 
 ### Non-parametric and categorical tests
 
+* Exact tests with expansion (population) weights: the 2x2 Fisher
+  p-value and the exact McNemar/binomial p-values come from distribution
+  tails instead of enumerating every possible table, with the same result
+  as `fisher.test()`/`binom.test()`. Weights summing to billions used to
+  take minutes or run out of memory; an r x c `fisher_test()` above 2^31
+  weighted cases is now a clear error suggesting to rescale the weights
+  (it failed with "cannot allocate memory block of size 134217728 Tb").
 * `chisq_gof(expected = )` is applied to every selected variable. With
   several variables it was silently dropped (equal proportions were
   tested while the summary header still showed the custom proportions);

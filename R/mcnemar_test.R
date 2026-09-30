@@ -216,9 +216,8 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
       }
       p_value <- pchisq(chi_sq, df = 1, lower.tail = FALSE)
 
-      # Exact binomial test (2-sided)
-      exact_result <- binom.test(b, b + c_val, p = 0.5)
-      exact_p <- exact_result$p.value
+      # Exact binomial test (2-sided; equals binom.test at p = .5)
+      exact_p <- .binom_exact_p(b, b + c_val, 0.5)$p_value
     }
 
     list(

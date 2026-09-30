@@ -458,6 +458,20 @@ print.summary.fisher_test <- function(x, ...) {
 #' @return htest object
 #' @noRd
 .fisher_exact_or_mc <- function(tbl, simulate, B, key = NULL) {
+  # 2x2: always exact (fisher.test() also ignores simulation for 2x2)
+  if (identical(dim(tbl), c(2L, 2L))) {
+    return(list(p.value = .fisher_2x2_p(tbl),
+                method = "Fisher's Exact Test for Count Data"))
+  }
+  # FEXACT and r2dtable() need integer counts: weighted tables above 2^31
+  # cases (expansion weights) cannot be tested exactly or simulated
+  if (sum(tbl) > .Machine$integer.max) {
+    where <- .np_where(key)
+    cli_abort(c(
+      "Fisher's exact test is not possible for this {nrow(tbl)}x{ncol(tbl)} table{where}: the weighted table has {fmt_int(sum(tbl))} cases, more than 2^31.",
+      "i" = "These look like expansion (population) weights. Rescale them to the sample size, e.g. {.code weights = w / mean(w)}."
+    ))
+  }
   if (isTRUE(simulate)) {
     return(stats::fisher.test(tbl, simulate.p.value = TRUE, B = B))
   }

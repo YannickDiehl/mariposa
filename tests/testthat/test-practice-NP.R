@@ -808,3 +808,45 @@ test_that("binomial_test with expansion weights is instant", {
   expect_gt(r$results$n_total, 2e9)
   expect_true(is.finite(r$results$p_value))
 })
+
+# --- 0.7.4 audit: exact tests with expansion weights ---------------------------
+
+test_that("2x2 Fisher p-value equals stats::fisher.test", {
+  # The two-sided p now comes from hypergeometric tails around the mode
+  # (same rule as fisher.test: all tables with probability <= observed).
+  set.seed(74)
+  tabs <- list(matrix(c(3, 1, 1, 3), 2), matrix(c(0, 5, 5, 0), 2),
+               matrix(c(10, 0, 0, 10), 2), matrix(c(1, 1, 1, 1), 2),
+               matrix(c(0, 0, 3, 4), 2), matrix(c(247, 238, 956, 1059), 2))
+  for (i in 1:40) tabs[[length(tabs) + 1]] <- matrix(rpois(4, sample(c(2, 20, 300), 1)), 2)
+  for (tb in tabs) {
+    if (any(rowSums(tb) == 0) || any(colSums(tb) == 0)) next
+    expect_equal(mariposa:::.fisher_2x2_p(tb), stats::fisher.test(tb)$p.value,
+                 tolerance = 1e-9)
+  }
+})
+
+test_that("fisher_test with expansion weights: 2x2 instant, r x c clear error", {
+  # Was: 2x2 fisher.test() enumerated the whole support (minutes, GBs);
+  # r x c tables above 2^31 cases failed with "cannot allocate memory
+  # block of size 134217728 Tb".
+  skip_on_cran()
+  d <- dplyr::mutate(survey_data, w = sampling_weight * 1e6)
+  elapsed <- system.time(r <- fisher_test(d, gender, region, weights = w))[["elapsed"]]
+  expect_lt(elapsed, 5)
+  expect_true(is.finite(r$results$p_value))
+  expect_error(fisher_test(d, education, region, weights = w),
+               "2\\^31|expansion|rescale")
+})
+
+test_that("mcnemar_test with expansion weights is instant", {
+  # Was: binom.test() on the discordant pairs enumerated the support.
+  skip_on_cran()
+  d <- dplyr::mutate(survey_data,
+                     g = as.integer(trust_government >= 4),
+                     m = as.integer(trust_media >= 4),
+                     w = sampling_weight * 1e6)
+  elapsed <- system.time(r <- mcnemar_test(d, g, m, weights = w))[["elapsed"]]
+  expect_lt(elapsed, 5)
+  expect_true(is.finite(r$results$exact_p))
+})
