@@ -534,3 +534,37 @@
   if (var_x <= 0 || var_y <= 0) return(NA_real_)
   cov_xy / sqrt(var_x * var_y)
 }
+
+# ============================================================================
+# WEIGHTED COUNTS (tables of the categorical and NPAR tests)
+# ============================================================================
+# SPSS applies WEIGHT BY to counts in two ways, kept here so that every
+# function uses the same rule: CROSSTABS rounds the sum of the weights per
+# cell (/COUNT ROUND CELL, the default), the binomial test rounds each case
+# weight. Which rule the other NPAR TESTS procedures follow awaits the
+# WEIGHT BY reference run (.claude/spss-syntax-0.7.4-weights.sps).
+
+#' Weighted cell counts, rounded per cell (SPSS /COUNT ROUND CELL)
+#'
+#' @param w Weights; cases with a missing weight or category are dropped
+#' @param ... One or two named factors (or vectors) of the same length as
+#'   `w`; their names become the table's dimnames names
+#' @return A table of whole numbers; empty cells (unused factor levels) are 0
+#' @noRd
+.w_cell_counts <- function(w, ...) {
+  f <- list(...)
+  ok <- !is.na(w)
+  for (x in f) ok <- ok & !is.na(x)
+  tbl <- tapply(w[ok], lapply(f, function(x) x[ok]), sum)
+  tbl[is.na(tbl)] <- 0
+  as.table(round(tbl))
+}
+
+#' Case weights rounded to whole numbers (SPSS binomial test)
+#'
+#' @param w Weights
+#' @return Numeric vector of rounded weights (NA stays NA)
+#' @noRd
+.w_round_case_weights <- function(w) {
+  round(w)
+}

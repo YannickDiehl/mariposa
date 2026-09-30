@@ -213,7 +213,7 @@ crosstab.data.frame <- function(data, row, col,
     # table (as chi_square() does). Keeping the unrounded cells showed
     # e.g. 402 + 447 with a margin of 848 and percentages off by up to
     # 0.1 point from SPSS.
-    tab <- round(xtabs(weights_vec ~ row_data + col_data))
+    tab <- .w_cell_counts(weights_vec, row_data = row_data, col_data = col_data)
   } else {
     # Create unweighted table
     tab <- table(row_data, col_data)

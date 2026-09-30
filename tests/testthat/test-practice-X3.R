@@ -386,3 +386,20 @@ test_that("knitted HTML prints wide tables as one block, the console splits them
     "age\\s+income\\s+life_satisfaction\\s+trust_government\\s+trust_media\\s+trust_science",
     cm)))
 })
+
+# --- Weighted count kernels (one home for SPSS's rounding rules) --------------------
+
+test_that(".w_cell_counts rounds cell sums of weights as SPSS /COUNT ROUND CELL", {
+  f1 <- factor(c("a", "a", "b", "b", "b", NA), levels = c("a", "b", "c"))
+  f2 <- factor(c("x", "y", "x", "x", "y", "x"))
+  w  <- c(0.6, 0.7, 1.2, 1.4, NA, 2)
+  tb <- mariposa:::.w_cell_counts(w, f1 = f1, f2 = f2)
+  expect_identical(names(dimnames(tb)), c("f1", "f2"))
+  expect_equal(as.numeric(tb["a", "x"]), 1)   # 0.6 -> 1
+  expect_equal(as.numeric(tb["b", "x"]), 3)   # 2.6 -> 3
+  expect_equal(as.numeric(tb["b", "y"]), 0)   # NA weight dropped
+  expect_equal(as.numeric(tb["c", "x"]), 0)   # empty level kept as 0
+  one <- mariposa:::.w_cell_counts(c(0.4, 0.4, 1.5), v = c("p", "p", "q"))
+  expect_equal(as.numeric(one), c(1, 2))      # per cell, not per case
+  expect_equal(mariposa:::.w_round_case_weights(c(0.4, 1.6, NA)), c(0, 2, NA))
+})

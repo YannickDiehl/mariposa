@@ -181,9 +181,7 @@ mcnemar_test <- function(data, var1, var2, weights = NULL,
     if (!is.null(w_name)) {
       w <- data_slice[[w_name]]
       valid <- valid & !is.na(w)
-      tbl <- round(tapply(w[valid], list(f1[valid], f2[valid]), sum))
-      tbl[is.na(tbl)] <- 0
-      tbl <- as.table(tbl)
+      tbl <- .w_cell_counts(w[valid], f1[valid], f2[valid])
     } else {
       tbl <- table(f1[valid], f2[valid])
     }

@@ -179,8 +179,7 @@ chisq_gof <- function(data, ..., expected = NULL, weights = NULL) {
     vals <- .np_factor(raw)
 
     if (!is.null(w_name)) {
-      freq_tbl <- xtabs(w ~ vals)
-      freq_tbl <- round(freq_tbl)
+      freq_tbl <- .w_cell_counts(w, vals = vals)
     } else {
       freq_tbl <- table(vals)
     }

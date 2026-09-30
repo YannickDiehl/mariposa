@@ -227,9 +227,7 @@
   ok <- !is.na(f1) & !is.na(f2)
   if (!is.null(w)) {
     ok <- ok & !is.na(w)
-    tbl <- round(tapply(w[ok], list(f1[ok], f2[ok]), sum))
-    tbl[is.na(tbl)] <- 0
-    tbl <- as.table(tbl)
+    tbl <- .w_cell_counts(w[ok], f1[ok], f2[ok])
   } else {
     tbl <- table(f1[ok], f2[ok])
   }

@@ -197,7 +197,7 @@ binomial_test <- function(data, ..., p = 0.50, weights = NULL,
     } else {
       # Weighted: SPSS rounds individual weights to integers first,
       # then sums as frequency weights
-      w_rounded <- round(w)
+      w_rounded <- .w_round_case_weights(w)
       n1 <- sum(w_rounded[x == cat1])
       n2 <- sum(w_rounded[x == cat2])
       n_total <- n1 + n2
