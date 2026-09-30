@@ -22,7 +22,8 @@
 #' @param group The categorical variable that defines your groups (e.g., education,
 #'   employment). Must have at least 2 groups (3+ for meaningful use).
 #' @param weights Optional survey weights for population-representative results
-#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
+#' @param conf.level Not used. Rank tests report no confidence interval (SPSS
+#'   \code{NPAR TESTS} neither); kept for backward compatibility.
 #'
 #' @return Test results showing whether groups differ, including:
 #' - H statistic (Kruskal-Wallis chi-square test statistic)

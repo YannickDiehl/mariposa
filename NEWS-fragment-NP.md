@@ -53,3 +53,20 @@
   approximation may be incorrect" warning (German: "Chi-Quadrat-
   Approximation kann inkorrekt sein") next to mariposa's message; that
   specific warning is now muffled in every locale.
+* `mann_whitney(mu = , alternative = )`: U, Z, r and the p-value now
+  refer to the same hypothesis. With `mu` the statistics were computed
+  for a shift of 0 while the p-value came from `wilcox.test(mu = )`
+  ("Z = -0.696, p < 0.001"); group-1 values are now shifted by `mu`
+  before ranking, as `wilcox.test()` does. For one-sided tests Z is
+  directional (positive when group 1 tends to be larger) so that its sign
+  matches the p-value (was Z = -0.226 next to p(less) = .589); the
+  two-sided Z keeps the SPSS convention. The weighted (design-based) test
+  supports only `mu = 0` and now says so instead of printing
+  "Null hypothesis (mu): 500" for an unshifted test.
+* The unused confidence interval of `mann_whitney()` is no longer
+  computed: `wilcox.test(conf.int = TRUE)` ran for every variable and
+  was discarded (the source of German "cannot compute confidence
+  interval" warnings for a constant variable), and `summary()` no longer
+  advertises a "Confidence level: 95.0%" for which no interval exists.
+  `conf.level` of `mann_whitney()`, `kruskal_wallis()`,
+  `wilcoxon_test()` and `friedman_test()` is documented as not used.

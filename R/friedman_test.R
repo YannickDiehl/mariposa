@@ -21,7 +21,8 @@
 #' @param ... The measurement variables to compare (at least 3). You can list
 #'   them individually or use helpers like \code{starts_with("trust_")}
 #' @param weights Optional survey weights for population-representative results
-#' @param conf.level Confidence level for intervals (Default: 0.95 = 95 percent)
+#' @param conf.level Not used. Rank tests report no confidence interval (SPSS
+#'   \code{NPAR TESTS} neither); kept for backward compatibility.
 #'
 #' @return Test results showing whether the measurements differ, including:
 #' - Chi-Square statistic (\code{chi_squared}, the Friedman test statistic)

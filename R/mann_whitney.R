@@ -22,14 +22,22 @@
 #' @param group The categorical variable that defines your two groups (e.g., gender,
 #'   treatment/control). Must have exactly two groups.
 #' @param weights Optional survey weights for population-representative results
-#' @param mu The hypothesized difference (Default: 0, meaning no difference)
+#' @param mu The hypothesized location shift of group 1 against group 2
+#'   (Default: 0, meaning no difference; this is the SPSS test). As in
+#'   \code{wilcox.test()}, group-1 values are shifted by \code{mu} before
+#'   ranking, so U, W, Z, r and p all refer to the same hypothesis. Only
+#'   \code{mu = 0} is available with \code{weights}.
 #' @param alternative Direction of the test:
 #'   \itemize{
-#'     \item \code{"two.sided"} (default): Test if groups are different
+#'     \item \code{"two.sided"} (default): Test if groups are different.
+#'       Z is reported as SPSS does, from the smaller U (never positive).
 #'     \item \code{"greater"}: Test if group 1 > group 2
 #'     \item \code{"less"}: Test if group 1 < group 2
 #'   }
-#' @param conf.level Confidence level for intervals (Default: 0.95 = 95%)
+#'   For a one-sided test Z is directional (positive when group 1 tends to
+#'   have higher values), so its sign matches the p-value.
+#' @param conf.level Not used. Rank tests report no confidence interval
+#'   (SPSS \code{NPAR TESTS} neither); kept for backward compatibility.
 #'
 #' @return Test results showing whether groups differ, including:
 #' - U and W statistics (test statistics)
@@ -186,6 +194,16 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
   data <- weights_info$data
   w_name <- weights_info$name
 
+  if (!is.numeric(mu) || length(mu) != 1 || !is.finite(mu)) {
+    cli_abort("{.arg mu} must be a single finite number.")
+  }
+  if (!is.null(w_name) && mu != 0) {
+    cli_abort(c(
+      "{.arg mu} is not supported for the weighted Mann-Whitney test.",
+      "i" = "The design-based weighted test only tests mu = 0; drop {.arg weights} or {.arg mu}."
+    ))
+  }
+
   # Helper function to perform Mann-Whitney test for a single variable
   perform_single_mann_whitney <- function(data, var_name, group_name, weight_name = NULL) {
     # Get the variable values
@@ -229,9 +247,11 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       # Calculate sample sizes
       n1 <- length(x1)
       n2 <- length(x2)
-      
-      # Manual rank calculation (more reliable than wilcox.test for our purposes)
-      all_values <- c(x1, x2)
+
+      # H0: the distribution of group 1 is shifted by `mu` against group 2
+      # (as in wilcox.test): rank group-1 values minus mu. U, W, Z, r and p
+      # therefore all refer to the same hypothesis; mu = 0 is SPSS's test.
+      all_values <- c(x1 - mu, x2)
       all_ranks <- rank(all_values)
       
       # Calculate rank sums
@@ -262,19 +282,20 @@ mann_whitney <- function(data, ..., group, weights = NULL, mu = 0,
       # Variance with tie correction (matching SPSS calculation)
       var_U <- n1 * n2 * ((n1 + n2 + 1) - tie_correction / ((n1 + n2) * (n1 + n2 - 1))) / 12
       
-      # Calculate Z without continuity correction (to match SPSS exactly)
-      Z <- (U - expected_U) / sqrt(var_U)
-      
+      # Calculate Z without continuity correction (to match SPSS exactly).
+      # Two-sided: SPSS reports Z from the smaller U (always <= 0).
+      # One-sided: Z is directional (from group 1's U: positive when group
+      # 1 tends to be larger), so that its sign matches the alternative.
+      if (alternative == "two.sided") {
+        Z <- (U - expected_U) / sqrt(var_U)
+        p_value <- 2 * stats::pnorm(-abs(Z))
+      } else {
+        Z <- (U1 - expected_U) / sqrt(var_U)
+        p_value <- stats::pnorm(Z, lower.tail = (alternative == "less"))
+      }
+
       # Effect size
       r <- abs(Z) / sqrt(n1 + n2)
-      
-      # Get p-value from wilcox.test. correct = FALSE: SPSS applies no
-      # continuity correction to the asymptotic Mann-Whitney p-value, and
-      # the Z reported above is computed without it - p and Z must agree.
-      test_result <- wilcox.test(x1, x2, alternative = alternative,
-                               mu = mu, exact = FALSE, correct = FALSE,
-                               conf.int = TRUE, conf.level = conf.level)
-      p_value <- test_result$p.value
       
       group_stats <- list(
         group1 = list(name = as.character(g_levels[1]), rank_mean = rank_mean1, n = n1),
@@ -711,10 +732,11 @@ print.summary.mann_whitney <- function(x, ...) {
         "Weights variable" = weights_name
       )
       print_info_section(test_info)
+      # No confidence interval is computed for rank tests, so no
+      # confidence level is shown; mu only when a shift was tested.
       print_test_parameters(list(
-        mu = x$mu,
         alternative = x$alternative,
-        conf.level = x$conf.level
+        mu = if (!is.null(x$mu) && x$mu != 0) x$mu
       ))
       cat("\n")
     }

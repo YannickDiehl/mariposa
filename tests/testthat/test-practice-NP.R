@@ -245,6 +245,65 @@ test_that("known note: small expected counts warn once, in English", {
   expect_length(collect(chi_square(small, a, b, correct = TRUE)), 1)
 })
 
+# --- NP-03 / NP-21: mann_whitney mu, alternative, conf.level -----------------
+
+test_that("NP-03 mann_whitney(mu =): U, Z and p refer to the same shift", {
+  # Was: U/Z/r were computed for mu = 0 but p came from wilcox.test(mu =),
+  # e.g. "Z = -0.696, p < 0.001".
+  r <- mann_whitney(survey_data, income, group = gender, mu = 500)$results
+  x1 <- survey_data$income[survey_data$gender == "Male"]
+  x2 <- survey_data$income[survey_data$gender == "Female"]
+  x1 <- x1[!is.na(x1)]
+  x2 <- x2[!is.na(x2)]
+  wt <- suppressWarnings(stats::wilcox.test(x1, x2, mu = 500, exact = FALSE,
+                                            correct = FALSE))
+  u1 <- unname(wt$statistic)
+  expect_equal(r$U, min(u1, length(x1) * length(x2) - u1))
+  expect_equal(r$p_value, wt$p.value, tolerance = 1e-10)
+  expect_equal(r$p_value, 2 * stats::pnorm(-abs(r$Z)), tolerance = 1e-10)
+})
+
+test_that("NP-03 one-sided mann_whitney: Z is directional and matches p", {
+  # Was: Z = -0.226 printed next to p(less) = .589 (Z from min(U), p from
+  # the directional test).
+  for (alt in c("less", "greater")) {
+    r <- mann_whitney(survey_data, life_satisfaction, group = region,
+                      alternative = alt)$results
+    x1 <- survey_data$life_satisfaction[survey_data$region == "East"]
+    x2 <- survey_data$life_satisfaction[survey_data$region == "West"]
+    wt <- stats::wilcox.test(x1[!is.na(x1)], x2[!is.na(x2)],
+                             alternative = alt, exact = FALSE, correct = FALSE)
+    expect_equal(r$p_value, wt$p.value, tolerance = 1e-10)
+    expected_p <- if (alt == "less") stats::pnorm(r$Z) else
+      stats::pnorm(r$Z, lower.tail = FALSE)
+    expect_equal(r$p_value, expected_p, tolerance = 1e-10)
+  }
+  # two-sided keeps the SPSS convention (Z from the smaller U, <= 0)
+  two <- mann_whitney(survey_data, life_satisfaction, group = region)$results
+  expect_lte(two$Z, 0)
+})
+
+test_that("NP-03 weighted mann_whitney refuses mu != 0 instead of ignoring it", {
+  # Was: the weighted test ignored mu but printed "Null hypothesis (mu): 500".
+  expect_error(
+    mann_whitney(survey_data, income, group = gender, mu = 500,
+                 weights = sampling_weight),
+    "mu"
+  )
+})
+
+test_that("NP-21 no confidence level is advertised for rank tests", {
+  # Was: summary() printed "Confidence level: 95.0%" although no interval
+  # is shown, and wilcox.test(conf.int = TRUE) was computed and discarded
+  # (source of German warnings for a constant variable).
+  r <- mann_whitney(survey_data, life_satisfaction, group = gender)
+  out <- capture.output(print(summary(r)))
+  expect_false(any(grepl("Confidence level", out, fixed = TRUE)))
+  expect_false(any(grepl("Null hypothesis (mu)", out, fixed = TRUE)))
+  src <- paste(deparse(mann_whitney), collapse = "\n")
+  expect_false(grepl("conf.int = TRUE", src, fixed = TRUE))
+})
+
 test_that("NP-23 cramers_v on a large table is fast", {
   # Was: ~50 s for age x income (quadruple R loop over `[.table`).
   skip_on_cran()

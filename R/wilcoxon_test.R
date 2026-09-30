@@ -22,7 +22,8 @@
 #' @param y The second measurement variable (e.g., post-test, trust in media).
 #'   The difference is computed as \code{y - x}
 #' @param weights Optional survey weights for population-representative results
-#' @param conf.level Confidence level for intervals (Default: 0.95 = 95 percent)
+#' @param conf.level Not used. Rank tests report no confidence interval (SPSS
+#'   \code{NPAR TESTS} neither); kept for backward compatibility.
 #'
 #' @return Test results showing whether the two measurements differ, including:
 #' - Z statistic (standardized test statistic, normal approximation)
