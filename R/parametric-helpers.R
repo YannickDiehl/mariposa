@@ -20,7 +20,7 @@
   y <- .plain_numeric(y)
   if (length(y) == 0) return("no non-missing values")
   if (all(y == y[1])) {
-    return(sprintf("no variance: all values are %s", format(y[1])))
+    return(sprintf("no variance: constant value %s", format(y[1])))
   }
   if (!is.null(g)) {
     const_within <- vapply(split(y, g, drop = TRUE),

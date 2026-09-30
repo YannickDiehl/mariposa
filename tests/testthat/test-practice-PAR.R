@@ -340,3 +340,74 @@ test_that("PAR-21: oneway summary tables use fixed decimals, integer N and digit
   expect_true(any(grepl("^ +life_satisfaction +0\\.07 ", out2)))
   expect_true(any(grepl("^ +Basic Secondary +816 +3\\.21 ", out2)))
 })
+
+# --- PAR-03 / PAR-12 / weights policy: levene_test() ---------------------------
+
+test_that("PAR-03: grouped levene_test() takes several variables via ...", {
+  # The grouped method's signature (x, variable, group, weights) bound the
+  # second variable to `weights`: "[Weighted] F(3, 1544896) = 40250".
+  g <- dplyr::group_by(survey_data, region)
+  r <- levene_test(g, life_satisfaction, income, group = education)
+  expect_null(r$weights)
+  expect_setequal(unique(r$results$Variable), c("life_satisfaction", "income"))
+  east <- r$results[r$results$region == "East" & r$results$Variable == "income", ]
+  ref <- levene_test(dplyr::filter(survey_data, region == "East"), income,
+                     group = education)
+  expect_equal(east$F_statistic, ref$results$F_statistic)
+  expect_false(any(grepl("Weighted", capture.output(print(r)))))
+})
+
+test_that("PAR-12: grouped levene_test(): labels, NA key, tidyselect, strings, center", {
+  # Two group_by() variables printed "region = East, gender = East"; an NA
+  # key gave a false "constant" warning and "F(NA, NA) = ,"; starts_with()
+  # was taken literally, group = "education" found 0 groups, an invalid
+  # `center` was accepted.
+  r <- levene_test(dplyr::group_by(survey_data, region, gender),
+                   life_satisfaction, group = education)
+  out <- capture.output(print(r))
+  expect_true(any(grepl("region = East, gender = Male", out, fixed = TRUE)))
+  expect_false(any(grepl("gender = East", out, fixed = TRUE)))
+
+  d <- survey_data
+  d$region[1:30] <- NA
+  expect_no_warning(
+    r2 <- levene_test(dplyr::group_by(d, region), life_satisfaction,
+                      group = education)
+  )
+  expect_equal(nrow(r2$results), 3L)
+  expect_false(anyNA(r2$results$F_statistic))
+
+  r3 <- levene_test(dplyr::group_by(survey_data, region), starts_with("trust"),
+                    group = "education")
+  expect_setequal(unique(r3$results$Variable),
+                  c("trust_government", "trust_media", "trust_science"))
+
+  expect_error(levene_test(dplyr::group_by(survey_data, region),
+                           life_satisfaction, group = education, center = "mode"),
+               "center")
+  expect_error(levene_test(survey_data, life_satisfaction, group = education,
+                           center = "mode"), "center")
+})
+
+test_that("PAR-12: a constant variable prints 'not computed', not 'F(NA, NA) = ,'", {
+  d <- survey_data
+  d$const <- 3
+  expect_warning(r <- levene_test(d, const, group = education), "no variance")
+  out <- capture.output(print(r))
+  expect_false(any(grepl("F(NA", out, fixed = TRUE)))
+  expect_true(any(grepl("not computed (no variance", out, fixed = TRUE)))
+})
+
+test_that("levene_test() applies the package weights policy", {
+  # Negative weights were accepted; character weights gave "F(NA, NA) = ,".
+  d <- survey_data
+  d$w_neg <- d$sampling_weight
+  d$w_neg[1] <- -1
+  expect_error(levene_test(d, life_satisfaction, group = gender, weights = w_neg),
+               "negative")
+  d$w_chr <- as.character(d$sampling_weight)
+  expect_error(levene_test(d, life_satisfaction, group = gender, weights = w_chr),
+               "numeric")
+  expect_error(levene_test(dplyr::group_by(d, region), life_satisfaction,
+                           group = gender, weights = w_neg), "negative")
+})

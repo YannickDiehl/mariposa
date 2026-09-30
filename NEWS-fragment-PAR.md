@@ -67,3 +67,16 @@
   effect. `tukey_test()` and `scheffe_test()` on a `oneway_anova()` result
   now default to the ANOVA's `conf.level` instead of silently using 95%.
   (PAR-19, PAR-21)
+* `group_by() %>% levene_test()` takes its variables through `...` like
+  the ungrouped method: several variables, tidyselect helpers
+  (`starts_with("trust")`) and `group = "education"` as a string work, and
+  `group`/`weights` must be named. The old grouped method had the
+  signature `(x, variable, group, weights)`, so a second variable was
+  silently used as `weights` ("[Weighted] F(3, 1544896) = 40250"). Grouped
+  results now carry the group keys as columns: two `group_by()` variables
+  no longer print "region = East, gender = East", and a missing key (`NA`)
+  is its own group instead of a false "constant values" warning with
+  "F(NA, NA) = ,". An invalid `center` is an error, a variable without
+  variance prints "not computed (no variance ...)", and `weights` follow
+  the package policy (negative or non-numeric weights are an error; they
+  were accepted). (PAR-03, PAR-12, EDGE-04)

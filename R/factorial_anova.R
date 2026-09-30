@@ -1115,7 +1115,7 @@ scheffe_test.factorial_anova <- function(x, conf.level = 0.95, ...) {
 
 #' @export
 levene_test.factorial_anova <- function(x, center = c("mean", "median"), ...) {
-  center <- match.arg(center)
+  center <- rlang::arg_match(center)
 
   # Recompute if median-based is requested, otherwise return stored result
   if (center == "mean") {
