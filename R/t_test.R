@@ -34,9 +34,13 @@
 #'
 #' @return Test results showing whether groups differ, including:
 #' - t-statistic and p-value for statistical significance
-#' - Mean difference and confidence interval
+#' - Mean difference and confidence interval (one-sample tests: mean minus
+#'   \code{mu} and the interval of that difference, as in the SPSS
+#'   One-Sample Test)
 #' - Effect sizes (Cohen's d, Hedges' g, Glass' Delta)
-#' - Group statistics (mean, SD, sample size)
+#' - Group statistics (mean, SD, standard error of the mean, sample size)
+#' - A \code{note} column that explains why a variable (or group) was not
+#'   computed, e.g. no variance or only one group with valid data
 #'   Use \code{summary()} for the full SPSS-style output with toggleable sections.
 #'
 #' @details
