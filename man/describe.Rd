@@ -26,10 +26,11 @@ Without weights, you describe your sample. With weights, you describe the popula
 \item{show}{Which statistics to display:
 \itemize{
 \item \code{"short"} (default): Essential stats (mean, median, SD, range, IQR, skewness)
-\item \code{"all"}: Everything including variance, kurtosis, mode, quantiles
+\item \code{"all"}: Everything including min/max, variance, kurtosis, mode, quantiles
 \item Custom list: Choose specific stats like \code{c("mean", "sd", "range")}
 from \code{"mean"}, \code{"median"}, \code{"sd"}, \code{"se"},
-\code{"var"}, \code{"range"}, \code{"iqr"}, \code{"skew"},
+\code{"var"}, \code{"min"}, \code{"max"} (SPSS DESCRIPTIVES'
+Minimum/Maximum), \code{"range"}, \code{"iqr"}, \code{"skew"},
 \code{"kurtosis"}, \code{"mode"}, \code{"quantiles"}. Unknown names
 are an error.
 }}
