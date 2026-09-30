@@ -113,21 +113,17 @@ test_that("Test 2a: Kendall weighted ungrouped — R-only Tier-4 baseline", {
     political_trust_tau = 0.003664,   political_trust_p = 0.7972,  political_trust_n = 2190L,
     diag_n_life = 2437L, diag_n_pol = 2312L, diag_n_tm = 2382L
   )
-  assert_spss(m$tau["life_satisfaction","political_orientation"],
-              baseline$life_political_tau,
-              tier = "display", precision = 3,
-              label = "2a Tier-4: life_political tau")
-  assert_spss(m$tau["life_satisfaction","trust_media"],
-              baseline$life_trust_tau,
-              tier = "display", precision = 3,
-              label = "2a Tier-4: life_trust tau")
-  assert_spss(m$tau["political_orientation","trust_media"],
-              baseline$political_trust_tau,
-              tier = "display", precision = 3,
-              label = "2a Tier-4: political_trust tau")
-  assert_spss_count(m$n_obs["life_satisfaction","political_orientation"],
-                    baseline$life_political_n,
-                    label = "2a Tier-4: life_political N")
+  # Tier 4 (R-only regression baselines, no SPSS value): plain expects so
+  # the compatibility vignette does not count them as SPSS assertions.
+  # Weighted NONPAR CORR semantics are pending an SPSS WEIGHT BY run.
+  expect_equal(round(m$tau["life_satisfaction","political_orientation"], 3),
+               round(baseline$life_political_tau, 3))
+  expect_equal(round(m$tau["life_satisfaction","trust_media"], 3),
+               round(baseline$life_trust_tau, 3))
+  expect_equal(round(m$tau["political_orientation","trust_media"], 3),
+               round(baseline$political_trust_tau, 3))
+  expect_equal(m$n_obs["life_satisfaction","political_orientation"],
+               baseline$life_political_n)
 })
 
 test_that("Test 3a: Kendall unweighted grouped by region — matches SPSS", {
@@ -160,12 +156,10 @@ test_that("Test 4a: Kendall weighted grouped by region — R-only Tier-4 baselin
     rg <- as.character(regions_in_order[i])
     m  <- r$matrices[[i]]
     b  <- baselines[[rg]]
-    assert_spss(m$tau["life_satisfaction","political_orientation"],
-                b$life_political_tau,
-                tier = "display", precision = 3,
-                label = sprintf("4a Tier-4 [%s]: life_political tau", rg))
-    assert_spss_count(m$n_obs["life_satisfaction","life_satisfaction"],
-                      b$n_diag_life,
-                      label = sprintf("4a Tier-4 [%s]: diag N(life)", rg))
+    # Tier 4 (R-only baselines, see Test 2a)
+    expect_equal(round(m$tau["life_satisfaction","political_orientation"], 3),
+                 round(b$life_political_tau, 3))
+    expect_equal(m$n_obs["life_satisfaction","life_satisfaction"],
+                 b$n_diag_life)
   }
 })
