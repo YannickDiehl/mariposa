@@ -260,3 +260,61 @@ test_that("REG-21: non-binary and constant outcomes get clear errors", {
   d$chr3 <- c("a", "b", "c")[(seq_len(nrow(d)) %% 3) + 1]
   expect_error(logistic_regression(d, chr3 ~ age), "3 distinct values")
 })
+
+# REG-10 (+EDGE-13): one small group aborted the whole grouped linear /
+# logistic regression ("Insufficient observations ...") without naming it.
+# SPSS SPLIT FILE skips such a split and carries on.
+test_that("REG-10: a degenerate group is skipped with a warning naming it", {
+  d <- .reg_sd2()
+  d$grp <- ifelse(seq_len(nrow(d)) <= 3, "tiny", "big")
+  g <- dplyr::group_by(d, grp)
+
+  expect_warning(
+    m <- linear_regression(g, life_satisfaction ~ age + income + trust_media),
+    "grp = tiny"
+  )
+  expect_length(m$groups, 1L)
+  expect_equal(m$groups[[1]]$group_values$grp, "big")
+  out <- capture.output(print(m))
+  expect_true(any(grepl("grp = tiny: not computed", out, fixed = TRUE)))
+  out_s <- capture.output(print(summary(m)))
+  expect_true(any(grepl("not computed", out_s, fixed = TRUE)))
+
+  expect_warning(
+    ml <- logistic_regression(g, high_sat ~ age + income + trust_media),
+    "grp = tiny"
+  )
+  expect_length(ml$groups, 1L)
+  expect_true(any(grepl("grp = tiny: not computed",
+                        capture.output(print(ml)), fixed = TRUE)))
+  expect_no_error(capture.output(print(summary(ml))))
+  expect_no_error(marginal_effects(ml))
+
+  # A group whose outcome is constant is skipped the same way
+  d$high_sat[d$region == "East"] <- 1L
+  expect_warning(
+    logistic_regression(dplyr::group_by(d, region), high_sat ~ age),
+    "region = East"
+  )
+
+  # All groups degenerate: one clear error
+  d$grp2 <- rep(1:1250, each = 2)
+  expect_error(
+    suppressWarnings(linear_regression(dplyr::group_by(d, grp2),
+                                       life_satisfaction ~ age + income)),
+    "No group"
+  )
+})
+
+# REG-21 (linear part): an all-NA predictor gave "Insufficient
+# observations for the number of predictors" without naming the cause.
+test_that("REG-21: an all-missing predictor is named in the error", {
+  d <- .reg_sd2()
+  d$empty <- NA_real_
+  expect_error(linear_regression(d, life_satisfaction ~ age + empty),
+               "empty.*no non-missing")
+  expect_error(logistic_regression(d, high_sat ~ age + empty),
+               "empty.*no non-missing")
+  expect_error(linear_regression(d[1:3, ], life_satisfaction ~ age + income + trust_media),
+               "complete case")
+})

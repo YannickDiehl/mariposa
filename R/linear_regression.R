@@ -284,15 +284,12 @@ linear_regression <- function(data, formula = NULL,
     group_split <- dplyr::group_split(data)
     group_keys <- dplyr::group_keys(data)
 
-    group_results <- lapply(seq_along(group_split), function(i) {
-      grp_data <- group_split[[i]]
+    # A group that cannot be fitted is skipped with a warning (SPSS SPLIT
+    # FILE carries on with the other splits)
+    fits <- .fit_groups(group_split, group_keys, function(grp_data) {
       grp_weights <- if (has_weights) grp_data[[weight_name]] else NULL
-
       result <- .lm_core(grp_data, model_formula, dep_name, pred_names,
                          grp_weights, use, standardized, conf.level, factors)
-      gv <- as.list(group_keys[i, , drop = FALSE])
-      gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
-      result$group_values <- gv
       # Each listwise group result IS an lm — tag it as linear_regression so
       # predict()/anova()/broom generics on a single group dispatch natively.
       if (inherits(result, "lm")) {
@@ -302,10 +299,12 @@ linear_regression <- function(data, formula = NULL,
       }
       result
     })
+    group_results <- fits$results
 
     structure(
       list(
         groups = group_results,
+        skipped_groups = fits$skipped,
         formula = model_formula,
         dependent = dep_name,
         predictor_names = pred_names,
@@ -382,7 +381,7 @@ linear_regression <- function(data, formula = NULL,
   n <- nrow(data_complete)
 
   if (n < length(pred_names) + 2) {
-    cli_abort("Insufficient observations for the number of predictors.")
+    .abort_insufficient_cases(data, all_vars, n, length(pred_names))
   }
 
   # Factor predictor handling — see @param factors documentation.
@@ -1033,37 +1032,27 @@ print.linear_regression <- function(x, ...) {
   weighted_tag <- if (isTRUE(x$weighted)) " [Weighted]" else ""
   formula_str <- .formula_label(x$formula)
 
+  fit_line <- function(m) {
+    sprintf("R2 = %.3f, adj.R2 = %.3f, F(%s, %s) = %.2f, %s, N = %s",
+            m$model_summary$R_squared,
+            m$model_summary$adj_R_squared,
+            .fmt_n(m$anova_table$df[1]), .fmt_n(m$anova_table$df[2]),
+            m$anova_table$F_statistic[1],
+            format_p_stars(m$anova_table$Sig[1]),
+            .fmt_n(m$n))
+  }
+
   if (isTRUE(x$is_grouped)) {
     grouped_tag <- sprintf(" [Grouped: %s]", paste(x$group_vars, collapse = ", "))
     cat(sprintf("Linear Regression: %s%s%s\n", formula_str, weighted_tag, grouped_tag))
     for (grp in x$groups) {
-      grp_label <- .format_group_label(grp$group_values)
-      f_stat <- grp$anova_table$F_statistic[1]
-      f_df1 <- as.integer(round(grp$anova_table$df[1]))
-      f_df2 <- as.integer(round(grp$anova_table$df[2]))
-      f_p <- grp$anova_table$Sig[1]
-      p_str <- format_p_compact(f_p)
-      stars <- add_significance_stars(f_p)
-      cat(sprintf("  %s: R2 = %.3f, adj.R2 = %.3f, F(%d, %d) = %.2f, %s %s, N = %d\n",
-                  grp_label,
-                  grp$model_summary$R_squared,
-                  grp$model_summary$adj_R_squared,
-                  f_df1, f_df2, f_stat,
-                  p_str, stars, grp$n))
+      cat(sprintf("  %s: %s\n", .format_group_label(grp$group_values),
+                  fit_line(grp)))
     }
+    .print_skipped_groups(x$skipped_groups)
   } else {
     cat(sprintf("Linear Regression: %s%s\n", formula_str, weighted_tag))
-    f_stat <- x$anova_table$F_statistic[1]
-    f_df1 <- as.integer(round(x$anova_table$df[1]))
-    f_df2 <- as.integer(round(x$anova_table$df[2]))
-    f_p <- x$anova_table$Sig[1]
-    p_str <- format_p_compact(f_p)
-    stars <- add_significance_stars(f_p)
-    cat(sprintf("  R2 = %.3f, adj.R2 = %.3f, F(%d, %d) = %.2f, %s %s, N = %d\n",
-                x$model_summary$R_squared,
-                x$model_summary$adj_R_squared,
-                f_df1, f_df2, f_stat,
-                p_str, stars, x$n))
+    cat(sprintf("  %s\n", fit_line(x)))
   }
 
   invisible(x)
@@ -1248,7 +1237,7 @@ print.summary.linear_regression <- function(x, ...) {
     cat("\n")
     print_group_header(grp$group_values)
 
-    cat(sprintf("  N: %d\n", grp$n))
+    cat(sprintf("  N: %s\n", .fmt_n(grp$n)))
 
     if (show_desc) {
       cat("\n")
@@ -1274,6 +1263,7 @@ print.summary.linear_regression <- function(x, ...) {
       .print_collinearity_table(grp$coef_table)
     }
   }
+  .print_skipped_groups(x$skipped_groups, verbose = TRUE)
 
   if (show_anova || show_coefs) {
     print_significance_legend(TRUE)
@@ -1681,4 +1671,95 @@ df.residual.linear_regression <- function(object, ...) {
   out <- formatC(round(as.numeric(n)), format = "f", digits = 0)
   out[is.na(n)] <- "NA"
   out
+}
+
+#' Abort for too few complete cases, naming the cause
+#'
+#' Replaces the bare "Insufficient observations for the number of
+#' predictors": an all-missing variable is named, otherwise the counts are
+#' given. Classed so grouped fits can skip the group (SPSS SPLIT FILE).
+#' @noRd
+.abort_insufficient_cases <- function(data, all_vars, n, n_pred,
+                                      call = rlang::caller_env()) {
+  if (n == 0) {
+    empty <- all_vars[vapply(all_vars, function(v) all(is.na(data[[v]])),
+                             logical(1))]
+    if (length(empty) > 0) {
+      cli_abort(
+        "No complete cases: {.var {empty}} {?has/have} no non-missing values.",
+        class = "mariposa_degenerate_fit", call = call
+      )
+    }
+    cli_abort(
+      "No complete cases: no case has valid values on all of {.var {all_vars}}.",
+      class = "mariposa_degenerate_fit", call = call
+    )
+  }
+  cli_abort(c(
+    "Only {n} complete case{?s} for {n_pred} predictor term{?s}.",
+    i = "The model needs at least {n_pred + 2} complete cases."
+  ), class = "mariposa_degenerate_fit", call = call)
+}
+
+#' Fit one model per group, skipping groups that cannot be fitted
+#'
+#' SPSS SPLIT FILE reports a split it cannot analyse and continues with the
+#' others; one small group used to abort the whole grouped regression
+#' without saying which group. Failing groups become a warning naming the
+#' group and the reason, and are listed in $skipped.
+#'
+#' @param group_split,group_keys From dplyr::group_split()/group_keys()
+#' @param fit_fun function(group_data) returning the fitted result
+#' @return list(results = fitted groups (with $group_values), skipped =
+#'   list of list(group_values, reason))
+#' @noRd
+.fit_groups <- function(group_split, group_keys, fit_fun,
+                        call = rlang::caller_env()) {
+  results <- list()
+  skipped <- list()
+  for (i in seq_along(group_split)) {
+    gv <- as.list(group_keys[i, , drop = FALSE])
+    gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
+    res <- tryCatch(fit_fun(group_split[[i]]), error = function(e) e)
+    if (inherits(res, "error")) {
+      label <- .format_group_label(gv)
+      reason <- cli::ansi_strip(strsplit(conditionMessage(res), "\n")[[1]][1])
+      cli_warn(c(
+        "Group {label} skipped: no model could be fitted.",
+        x = "{reason}"
+      ))
+      skipped[[length(skipped) + 1]] <- list(group_values = gv,
+                                             reason = reason)
+      next
+    }
+    res$group_values <- gv
+    results[[length(results) + 1]] <- res
+  }
+  if (length(results) == 0) {
+    reasons <- unique(vapply(skipped, `[[`, character(1), "reason"))
+    # literal text in cli bullets: escape glue braces
+    reasons <- gsub("}", "}}", gsub("{", "{{", reasons, fixed = TRUE),
+                    fixed = TRUE)
+    cli_abort(c(
+      "No group could be fitted.",
+      stats::setNames(reasons, rep("x", length(reasons)))
+    ), call = call)
+  }
+  list(results = results, skipped = skipped)
+}
+
+#' Compact lines for skipped groups ("group: not computed (reason)")
+#' @noRd
+.print_skipped_groups <- function(skipped, verbose = FALSE) {
+  for (s in skipped) {
+    if (verbose) {
+      cat("\n")
+      print_group_header(s$group_values)
+      cat(sprintf("  Model not computed: %s\n", s$reason))
+    } else {
+      cat(sprintf("  %s: not computed (%s)\n",
+                  .format_group_label(s$group_values), s$reason))
+    }
+  }
+  invisible(NULL)
 }

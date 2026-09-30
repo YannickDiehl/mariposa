@@ -46,3 +46,12 @@
   labelled with the categories instead of 0/1. A constant outcome
   (previously "Nagelkerke R2 = -Inf ... Accuracy = 100%") and outcomes
   with more than two values now stop with a clear message.
+* Grouped `linear_regression()` and `logistic_regression()` no longer
+  abort when one group cannot be fitted (too few cases, a constant
+  outcome, ...). Like SPSS SPLIT FILE, the group is skipped with a
+  warning naming it and the reason, the other groups are reported, and
+  `print()`/`summary()` list the group as "not computed". Before, one
+  small group stopped the whole analysis with "Insufficient observations
+  for the number of predictors" without saying which group. The message
+  itself now names an all-missing variable ("`x` has no non-missing
+  values") or gives the case count.

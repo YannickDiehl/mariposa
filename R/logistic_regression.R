@@ -265,30 +265,31 @@ logistic_regression <- function(data, formula = NULL,
 
   # Outcome encoding (SPSS "Dependent Variable Encoding"), fixed once on
   # the cases in the analysis so every group models the same category
+  is_grouped <- inherits(data, "grouped_df")
+
   in_analysis <- stats::complete.cases(data[, all_vars, drop = FALSE])
   if (has_weights) in_analysis <- in_analysis & !is.na(weights_vec)
+  n_in <- sum(in_analysis)
+  if (n_in == 0 || (!is_grouped && n_in < length(pred_names) + 2)) {
+    .abort_insufficient_cases(data, all_vars, n_in, length(pred_names))
+  }
   dv_encoding <- .logistic_dv_encoding(data[[dep_name]][in_analysis], dep_name)
 
   # ============================================================================
   # GROUPED ANALYSIS
   # ============================================================================
 
-  is_grouped <- inherits(data, "grouped_df")
-
   if (is_grouped) {
     group_vars <- dplyr::group_vars(data)
     group_split <- dplyr::group_split(data)
     group_keys <- dplyr::group_keys(data)
 
-    group_results <- lapply(seq_along(group_split), function(i) {
-      grp_data <- group_split[[i]]
+    # A group that cannot be fitted is skipped with a warning (SPSS SPLIT
+    # FILE carries on with the other splits)
+    fits <- .fit_groups(group_split, group_keys, function(grp_data) {
       grp_weights <- if (has_weights) grp_data[[weight_name]] else NULL
-
       result <- .glm_core(grp_data, model_formula, dep_name, pred_names,
                           grp_weights, conf.level, factors, dv_encoding)
-      gv <- as.list(group_keys[i, , drop = FALSE])
-      gv <- lapply(gv, function(v) if (is.factor(v)) as.character(v) else v)
-      result$group_values <- gv
       # Each group result IS a glm — tag it so per-group predict/anova/broom
       # generics dispatch natively.
       if (inherits(result, "glm")) {
@@ -298,10 +299,12 @@ logistic_regression <- function(data, formula = NULL,
       }
       result
     })
+    group_results <- fits$results
 
     structure(
       list(
         groups = group_results,
+        skipped_groups = fits$skipped,
         formula = model_formula,
         dependent = dep_name,
         predictor_names = pred_names,
@@ -380,7 +383,7 @@ logistic_regression <- function(data, formula = NULL,
   n_actual <- nrow(data_complete)
 
   if (n_actual < length(pred_names) + 2) {
-    cli_abort("Insufficient observations for the number of predictors.")
+    .abort_insufficient_cases(data, all_vars, n_actual, length(pred_names))
   }
 
   # Factor predictor handling — see @param factors documentation.
@@ -788,6 +791,7 @@ print.logistic_regression <- function(x, ...) {
       cat(sprintf("  %s: %s\n", .format_group_label(grp$group_values),
                   fit_line(grp)))
     }
+    .print_skipped_groups(x$skipped_groups)
   } else {
     cat(sprintf("Logistic Regression: %s%s%s\n", formula_str, outcome_tag,
                 weighted_tag))
@@ -997,6 +1001,7 @@ print.summary.logistic_regression <- function(x, ...) {
       .print_logistic_coefficients(grp$coef_table)
     }
   }
+  .print_skipped_groups(x$skipped_groups, verbose = TRUE)
 
   if (show_omnibus || show_coefs) {
     print_significance_legend(TRUE)
