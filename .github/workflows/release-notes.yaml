@@ -1,0 +1,80 @@
+# Publishes the NEWS.md section of a version as its GitHub release, so no
+# version is left without release notes.
+#
+# Release a version (after the NEWS.md heading is final, without
+# "(development)"):
+#
+#   git tag -a v0.7.4 -m "mariposa 0.7.4 - <Theme>"
+#   git push origin v0.7.4
+#
+# The release title is "v0.7.4 — <Theme>" (from the annotated tag message,
+# "mariposa 0.7.4 - " prefix dropped); the notes are the version's NEWS.md
+# section (.github/scripts/release-notes.sh). The job fails when NEWS.md has
+# no final section for the tag.
+#
+# Re-run by hand (Actions > release-notes > Run workflow, tag v0.7.4) to
+# refresh the notes of an existing release after a NEWS.md correction; the
+# title is kept.
+#
+# GitHub creates no push events when more than three tags are pushed at once,
+# so push version tags one at a time.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag, e.g. v0.7.4'
+        required: true
+        type: string
+
+name: release-notes
+
+permissions:
+  contents: write
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      # actions/checkout can store an annotated tag as a lightweight one;
+      # fetch it again to read its message.
+      - name: Fetch the annotated tag
+        run: git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
+
+      - name: Extract the NEWS.md section
+        run: bash .github/scripts/release-notes.sh "$TAG" > notes.md
+
+      - name: Create or update the GitHub release
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file notes.md
+            echo "Updated the notes of release $TAG"
+            exit 0
+          fi
+
+          title="$TAG"
+          if [ "$(git cat-file -t "refs/tags/$TAG")" = "tag" ]; then
+            subject=$(git for-each-ref --format='%(contents:subject)' "refs/tags/$TAG")
+            theme=$(printf '%s' "$subject" | sed -E "s/^mariposa ${TAG#v} +(-|—|:) +//")
+            if [ -n "$theme" ]; then title="$TAG — ${theme^}"; fi
+          fi
+
+          newest=$(git tag -l 'v*' --sort=-v:refname | head -n 1)
+          latest=false
+          if [ "$TAG" = "$newest" ]; then latest=true; fi
+
+          gh release create "$TAG" --verify-tag --title "$title" \
+            --notes-file notes.md --latest="$latest"
+          echo "Created release $TAG: $title (latest: $latest)"

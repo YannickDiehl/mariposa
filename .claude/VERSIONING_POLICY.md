@@ -81,6 +81,15 @@ The package has few users; breaking changes are acceptable but never casual:
 - Commits between releases carry conventional prefixes (`fix:`, `feat:`,
   `refactor:`, `docs:`, `test:`, `chore:`); the release commit's NEWS
   entry is assembled from them.
+- **Every release gets a tag and a GitHub release.** Tag the released
+  commit (a CRAN version: the commit in `CRAN-SUBMISSION`, once CRAN has
+  accepted it) with an annotated tag and push it on its own:
+  `git tag -a vX.Y.Z -m "mariposa X.Y.Z - <Theme In Title Case>"`, then
+  `git push origin vX.Y.Z`. `.github/workflows/release-notes.yaml` publishes
+  the version's NEWS.md section as the release notes (title
+  `vX.Y.Z — <Theme>` from the tag message); it fails while the NEWS heading
+  still says "(development)". Push tags one at a time: GitHub runs no
+  workflow when more than three tags are pushed at once.
 
 ## 6. Current roadmap mapping (2026-07)
 
