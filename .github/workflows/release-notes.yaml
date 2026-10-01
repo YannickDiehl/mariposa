@@ -8,9 +8,9 @@
 #   git push origin v0.7.4
 #
 # The release title is "v0.7.4 — <Theme>" (from the annotated tag message,
-# "mariposa 0.7.4 - " prefix dropped); the notes are the version's NEWS.md
-# section (.github/scripts/release-notes.sh). The job fails when NEWS.md has
-# no final section for the tag.
+# "mariposa 0.7.4 - " prefix dropped); the notes are the version's section of
+# NEWS.md on the default branch (.github/scripts/release-notes.sh). The job
+# fails when NEWS.md has no final section for the tag.
 #
 # Re-run by hand (Actions > release-notes > Run workflow, tag v0.7.4) to
 # refresh the notes of an existing release after a NEWS.md correction; the
@@ -43,9 +43,12 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
+      # NEWS.md and the script come from the default branch, not from the
+      # tag: the notes follow the current NEWS.md (also when refreshing an
+      # old release), and older tags predate the script.
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
 
       # actions/checkout can store an annotated tag as a lightweight one;
