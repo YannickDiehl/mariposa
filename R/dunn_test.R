@@ -67,13 +67,12 @@
 #' - Non-parametric equivalent of \code{\link{tukey_test}()} and
 #'   \code{\link{scheffe_test}()}
 #' - Follow-up to \code{\link{kruskal_wallis}()}, just like Tukey follows ANOVA
-#' ## Weighted variants
+#' ## Weighted analyses
 #'
-#' When the parent \code{\link{kruskal_wallis}()} result is weighted, the
-#' pairwise z statistics use the same frequency-weighted midranks. SPSS
-#' \code{NPAR TESTS} ignores \code{WEIGHT BY}, so weighted results have no
-#' SPSS reference (R-only, guarded by an internal invariance suite); see
-#' \code{vignette("spss-compatibility")} for validation status.
+#' When the \code{\link{kruskal_wallis}()} result is weighted, the pairwise z
+#' statistics use the same frequency-weighted midranks. With all weights equal
+#' to 1 they reproduce the unweighted comparisons exactly. Weighted results are
+#' not yet compared with SPSS output; see \code{vignette("spss-compatibility")}.
 #'
 #' - Uses ranks instead of raw values, making it robust to outliers
 #'

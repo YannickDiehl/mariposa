@@ -52,9 +52,8 @@ a clear Group x Time interaction suitable for repeated measures testing.
 library(dplyr)
 data(longitudinal_data)
 
-# Simple example analysis with wide format data
-# data(longitudinal_data_wide)
-# (Repeated measures functions coming in future version)
+# Repeated measurements are analysed in the wide format
+# (see longitudinal_data_wide), e.g. with friedman_test()
 
 # Descriptive statistics by group and time
 longitudinal_data \%>\%

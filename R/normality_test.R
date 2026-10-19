@@ -76,9 +76,9 @@
 #' Lilliefors correction has a well-defined fractional-frequency-weight
 #' form. Run the test on the unweighted sample.
 #'
-#' An SPSS v29 EXAMINE reference run is pending; until it lands the
-#' statistics are verified against independent R implementations of the
-#' same published formulas (see the SPSS compatibility vignette).
+#' The statistics are checked against independent R implementations of the
+#' same published formulas and are not yet compared with SPSS output (see
+#' the SPSS compatibility vignette).
 #'
 #' @examples
 #' library(dplyr)

@@ -51,9 +51,8 @@
 #' SPSS HAVERAGE (quantile Type 6) position h = 0.5 * (W + 1) on the
 #' cumulative weights, with linear interpolation between bracketing
 #' observations. It is identical to \code{w_quantile(x, probs = 0.5)} by
-#' construction. Unweighted values match SPSS FREQUENCIES; weighted values
-#' with non-integer weights are an R-internal extension of the HAVERAGE
-#' rule (Tier 4 of the Validation Charter) pending SPSS reference runs.
+#' construction. Unweighted and weighted values reproduce SPSS FREQUENCIES
+#' (with and without \code{WEIGHT BY}).
 #'
 #' @examples
 #' # Load required packages and data

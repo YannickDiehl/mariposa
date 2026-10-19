@@ -82,13 +82,13 @@
 #'   independent groups)
 #' - Follow-up to \code{\link{friedman_test}()}, like \code{\link{dunn_test}()}
 #'   follows \code{\link{kruskal_wallis}()}
-#' ## Weighted variants
+#' ## Weighted analyses
 #'
-#' When the parent \code{\link{friedman_test}()} result is weighted, each
-#' pairwise test uses the same frequency-weighted signed-rank formulas. SPSS
-#' \code{NPAR TESTS} ignores \code{WEIGHT BY}, so weighted results have no
-#' SPSS reference (R-only, guarded by an internal invariance suite); see
-#' \code{vignette("spss-compatibility")} for validation status.
+#' When the \code{\link{friedman_test}()} result is weighted, each pairwise
+#' test uses the same frequency-weighted signed-rank formulas. With all
+#' weights equal to 1 they reproduce the unweighted tests exactly. Weighted
+#' results are not yet compared with SPSS output; see
+#' \code{vignette("spss-compatibility")}.
 #'
 #' - Each pairwise comparison uses \code{\link{wilcoxon_test}()} logic internally
 #'

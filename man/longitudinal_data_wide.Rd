@@ -38,8 +38,11 @@ represent subject dropout or missed assessments.
 library(dplyr)
 data(longitudinal_data_wide)
 
-# Analysis of change scores
-# (Repeated measures functions coming in future version)
+# Change over the four time points
+friedman_test(longitudinal_data_wide, score_T1, score_T2, score_T3, score_T4)
+
+# Change between two time points
+wilcoxon_test(longitudinal_data_wide, score_T1, score_T2)
 
 }
 \seealso{

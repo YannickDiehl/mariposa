@@ -66,9 +66,8 @@
 #' delta method with the analytic gradient of the AME with respect to
 #' the coefficients and the model's Wald covariance matrix, matching the
 #' default in Stata's \code{margins} and R's \pkg{margins} package.
-#' Weighted models average with their frequency weights (unrounded,
-#' Charter §5.1); at \code{weights == 1} the weighted AME reduces
-#' exactly to the unweighted one.
+#' Weighted models average with their frequency weights (unrounded); with
+#' all weights equal to 1 the weighted AME equals the unweighted one.
 #'
 #' \strong{Linear regression}: AMEs are not needed there — for a linear
 #' model without interactions or transformations, the unstandardized
@@ -77,10 +76,9 @@
 #' \code{marginal_effects()} on a \code{linear_regression} result says
 #' so instead of duplicating the table.
 #'
-#' \strong{Validation}: SPSS has no AME procedure, so this function is
-#' Tier 4 (Internal) under the Validation Charter — verified against the
-#' analytic logit-AME formula and an independent finite-difference
-#' delta-method recomputation, not against SPSS output.
+#' \strong{Validation}: SPSS has no AME procedure. The results are verified
+#' against the analytic logit-AME formula and an independent
+#' finite-difference delta-method computation.
 #'
 #' @examples
 #' data(survey_data)

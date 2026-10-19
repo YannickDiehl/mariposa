@@ -33,7 +33,7 @@ group combination) with:
 \item{zero_order_r}{The ordinary (zero-order) Pearson correlation of
 the pair, for comparison — SPSS \code{/STATISTICS=CORR}}
 \item{df}{Degrees of freedom, n - 2 - k with k control variables
-(non-integer for weighted data, Charter §5.1)}
+(non-integer for weighted data)}
 \item{t_stat, p_value}{t-test of the partial correlation
 (two-tailed, the SPSS default)}
 \item{n}{Listwise-complete sample size (rounded weighted N when
@@ -89,10 +89,9 @@ throughout, so weighted results follow the SPSS frequency-weight
 convention with unrounded \code{sum(w)} in df and test statistics.
 Significance is two-tailed (the SPSS default).
 
-An SPSS v29 PARTIAL CORR reference run is pending; until it lands the
-statistics are verified against the independent
-residual-of-regressions characterization (see the SPSS compatibility
-vignette).
+The statistics are checked against the equivalent computation from
+regression residuals and are not yet compared with SPSS output (see the
+SPSS compatibility vignette).
 }
 }
 \examples{

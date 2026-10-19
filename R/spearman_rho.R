@@ -4,7 +4,7 @@
 #' Calculates Spearman's rank correlation coefficients (rho) between variables with support
 #' for grouped data and multiple variable pairs. Provides significance testing and
 #' SPSS-compatible output formatting. Survey weights only select cases (see
-#' \code{weights}); the coefficient itself is unweighted, as in SPSS NONPAR CORR.
+#' \code{weights}); the coefficient itself is unweighted.
 #'
 #' Spearman's rho is a non-parametric measure of rank correlation that assesses monotonic
 #' relationships between variables. It is particularly suitable for ordinal data or when
@@ -15,9 +15,9 @@
 #'   correlation or more for a correlation matrix. You can use helpers like
 #'   \code{starts_with("trust")}. Numeric variables or ordered factors
 #'   (ranked by their level order).
-#' @param weights Optional survey weights. Following the SPSS NONPAR CORR
-#'   convention, weights are used only to filter cases (rows with weight <= 0 or
-#'   NA are dropped); the rank correlation itself is computed unweighted on the
+#' @param weights Optional survey weights. They are used only to select
+#'   cases (rows with a weight <= 0 or NA are left out); the rank correlation
+#'   itself is computed unweighted on the
 #'   remaining sample. For design-based weighted Spearman use
 #'   \code{survey::svyolr()} or \code{wCorr::weightedCorr(method = "Spearman")}.
 #'   Give a column name (unquoted or as a string), an expression such as
@@ -91,8 +91,8 @@
 #' survey_data %>%
 #'   spearman_rho(life_satisfaction, political_orientation, trust_media)
 #'
-#' # Weights only filter cases (weight <= 0 or NA dropped); rho itself is
-#' # unweighted, matching SPSS NONPAR CORR
+#' # Weights only select cases (weight <= 0 or NA left out); rho itself is
+#' # unweighted
 #' survey_data %>%
 #'   spearman_rho(age, income, weights = sampling_weight)
 #'

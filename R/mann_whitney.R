@@ -91,15 +91,13 @@
 #' - The test compares distributions, not just means
 #' - Look at both p-values and effect sizes
 #' - Consider plotting the data to see the pattern
-#' ## Weighted variants
+#' ## Weighted analyses
 #'
 #' The weighted test is the design-based Lumley-Scott (2013) rank test
-#' (Horvitz-Thompson midranks with a sandwich variance), validated against
-#' \code{survey::svyranktest()} rather than SPSS: SPSS \code{NPAR TESTS}
-#' ignores \code{WEIGHT BY}, so no SPSS reference exists for weighted results.
-#' The weighted descriptive U and W are design-based rank quantities and may
-#' differ from SPSS's expanded-data U; the Z statistic and p-value are the
-#' validated quantities.
+#' (Horvitz-Thompson midranks with a sandwich variance) and agrees with
+#' \code{survey::svyranktest()}. Its U and W are design-based rank
+#' quantities; Z and the p-value are the test result. Weighted results are
+#' not yet compared with SPSS output; see \code{vignette("spss-compatibility")}.
 #'
 #' - Use this for Likert scales and rating data
 #'

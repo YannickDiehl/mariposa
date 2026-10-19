@@ -75,13 +75,11 @@
 #'
 #' - For 2 groups: Use \code{\link{mann_whitney}()} instead
 #' - For normally distributed data: Use \code{\link{oneway_anova}()} instead
-#' ## Weighted variants
+#' ## Weighted analyses
 #'
-#' SPSS \code{NPAR TESTS} ignores \code{WEIGHT BY}, so weighted results have
-#' no SPSS reference. The weighted variant is an R-only frequency-weight
-#' extension that reduces exactly to the unweighted test when all weights
-#' equal 1 (enforced by an internal invariance suite); see
-#' \code{vignette("spss-compatibility")} for validation status.
+#' Weights are treated as frequency weights. With all weights equal to 1 the
+#' weighted test reproduces the unweighted one exactly. Weighted results are
+#' not yet compared with SPSS output; see \code{vignette("spss-compatibility")}.
 #'
 #' - For repeated measures (same subjects): Use \code{friedman_test()} instead
 #'

@@ -73,15 +73,14 @@
 #' ## Technical Details
 #'
 #' Weighted analyses count mentions and cases as unrounded sums of
-#' weights (Charter §5.1); displayed Ns are rounded. With
+#' weights; displayed Ns are rounded. With
 #' \code{weights == 1} the weighted table reduces exactly to the
 #' unweighted one. Only dichotomy sets (indicator + \code{counted}
 #' value) are supported; SPSS's category-range sets are not.
 #'
-#' An SPSS v29 MULT RESPONSE reference run is pending; until it lands
-#' the counts and percentages are verified against direct
-#' hand-computation from the indicator matrix (see the SPSS
-#' compatibility vignette).
+#' The counts and percentages are checked by direct computation from the
+#' indicator matrix and are not yet compared with SPSS output (see the
+#' SPSS compatibility vignette).
 #'
 #' @examples
 #' library(dplyr)

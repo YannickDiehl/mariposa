@@ -48,9 +48,9 @@
 #'   After a significant \code{\link{chi_square}} test, cells with
 #'   |adj. residual| > 2 are the ones driving the association.
 #'   For weighted tables the residuals are computed on the rounded
-#'   weighted cell counts (see below); an SPSS v29 reference run for the
-#'   residuals is pending, so they are currently verified against the
-#'   Haberman formula (\code{chisq.test()$stdres}) rather than SPSS output.
+#'   weighted cell counts (see below). They follow Haberman's formula
+#'   (as \code{chisq.test()$stdres}) and are not yet compared with SPSS
+#'   output.
 #'
 #' ## Weighted Tables
 #'

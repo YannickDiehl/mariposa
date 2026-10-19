@@ -106,19 +106,15 @@ Items with zero variance are removed from the scale with a warning, as
 SPSS RELIABILITY does (\code{$removed_items}).
 }
 
-\subsection{Weighted variants and validation status}{
+\subsection{Weighted analyses and SPSS comparison}{
 
-Cronbach's alpha and the item statistics are validated against SPSS v29
-\code{RELIABILITY} output (weighted and unweighted). McDonald's omega is
-currently an R-only statistic (Tier 4 per the Validation Charter): SPSS
-offers omega from v27 onward, but IBM's algorithm documentation for it is
-not publicly retrievable and no SPSS v29 reference run exists yet.
-mariposa computes omega from a one-factor maximum-likelihood solution
-(the same estimator family as \code{\link{efa}} with \code{fm = "ml"}).
-The weighted omega uses the same weighted correlation and covariance
-matrices as the weighted alpha and reduces exactly to the unweighted
-omega when all weights equal 1 (enforced by an internal invariance
-suite); see \code{vignette("spss-compatibility")} for validation status.
+Cronbach's alpha and the item statistics reproduce SPSS v29
+\code{RELIABILITY} output, weighted and unweighted. McDonald's omega is
+computed from a one-factor maximum-likelihood solution (the estimator of
+\code{\link{efa}} with ML extraction) and is not yet compared with SPSS
+output. The weighted omega uses the same weighted correlation and
+covariance matrices as the weighted alpha and equals the unweighted omega
+when all weights are 1; see \code{vignette("spss-compatibility")}.
 }
 
 \subsection{When to Use This}{

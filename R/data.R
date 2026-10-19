@@ -114,9 +114,8 @@
 #' library(dplyr)
 #' data(longitudinal_data)
 #'
-#' # Simple example analysis with wide format data
-#' # data(longitudinal_data_wide)
-#' # (Repeated measures functions coming in future version)
+#' # Repeated measurements are analysed in the wide format
+#' # (see longitudinal_data_wide), e.g. with friedman_test()
 #'
 #' # Descriptive statistics by group and time
 #' longitudinal_data %>%
@@ -157,7 +156,10 @@
 #' library(dplyr)
 #' data(longitudinal_data_wide)
 #' 
-#' # Analysis of change scores
-#' # (Repeated measures functions coming in future version)
+#' # Change over the four time points
+#' friedman_test(longitudinal_data_wide, score_T1, score_T2, score_T3, score_T4)
+#'
+#' # Change between two time points
+#' wilcoxon_test(longitudinal_data_wide, score_T1, score_T2)
 #'
 "longitudinal_data_wide"
