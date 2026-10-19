@@ -61,7 +61,7 @@ exception_registry <- list(
   # West) differ by up to .00105 (a percentage of variance) / .00052 (a
   # loading).
   "EXC-001" = list(tolerance = 0.002,
-                   statistic = "ML loadings, sums of squares, % of variance",
+                   statistic = "ML loadings, sums of squared loadings, % of variance",
                    function_name = "efa",
                    reason = paste(
                      "SPSS stops the ML iteration at its convergence",
@@ -71,7 +71,7 @@ exception_registry <- list(
   # values are an unfinished iteration state on an almost flat likelihood.
   # Observed maximum .044 (5a life_satisfaction communality).
   "EXC-002" = list(tolerance = 0.05,
-                   statistic = "ML communalities / SS where SPSS did not converge",
+                   statistic = "ML communalities and sums of squared loadings where SPSS does not converge",
                    function_name = "efa",
                    reason = paste(
                      "The SPSS reference runs end without convergence",

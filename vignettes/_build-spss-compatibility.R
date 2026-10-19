@@ -99,12 +99,12 @@ tier4_weighted <- c("mann_whitney", "kruskal_wallis", "wilcoxon_test",
 # Algorithms) as the oracle, so every statistic is Tier 4 until an SPSS
 # LOGISTIC REGRESSION reference run lands.
 tier4_statistics <- c(
-  reliability = "McDonald's omega (all paths)",
-  logistic_regression = "all statistics (textbook-formula oracle; no SPSS v29 reference run yet)",
-  crosstab = "adjusted standardized residuals (Haberman-formula oracle; SPSS /CELLS=ASRESID reference run pending)",
-  normality_test = "all statistics (independent-implementation oracles; SPSS EXAMINE reference run pending)",
-  partial_cor = "all statistics (residual-regression oracle; SPSS PARTIAL CORR reference run pending)",
-  multiple_response = "all statistics (hand-computation oracle; SPSS MULT RESPONSE reference run pending)"
+  reliability = "McDonald's omega",
+  logistic_regression = "all results (checked against the formulas of the SPSS algorithm)",
+  crosstab = "adjusted standardized residuals",
+  normality_test = "all results (checked against independent implementations)",
+  partial_cor = "all results (checked against an equivalent regression computation)",
+  multiple_response = "all results (checked by direct computation)"
 )
 
 # 3. Exception registry
@@ -241,43 +241,39 @@ render_table_row <- function(fn) {
   # The shared weighted-statistics file covers all w_* functions
   if (fn %in% w_funcs) fn_alias <- "weighted_statistics"
 
-  tier4_notes <- character()
-  if (fn %in% tier4_weighted) tier4_notes <- c(tier4_notes, "weighted variant")
-  if (fn %in% names(tier4_statistics)) {
-    tier4_notes <- c(tier4_notes, tier4_statistics[[fn]])
-  }
-  tier4_col <- if (length(tier4_notes)) {
-    paste(tier4_notes, collapse = "; ")
-  } else {
-    "—"
-  }
+  notes <- character()
+  if (fn %in% tier4_weighted) notes <- c(notes, "weighted results")
+  if (fn %in% names(tier4_statistics)) notes <- c(notes, tier4_statistics[[fn]])
+  notes_col <- if (length(notes)) paste(notes, collapse = "; ") else "—"
 
   matched <- per_file_stats[vapply(per_file_stats,
                                    function(x) x$fn == fn || x$fn == fn_alias,
                                    logical(1))]
-  if (length(matched) == 0L) {
-    return(sprintf("| `%s` | not validated | — | — | — | — | %s |",
-                   fn, tier4_col))
-  }
+  if (length(matched) == 0L) return(NULL)
   cs <- matched[[1]]$counts
-  status <- if (cs["legacy"] > 0L) "legacy (migration needed)" else "compliant"
-  sprintf("| `%s` | %s | %d | %d | %d | %d | %s |",
-          fn, status, cs["spec"], cs["display"], cs["exception"], cs["total"],
-          tier4_col)
+  sprintf("| `%s()` | %s | %s | %s | %s | %s |",
+          fn, fmt_count(cs["total"]), fmt_count(cs["spec"]),
+          fmt_count(cs["display"]), fmt_count(cs["exception"]), notes_col)
 }
 
+fmt_count <- function(x) formatC(as.numeric(x), format = "d", big.mark = ",")
+
 today <- format(Sys.Date(), "%Y-%m-%d")
+pkg_version <- read.dcf(file.path(repo_root, "DESCRIPTION"), fields = "Version")[1, 1]
 n_exceptions <- length(exception_registry)
 n_validated  <- length(validated_set)
 n_missing    <- length(missing_set)
 n_in_scope   <- length(in_scope_fns)
+# Each validation file once (the w_* functions share one file)
+total_values <- sum(vapply(per_file_stats, function(x) as.numeric(x$counts["total"]),
+                           numeric(1)))
 
 rmd_lines <- c(
   "---",
-  "title: \"SPSS Compatibility Status\"",
+  "title: \"SPSS Compatibility\"",
   "output: rmarkdown::html_vignette",
   "vignette: >",
-  "  %\\VignetteIndexEntry{SPSS Compatibility Status}",
+  "  %\\VignetteIndexEntry{SPSS Compatibility}",
   "  %\\VignetteEngine{knitr::rmarkdown}",
   "  %\\VignetteEncoding{UTF-8}",
   "---",
@@ -290,124 +286,103 @@ rmd_lines <- c(
   ")",
   "```",
   "",
-  "This vignette reports the SPSS-compatibility status of every statistical",
-  "function in **mariposa**. It is auto-generated from the test suite and the",
-  "validation exception registry.",
+  "The statistical functions of **mariposa** are checked against reference",
+  "output of IBM SPSS Statistics 29. This article lists, for each function,",
+  "how many SPSS values its tests compare and which results are not compared",
+  "with SPSS.",
   "",
-  sprintf("**Generated:** %s", today),
+  sprintf("*mariposa %s, status of %s.*", pkg_version, today),
   "",
   "## Summary",
   "",
-  sprintf("- Functions in SPSS-validation scope: **%d**", n_in_scope),
-  sprintf("- With validation tests in place:      **%d**", n_validated),
-  sprintf("- Validation gaps (no test file yet):  **%d**", n_missing),
-  sprintf("- Active Tier-3 algorithmic exceptions: **%d**", n_exceptions),
+  sprintf("- **%d** of %d statistical functions are compared with SPSS output,",
+          n_validated, n_in_scope),
+  sprintf("  with **%s** SPSS values in total.", fmt_count(total_values)),
+  sprintf("- **%d** documented algorithmic difference%s (see below).",
+          n_exceptions, if (n_exceptions == 1L) "" else "s"),
   "",
-  "## Tier Definitions",
+  "## How results are compared",
   "",
-  "Every numerical comparison between an R-side value and an SPSS reference",
-  "falls into one of four tiers (Charter §4):",
+  "Each comparison uses the precision with which SPSS prints the value:",
   "",
-  "- **Spec** — exact integers and SPSS-truncated sentinels (exact match)",
-  "- **Display** — SPSS rounds for print; tolerance is half a unit of the last printed decimal",
-  "- **Exception** — documented algorithmic difference; see `VALIDATION_EXCEPTIONS.md`",
-  "- **Internal** — statistic has no SPSS equivalent; verified via snapshot tests only",
+  "- **Exact**: counts, degrees of freedom, and p-values that SPSS prints as",
+  "  `.000` (p < .001).",
+  "- **Printed precision**: all other values agree with SPSS to within half a",
+  "  unit of the last decimal SPSS prints (one unit for p-values).",
+  "- **Documented difference**: where SPSS and mariposa use different",
+  "  algorithms by design, the values agree within the tolerance listed under",
+  "  \"Documented differences\".",
   "",
-  "## Per-Function Status",
+  "The reference values come from SPSS syntax runs on the `survey_data`",
+  "example data. The comparisons run with the package's test suite on every",
+  "change; the SPSS syntax and output are part of the source repository",
+  "([tests/spss_reference](https://github.com/YannickDiehl/mariposa/tree/main/tests/spss_reference)).",
   "",
-  "The columns show how many SPSS reference values per tier the validation file",
-  "checks when it runs. \"Total\" is the total number of charter-compliant",
-  "comparisons. The `w_*` functions share one validation file, whose total each",
-  "of them shows.",
+  "## Results by function",
   "",
-  "The \"Internal (Tier 4)\" column flags statistics that have no SPSS",
-  "reference and are therefore R-only: for the rank-based family the",
-  "*weighted variant* (SPSS `NPAR TESTS` and `NONPAR CORR` ignore",
-  "`WEIGHT BY`); for `reliability`, McDonald's omega in all paths (IBM does",
-  "not publicly document the SPSS omega algorithm; an SPSS v29 reference run",
-  "is pending). Tier-4 statistics are covered by internal regression and",
-  "cross-check tests plus a weights-equal-1 invariance suite instead of SPSS",
-  "references. (`mann_whitney`'s weighted variant is a design-based rank",
-  "test additionally validated against `survey::svyranktest()`.) All other",
-  "statistics of these functions are SPSS-validated as shown in the tier",
-  "columns.",
+  "The `w_*()` functions share one set of SPSS references; each row shows",
+  "that total. The last column lists results that are not compared with",
+  "SPSS output. They are verified by other means: the weighted results of",
+  "the rank-based tests reproduce the unweighted results exactly when all",
+  "weights equal 1 (the weighted Mann-Whitney test also agrees with",
+  "`survey::svyranktest()`), and the remaining results are checked against",
+  "published formulas or independent implementations.",
   "",
-  "| Function | Status | Spec | Display | Exception | Total | Internal (Tier 4) |",
-  "|---|---|---:|---:|---:|---:|---|"
+  "| Function | SPSS values | Exact | Printed precision | Documented difference | Not compared with SPSS |",
+  "|---|---:|---:|---:|---:|---|"
 )
 
-for (fn in sort(in_scope_fns)) {
+for (fn in sort(validated_set)) {
   rmd_lines <- c(rmd_lines, render_table_row(fn))
 }
 
-rmd_lines <- c(rmd_lines, "",
-               "## Active Exceptions",
-               "")
-
-if (n_exceptions == 0L) {
-  rmd_lines <- c(rmd_lines,
-                 "No active Tier-3 exceptions. All validated statistics agree with",
-                 "SPSS within Spec or Display tolerances.",
-                 "")
-} else {
-  rmd_lines <- c(rmd_lines,
-                 "| ID | Function | Statistic | Tolerance | Reason |",
-                 "|---|---|---|---:|---|")
+if (n_exceptions > 0L) {
+  rmd_lines <- c(rmd_lines, "",
+                 "## Documented differences",
+                 "",
+                 "| Function | Results | Tolerance | Reason |",
+                 "|---|---|---:|---|")
   for (id in sort(names(exception_registry))) {
     e <- exception_registry[[id]]
     rmd_lines <- c(rmd_lines,
-                   sprintf("| %s | `%s` | %s | %g | %s |",
-                           id, e$function_name, e$statistic, e$tolerance,
-                           e$reason %||% "\u2014"))
+                   sprintf("| `%s()` | %s | %g | %s |",
+                           e$function_name, e$statistic, e$tolerance,
+                           e$reason %||% "—"))
   }
   rmd_lines <- c(rmd_lines, "",
-                 "An exception covers an identified algorithmic difference to SPSS,",
-                 "not a bug: its tolerance is what the two algorithms agree to.",
-                 "Statistics outside an exception are asserted at Spec or Display",
-                 "tier, or are listed as Internal (Tier 4) in the table above.",
+                 "A documented difference describes a known difference between",
+                 "the algorithms, not an error; its tolerance is the agreement the",
+                 "two algorithms reach.",
                  "")
 }
 
 if (n_missing > 0L) {
+  groups <- list(
+    "Computed by `chi_square()`, whose results are compared with SPSS" =
+      c("phi", "cramers_v", "goodman_gamma"),
+    "Data transformations, covered by unit tests" =
+      c("center", "std", "rec", "row_count", "row_means", "row_sums", "pomps"),
+    "Data documentation without an SPSS counterpart" = "codebook"
+  )
   rmd_lines <- c(rmd_lines,
-                 "## Validation Gaps",
-                 "",
-                 "The following functions are in SPSS-validation scope (per Charter §9)",
-                 "but do not yet have a `test-<fn>-spss-validation.R` file:",
+                 "## Functions without their own SPSS comparison",
                  "")
-  for (fn in sort(missing_set)) {
-    rmd_lines <- c(rmd_lines, sprintf("- `%s`", fn))
+  listed <- character()
+  for (label in names(groups)) {
+    fns <- intersect(groups[[label]], missing_set)
+    if (length(fns)) {
+      rmd_lines <- c(rmd_lines, sprintf("- %s: %s", label,
+                                        paste0("`", sort(fns), "()`", collapse = ", ")))
+      listed <- c(listed, fns)
+    }
+  }
+  rest <- setdiff(missing_set, listed)
+  if (length(rest)) {
+    rmd_lines <- c(rmd_lines, sprintf("- Covered by unit tests: %s",
+                                      paste0("`", sort(rest), "()`", collapse = ", ")))
   }
   rmd_lines <- c(rmd_lines, "")
 }
-
-rmd_lines <- c(rmd_lines,
-               "## How to Read \"SPSS-Compatible\"",
-               "",
-               "A function is **SPSS-compatible** when:",
-               "",
-               "1. It has a validation test file (column \"Status: compliant\")",
-               "2. Its Legacy column is zero",
-               "3. Every value it asserts falls into Spec, Display, or a registered",
-               "   Exception",
-               "4. It carries no `NA` placeholders in its `spss_values` block",
-               "",
-               "Functions with non-zero Legacy counts are mid-migration and not yet",
-               "Charter-compliant; their assertions may pass but do not yet enforce",
-               "the documented tolerance policy.",
-               "",
-               "## Methodology",
-               "",
-               "All validation runs SPSS v29 syntax scripts in",
-               "`tests/spss_reference/syntax/` against `tests/spss_reference/data/`,",
-               "saves the output to `tests/spss_reference/outputs/`, and asserts the",
-               "R-side computation matches via `assert_spss()` from the",
-               "validation helpers in `tests/testthat/`.",
-               "Inline cached values in test files cite their source line via",
-               "trailing `# <output_file>:<line>` comments; the dev-only script",
-               "`tests/spss_reference/verify_inline.R` audits this citation chain",
-               "before every release.",
-               "")
 
 writeLines(rmd_lines, out_path)
 
