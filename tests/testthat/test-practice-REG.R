@@ -321,10 +321,12 @@ test_that("REG-10: a degenerate group is skipped with a warning naming it", {
     "region = East"
   )
 
-  # All groups degenerate: one clear error
-  d$grp2 <- rep(1:1250, each = 2)
+  # All groups degenerate: one clear error (ten 2-case groups suffice; the
+  # former 1,250 groups took 20 s of the CRAN check time)
+  d2 <- d[1:20, ]
+  d2$grp2 <- rep(1:10, each = 2)
   expect_error(
-    suppressWarnings(linear_regression(dplyr::group_by(d, grp2),
+    suppressWarnings(linear_regression(dplyr::group_by(d2, grp2),
                                        life_satisfaction ~ age + income)),
     "No group"
   )
