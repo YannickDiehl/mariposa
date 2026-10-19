@@ -93,7 +93,7 @@ unweighted one. Only dichotomy sets (indicator + \code{counted}
 value) are supported; SPSS's category-range sets are not.
 
 The counts and percentages are checked by direct computation from the
-indicator matrix and are not yet compared with SPSS output (see the
+indicator matrix and are not compared with SPSS output (see the
 SPSS compatibility vignette).
 }
 }

@@ -117,7 +117,7 @@ Don't use when:
 \itemize{
 \item You have more than two groups (use ANOVA)
 \item Data is severely skewed with small samples (use Mann-Whitney)
-\item Groups are paired/matched (use paired t-test - coming soon)
+\item Groups are paired or matched (use wilcoxon_test())
 \item Variables are categorical (use chi-square)
 }
 }

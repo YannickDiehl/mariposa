@@ -119,7 +119,7 @@ follows \code{\link{kruskal_wallis}()}
 When the \code{\link{friedman_test}()} result is weighted, each pairwise
 test uses the same frequency-weighted signed-rank formulas. With all
 weights equal to 1 they reproduce the unweighted tests exactly. Weighted
-results are not yet compared with SPSS output; see
+results are not compared with SPSS output; see
 \code{vignette("spss-compatibility")}.
 \itemize{
 \item Each pairwise comparison uses \code{\link{wilcoxon_test}()} logic internally

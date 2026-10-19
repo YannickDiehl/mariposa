@@ -72,7 +72,7 @@
 #' When the \code{\link{kruskal_wallis}()} result is weighted, the pairwise z
 #' statistics use the same frequency-weighted midranks. With all weights equal
 #' to 1 they reproduce the unweighted comparisons exactly. Weighted results are
-#' not yet compared with SPSS output; see \code{vignette("spss-compatibility")}.
+#' not compared with SPSS output; see \code{vignette("spss-compatibility")}.
 #'
 #' - Uses ranks instead of raw values, making it robust to outliers
 #'

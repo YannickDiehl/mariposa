@@ -77,7 +77,7 @@
 #' form. Run the test on the unweighted sample.
 #'
 #' The statistics are checked against independent R implementations of the
-#' same published formulas and are not yet compared with SPSS output (see
+#' same published formulas and are not compared with SPSS output (see
 #' the SPSS compatibility vignette).
 #'
 #' @examples

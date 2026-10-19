@@ -75,7 +75,7 @@ The detailed output shows item-total correlations, alpha-if-item-deleted, and in
 
 Alongside alpha, `reliability()` reports **McDonald's Omega**, a factor-model-based reliability coefficient. Alpha assumes all items measure the construct equally well; omega fits a one-factor model and lets each item carry its own loading, which usually makes it the more accurate estimate when item loadings differ. The same thresholds as for alpha are commonly applied. Omega needs at least 3 items (with 2 items it is reported as `NA`), and **Omega if Item Deleted** appears in the item-total table for scales of 4 or more items.
 
-Note: omega is currently an R-only statistic (no SPSS reference run yet); see `vignette("spss-compatibility")` for its validation status.
+Note: omega is not compared with SPSS output; see `vignette("spss-compatibility")` for the status of each statistic.
 
 ### With Survey Weights
 

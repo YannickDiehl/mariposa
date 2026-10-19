@@ -75,7 +75,7 @@
 #'
 #' Weights are treated as frequency weights. With all weights equal to 1 the
 #' weighted test reproduces the unweighted one exactly. Weighted results are
-#' not yet compared with SPSS output; see \code{vignette("spss-compatibility")}.
+#' not compared with SPSS output; see \code{vignette("spss-compatibility")}.
 #'
 #' - For 3+ related measurements: Use \code{friedman_test()} instead
 #'

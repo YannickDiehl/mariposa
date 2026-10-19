@@ -86,7 +86,7 @@
 #'
 #' Each case weight is rounded to a whole number before the categories are
 #' counted. With all weights equal to 1 the weighted test reproduces the
-#' unweighted one exactly. Weighted results are not yet compared with SPSS
+#' unweighted one exactly. Weighted results are not compared with SPSS
 #' output; see \code{vignette("spss-compatibility")}.
 #'
 #' @seealso

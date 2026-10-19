@@ -90,7 +90,7 @@ convention with unrounded \code{sum(w)} in df and test statistics.
 Significance is two-tailed (the SPSS default).
 
 The statistics are checked against the equivalent computation from
-regression residuals and are not yet compared with SPSS output (see the
+regression residuals and are not compared with SPSS output (see the
 SPSS compatibility vignette).
 }
 }

@@ -49,7 +49,7 @@
 #'   |adj. residual| > 2 are the ones driving the association.
 #'   For weighted tables the residuals are computed on the rounded
 #'   weighted cell counts (see below). They follow Haberman's formula
-#'   (as \code{chisq.test()$stdres}) and are not yet compared with SPSS
+#'   (as \code{chisq.test()$stdres}) and are not compared with SPSS
 #'   output.
 #'
 #' ## Weighted Tables

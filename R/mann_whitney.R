@@ -97,7 +97,7 @@
 #' (Horvitz-Thompson midranks with a sandwich variance) and agrees with
 #' \code{survey::svyranktest()}. Its U and W are design-based rank
 #' quantities; Z and the p-value are the test result. Weighted results are
-#' not yet compared with SPSS output; see \code{vignette("spss-compatibility")}.
+#' not compared with SPSS output; see \code{vignette("spss-compatibility")}.
 #'
 #' - Use this for Likert scales and rating data
 #'

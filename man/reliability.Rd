@@ -111,7 +111,7 @@ SPSS RELIABILITY does (\code{$removed_items}).
 Cronbach's alpha and the item statistics reproduce SPSS v29
 \code{RELIABILITY} output, weighted and unweighted. McDonald's omega is
 computed from a one-factor maximum-likelihood solution (the estimator of
-\code{\link{efa}} with ML extraction) and is not yet compared with SPSS
+\code{\link{efa}} with ML extraction) and is not compared with SPSS
 output. The weighted omega uses the same weighted correlation and
 covariance matrices as the weighted alpha and equals the unweighted omega
 when all weights are 1; see \code{vignette("spss-compatibility")}.

@@ -112,7 +112,7 @@ which specific groups differ
 
 Weights are treated as frequency weights. With all weights equal to 1 the
 weighted test reproduces the unweighted one exactly. Weighted results are
-not yet compared with SPSS output; see \code{vignette("spss-compatibility")}.
+not compared with SPSS output; see \code{vignette("spss-compatibility")}.
 \itemize{
 \item For repeated measures (same subjects): Use \code{friedman_test()} instead
 }

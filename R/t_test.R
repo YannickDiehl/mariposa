@@ -78,7 +78,7 @@
 #' Don't use when:
 #' - You have more than two groups (use ANOVA)
 #' - Data is severely skewed with small samples (use Mann-Whitney)
-#' - Groups are paired/matched (use paired t-test - coming soon)
+#' - Groups are paired or matched (use wilcoxon_test())
 #' - Variables are categorical (use chi-square)
 #'
 #' ## Reading the Output

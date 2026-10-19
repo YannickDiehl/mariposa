@@ -67,7 +67,7 @@
 #' The weighted tau-b is an exact frequency-weighted computation and
 #' reproduces the unweighted tau when all weights equal 1; its z statistic
 #' and p-value use a normal approximation without tie correction. Weighted
-#' results are not yet compared with SPSS output; see
+#' results are not compared with SPSS output; see
 #' \code{vignette("spss-compatibility")}.
 #'
 #' - You want a more conservative measure than Spearman's rho
