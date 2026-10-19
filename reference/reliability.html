@@ -196,20 +196,16 @@ SPSS RELIABILITY does (<code>$removed_items</code>).</p>
 </div>
 
 <div class="section">
-<h3 id="weighted-variants-and-validation-status">Weighted variants and validation status<a class="anchor" aria-label="anchor" href="#weighted-variants-and-validation-status"></a></h3>
+<h3 id="weighted-analyses-and-spss-comparison">Weighted analyses and SPSS comparison<a class="anchor" aria-label="anchor" href="#weighted-analyses-and-spss-comparison"></a></h3>
 
 
-<p>Cronbach's alpha and the item statistics are validated against SPSS v29
-<code>RELIABILITY</code> output (weighted and unweighted). McDonald's omega is
-currently an R-only statistic (Tier 4 per the Validation Charter): SPSS
-offers omega from v27 onward, but IBM's algorithm documentation for it is
-not publicly retrievable and no SPSS v29 reference run exists yet.
-mariposa computes omega from a one-factor maximum-likelihood solution
-(the same estimator family as <code><a href="efa.html">efa</a></code> with <code>fm = "ml"</code>).
-The weighted omega uses the same weighted correlation and covariance
-matrices as the weighted alpha and reduces exactly to the unweighted
-omega when all weights equal 1 (enforced by an internal invariance
-suite); see <code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p>
+<p>Cronbach's alpha and the item statistics reproduce SPSS v29
+<code>RELIABILITY</code> output, weighted and unweighted. McDonald's omega is
+computed from a one-factor maximum-likelihood solution (the estimator of
+<code><a href="efa.html">efa</a></code> with ML extraction) and is not compared with SPSS
+output. The weighted omega uses the same weighted correlation and
+covariance matrices as the weighted alpha and equals the unweighted omega
+when all weights are 1; see <code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code>.</p>
 </div>
 
 <div class="section">

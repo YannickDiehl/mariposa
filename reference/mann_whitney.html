@@ -210,16 +210,14 @@ Use <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">su
 </ul></div>
 
 <div class="section">
-<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+<h3 id="weighted-analyses">Weighted analyses<a class="anchor" aria-label="anchor" href="#weighted-analyses"></a></h3>
 
 
 <p>The weighted test is the design-based Lumley-Scott (2013) rank test
-(Horvitz-Thompson midranks with a sandwich variance), validated against
-<code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">survey::svyranktest()</a></code> rather than SPSS: SPSS <code>NPAR TESTS</code>
-ignores <code>WEIGHT BY</code>, so no SPSS reference exists for weighted results.
-The weighted descriptive U and W are design-based rank quantities and may
-differ from SPSS's expanded-data U; the Z statistic and p-value are the
-validated quantities.</p><ul><li><p>Use this for Likert scales and rating data</p></li>
+(Horvitz-Thompson midranks with a sandwich variance) and agrees with
+<code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">survey::svyranktest()</a></code>. Its U and W are design-based rank
+quantities; Z and the p-value are the test result. Weighted results are
+not compared with SPSS output; see <code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code>.</p><ul><li><p>Use this for Likert scales and rating data</p></li>
 </ul></div>
 
     </div>

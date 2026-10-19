@@ -160,15 +160,14 @@ monotonic relationships.</p>
 </ul></div>
 
 <div class="section">
-<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+<h3 id="weighted-analyses">Weighted analyses<a class="anchor" aria-label="anchor" href="#weighted-analyses"></a></h3>
 
 
-<p>The weighted tau-b is an exact frequency-weighted computation (it
-reproduces the unweighted tau when all weights equal 1, enforced by an
-internal invariance suite), but its z statistic and p-value use a no-ties
-normal approximation. SPSS <code>NONPAR CORR</code> ignores <code>WEIGHT BY</code>,
-so weighted results have no SPSS reference; see
-<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>You want a more conservative measure than Spearman's rho</p></li>
+<p>The weighted tau-b is an exact frequency-weighted computation and
+reproduces the unweighted tau when all weights equal 1; its z statistic
+and p-value use a normal approximation without tie correction. Weighted
+results are not compared with SPSS output; see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code>.</p><ul><li><p>You want a more conservative measure than Spearman's rho</p></li>
 </ul></div>
 
     </div>

@@ -102,12 +102,13 @@ for the full weighted range.
 [`describe`](https://YannickDiehl.github.io/mariposa/reference/describe.md)
 for comprehensive descriptive statistics including IQR.
 
-### Validation status
+### Method
 
 Unweighted values use quantile Type 6 (SPSS HAVERAGE). Weighted values
-apply the HAVERAGE position to cumulative weights with linear
-interpolation - an R-internal extension (Tier 4 of the Validation
-Charter); SPSS reference validation for weighted percentiles is pending.
+apply the HAVERAGE position to the cumulative weights with linear
+interpolation. Both reproduce SPSS FREQUENCIES (with and without
+`WEIGHT BY`); see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md).
 
 Other weighted_statistics:
 [`w_kurtosis()`](https://YannickDiehl.github.io/mariposa/reference/w_kurtosis.md),

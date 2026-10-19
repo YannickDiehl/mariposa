@@ -54,7 +54,7 @@ one row per variable pair (and group combination) with:
 - df:
 
   Degrees of freedom, n - 2 - k with k control variables (non-integer
-  for weighted data, Charter §5.1)
+  for weighted data)
 
 - t_stat, p_value:
 
@@ -108,9 +108,9 @@ is used throughout, so weighted results follow the SPSS frequency-weight
 convention with unrounded `sum(w)` in df and test statistics.
 Significance is two-tailed (the SPSS default).
 
-An SPSS v29 PARTIAL CORR reference run is pending; until it lands the
-statistics are verified against the independent residual-of-regressions
-characterization (see the SPSS compatibility vignette).
+The statistics are checked against the equivalent computation from
+regression residuals and are not compared with SPSS output (see the SPSS
+compatibility vignette).
 
 ## See also
 

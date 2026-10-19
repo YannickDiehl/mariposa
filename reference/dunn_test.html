@@ -162,14 +162,13 @@ sample size, and \(n_i\) is the size of group i.</p>
 </ul></div>
 
 <div class="section">
-<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+<h3 id="weighted-analyses">Weighted analyses<a class="anchor" aria-label="anchor" href="#weighted-analyses"></a></h3>
 
 
-<p>When the parent <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code> result is weighted, the
-pairwise z statistics use the same frequency-weighted midranks. SPSS
-<code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have no
-SPSS reference (R-only, guarded by an internal invariance suite); see
-<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>Uses ranks instead of raw values, making it robust to outliers</p></li>
+<p>When the <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code> result is weighted, the pairwise z
+statistics use the same frequency-weighted midranks. With all weights equal
+to 1 they reproduce the unweighted comparisons exactly. Weighted results are
+not compared with SPSS output; see <code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code>.</p><ul><li><p>Uses ranks instead of raw values, making it robust to outliers</p></li>
 </ul></div>
 
     </div>

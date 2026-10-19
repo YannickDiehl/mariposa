@@ -17,7 +17,7 @@ in mariposa, organized by the type of data and research question.
 
 | Your data | 2 groups | 3+ groups | Paired |
 |----|----|----|----|
-| **Continuous, normal** | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | *paired t-test planned* |
+| **Continuous, normal** | [`t_test()`](https://YannickDiehl.github.io/mariposa/reference/t_test.md) | [`oneway_anova()`](https://YannickDiehl.github.io/mariposa/reference/oneway_anova.md) | [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md) |
 | **Continuous, non-normal** | [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md) | [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md) | [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md) |
 | **Categorical** | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | [`chi_square()`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md) | [`mcnemar_test()`](https://YannickDiehl.github.io/mariposa/reference/mcnemar_test.md) |
 | **Small sample, categorical** | [`fisher_test()`](https://YannickDiehl.github.io/mariposa/reference/fisher_test.md) | — | — |

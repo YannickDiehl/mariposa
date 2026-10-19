@@ -9,10 +9,10 @@ Stata, SAS, Excel) through label management, recoding, and
 standardization to statistical analysis with survey weights, grouped
 operations via
 [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
-and publication-ready output. Statistical results are validated against
-SPSS v29 within documented per-tier tolerances; see
+and publication-ready output. Statistical results are checked against
+reference output of IBM SPSS Statistics 29;
 [`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for per-function status.
+shows the status of every function.
 
 ## Installation
 
@@ -194,14 +194,13 @@ and more.
 
 ## SPSS Compatibility
 
-Statistical functions are validated against SPSS v29 within documented
-per-tier tolerances, typically across four scenarios:
-weighted/unweighted and grouped/ungrouped. Some statistics have no SPSS
-equivalent (for example, the weighted variants of the rank-based tests,
-which SPSS’s `NPAR TESTS` does not support) and are covered by internal
-regression tests instead. See
+Statistical results are checked against reference output of IBM SPSS
+Statistics 29, weighted and unweighted, with and without grouping.
+Results without an SPSS counterpart, and the weighted variants of the
+rank-based tests, are verified against published formulas and
+independent implementations. See
 [`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for the per-function validation status. If you’re migrating from SPSS,
+for the status of every function. If you’re migrating from SPSS,
 workflows translate directly:
 
 **SPSS:**

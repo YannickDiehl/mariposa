@@ -128,14 +128,13 @@ direction of the observed proportion ("the proportion of cases in the
 first group \< p"); `binomial_test()` does the same. To test the other
 category, put a case of it first or use `1 - p`.
 
-### Weighted variants
+### Weighted analyses
 
-SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted results have no SPSS
-reference. The weighted variant is an R-only frequency-weight extension
-that reduces exactly to the unweighted test when all weights equal 1
-(enforced by an internal invariance suite); see
-[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for validation status.
+Each case weight is rounded to a whole number before the categories are
+counted. With all weights equal to 1 the weighted test reproduces the
+unweighted one exactly. Weighted results are not compared with SPSS
+output; see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md).
 
 ## References
 

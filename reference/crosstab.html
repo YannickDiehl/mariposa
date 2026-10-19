@@ -155,9 +155,9 @@ SPSS <code>/CELLS=ASRESID</code>): which cells deviate from independence.
 After a significant <code><a href="chi_square.html">chi_square</a></code> test, cells with
 |adj. residual| &gt; 2 are the ones driving the association.
 For weighted tables the residuals are computed on the rounded
-weighted cell counts (see below); an SPSS v29 reference run for the
-residuals is pending, so they are currently verified against the
-Haberman formula (<code>chisq.test()$stdres</code>) rather than SPSS output.</p></li>
+weighted cell counts (see below). They follow Haberman's formula
+(as <code>chisq.test()$stdres</code>) and are not compared with SPSS
+output.</p></li>
 </ul></div>
 
 <div class="section">

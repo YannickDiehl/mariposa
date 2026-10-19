@@ -109,16 +109,15 @@ Use Dunn test when:
   [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md),
   just like Tukey follows ANOVA
 
-### Weighted variants
+### Weighted analyses
 
-When the parent
+When the
 [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)
 result is weighted, the pairwise z statistics use the same
-frequency-weighted midranks. SPSS `NPAR TESTS` ignores `WEIGHT BY`, so
-weighted results have no SPSS reference (R-only, guarded by an internal
-invariance suite); see
-[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for validation status.
+frequency-weighted midranks. With all weights equal to 1 they reproduce
+the unweighted comparisons exactly. Weighted results are not compared
+with SPSS output; see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md).
 
 - Uses ranks instead of raw values, making it robust to outliers
 

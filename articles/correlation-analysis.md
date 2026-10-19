@@ -20,9 +20,8 @@ three methods for different situations:
 
 All three support multiple variables (correlation matrices), grouped
 analysis, and a `weights` argument. Pearson and Kendall compute weighted
-coefficients; for Spearman, following SPSS NONPAR CORR, weights only
-select cases (weight \<= 0 or missing is excluded) and rho itself is
-unweighted.
+coefficients; for Spearman, weights only select cases (a weight \<= 0 or
+missing excludes the case) and rho itself is unweighted.
 
 ## Pearson Correlation
 

@@ -101,9 +101,9 @@ The crosstab table shows:
   [`chi_square`](https://YannickDiehl.github.io/mariposa/reference/chi_square.md)
   test, cells with \|adj. residual\| \> 2 are the ones driving the
   association. For weighted tables the residuals are computed on the
-  rounded weighted cell counts (see below); an SPSS v29 reference run
-  for the residuals is pending, so they are currently verified against
-  the Haberman formula (`chisq.test()$stdres`) rather than SPSS output.
+  rounded weighted cell counts (see below). They follow Haberman's
+  formula (as `chisq.test()$stdres`) and are not compared with SPSS
+  output.
 
 ### Weighted Tables
 

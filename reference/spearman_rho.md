@@ -4,7 +4,7 @@ Calculates Spearman's rank correlation coefficients (rho) between
 variables with support for grouped data and multiple variable pairs.
 Provides significance testing and SPSS-compatible output formatting.
 Survey weights only select cases (see `weights`); the coefficient itself
-is unweighted, as in SPSS NONPAR CORR.
+is unweighted.
 
 Spearman's rho is a non-parametric measure of rank correlation that
 assesses monotonic relationships between variables. It is particularly
@@ -39,10 +39,10 @@ spearman_rho(
 
 - weights:
 
-  Optional survey weights. Following the SPSS NONPAR CORR convention,
-  weights are used only to filter cases (rows with weight \<= 0 or NA
-  are dropped); the rank correlation itself is computed unweighted on
-  the remaining sample. For design-based weighted Spearman use
+  Optional survey weights. They are used only to select cases (rows with
+  a weight \<= 0 or NA are left out); the rank correlation itself is
+  computed unweighted on the remaining sample. For design-based weighted
+  Spearman use
   [`survey::svyolr()`](https://rdrr.io/pkg/survey/man/svyolr.html) or
   `wCorr::weightedCorr(method = "Spearman")`. Give a column name
   (unquoted or as a string), an expression such as
@@ -193,8 +193,8 @@ survey_data %>%
 #>   0/3 pairs significant (p < .05), N = 2177-2291
 #> Use summary() for detailed output.
 
-# Weights only filter cases (weight <= 0 or NA dropped); rho itself is
-# unweighted, matching SPSS NONPAR CORR
+# Weights only select cases (weight <= 0 or NA left out); rho itself is
+# unweighted
 survey_data %>%
   spearman_rho(age, income, weights = sampling_weight)
 #> Spearman Correlation: age x income

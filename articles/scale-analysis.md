@@ -136,10 +136,9 @@ needs at least 3 items (with 2 items it is reported as `NA`), and
 **Omega if Item Deleted** appears in the item-total table for scales of
 4 or more items.
 
-Note: omega is currently an R-only statistic (no SPSS reference run
-yet); see
+Note: omega is not compared with SPSS output; see
 [`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for its validation status.
+for the status of each statistic.
 
 ### With Survey Weights
 

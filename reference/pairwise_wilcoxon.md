@@ -132,16 +132,15 @@ Use pairwise Wilcoxon when:
   follows
   [`kruskal_wallis()`](https://YannickDiehl.github.io/mariposa/reference/kruskal_wallis.md)
 
-### Weighted variants
+### Weighted analyses
 
-When the parent
+When the
 [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)
 result is weighted, each pairwise test uses the same frequency-weighted
-signed-rank formulas. SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted
-results have no SPSS reference (R-only, guarded by an internal
-invariance suite); see
-[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for validation status.
+signed-rank formulas. With all weights equal to 1 they reproduce the
+unweighted tests exactly. Weighted results are not compared with SPSS
+output; see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md).
 
 - Each pairwise comparison uses
   [`wilcoxon_test()`](https://YannickDiehl.github.io/mariposa/reference/wilcoxon_test.md)

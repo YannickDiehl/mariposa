@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>SPSS Compatibility Status • mariposa</title>
+<title>SPSS Compatibility • mariposa</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="SPSS Compatibility Status">
+<meta property="og:title" content="SPSS Compatibility">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -78,7 +78,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>SPSS Compatibility Status</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>SPSS Compatibility</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/YannickDiehl/mariposa/blob/main/vignettes/spss-compatibility.Rmd" class="external-link"><code>vignettes/spss-compatibility.Rmd</code></a></small>
@@ -87,599 +87,442 @@
 
     
     
-<p>This vignette reports the SPSS-compatibility status of every
-statistical function in <strong>mariposa</strong>. It is auto-generated
-from the test suite and the validation exception registry.</p>
-<p><strong>Generated:</strong> 2026-09-30</p>
+<p>The statistical functions of <strong>mariposa</strong> are checked
+against reference output of IBM SPSS Statistics 29. This article lists,
+for each function, how many SPSS values its tests compare and which
+results are not compared with SPSS.</p>
+<p><em>mariposa 0.7.4, status of 2026-10-19.</em></p>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
 <ul>
-<li>Functions in SPSS-validation scope: <strong>53</strong>
-</li>
-<li>With validation tests in place: <strong>42</strong>
-</li>
-<li>Validation gaps (no test file yet): <strong>11</strong>
-</li>
-<li>Active Tier-3 algorithmic exceptions: <strong>2</strong>
-</li>
+<li>
+<strong>42</strong> of 53 statistical functions are compared with
+SPSS output, with <strong>14,622</strong> SPSS values in total.</li>
+<li>
+<strong>2</strong> documented algorithmic differences (see
+below).</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="tier-definitions">Tier Definitions<a class="anchor" aria-label="anchor" href="#tier-definitions"></a>
+<h2 id="how-results-are-compared">How results are compared<a class="anchor" aria-label="anchor" href="#how-results-are-compared"></a>
 </h2>
-<p>Every numerical comparison between an R-side value and an SPSS
-reference falls into one of four tiers (Charter §4):</p>
+<p>Each comparison uses the precision with which SPSS prints the
+value:</p>
 <ul>
 <li>
-<strong>Spec</strong> — exact integers and SPSS-truncated sentinels
-(exact match)</li>
+<strong>Exact</strong>: counts, degrees of freedom, and p-values
+that SPSS prints as <code>.000</code> (p &lt; .001).</li>
 <li>
-<strong>Display</strong> — SPSS rounds for print; tolerance is half
-a unit of the last printed decimal</li>
+<strong>Printed precision</strong>: all other values agree with SPSS
+to within half a unit of the last decimal SPSS prints (one unit for
+p-values).</li>
 <li>
-<strong>Exception</strong> — documented algorithmic difference; see
-<code>VALIDATION_EXCEPTIONS.md</code>
-</li>
-<li>
-<strong>Internal</strong> — statistic has no SPSS equivalent;
-verified via snapshot tests only</li>
+<strong>Documented difference</strong>: where SPSS and mariposa use
+different algorithms by design, the values agree within the tolerance
+listed under “Documented differences”.</li>
 </ul>
+<p>The reference values come from SPSS syntax runs on the
+<code>survey_data</code> example data. The comparisons run with the
+package’s test suite on every change; the SPSS syntax and output are
+part of the source repository (<a href="https://github.com/YannickDiehl/mariposa/tree/main/tests/spss_reference" class="external-link">tests/spss_reference</a>).</p>
 </div>
 <div class="section level2">
-<h2 id="per-function-status">Per-Function Status<a class="anchor" aria-label="anchor" href="#per-function-status"></a>
+<h2 id="results-by-function">Results by function<a class="anchor" aria-label="anchor" href="#results-by-function"></a>
 </h2>
-<p>The columns show how many SPSS reference values per tier the
-validation file checks when it runs. “Total” is the total number of
-charter-compliant comparisons. The <code>w_*</code> functions share one
-validation file, whose total each of them shows.</p>
-<p>The “Internal (Tier 4)” column flags statistics that have no SPSS
-reference and are therefore R-only: for the rank-based family the
-<em>weighted variant</em> (SPSS <code>NPAR TESTS</code> and
-<code>NONPAR CORR</code> ignore <code>WEIGHT BY</code>); for
-<code>reliability</code>, McDonald’s omega in all paths (IBM does not
-publicly document the SPSS omega algorithm; an SPSS v29 reference run is
-pending). Tier-4 statistics are covered by internal regression and
-cross-check tests plus a weights-equal-1 invariance suite instead of
-SPSS references. (<code>mann_whitney</code>’s weighted variant is a
-design-based rank test additionally validated against
-<code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">survey::svyranktest()</a></code>.) All other statistics of these
-functions are SPSS-validated as shown in the tier columns.</p>
+<p>The <code>w_*()</code> functions share one set of SPSS references;
+each row shows that total. The last column lists results that are not
+compared with SPSS output. They are verified by other means: the
+weighted results of the rank-based tests reproduce the unweighted
+results exactly when all weights equal 1 (the weighted Mann-Whitney test
+also agrees with <code><a href="https://rdrr.io/pkg/survey/man/svyranktest.html" class="external-link">survey::svyranktest()</a></code>), and the remaining
+results are checked against published formulas or independent
+implementations.</p>
 <table class="table">
 <colgroup>
-<col width="12%">
-<col width="12%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="12%">
+<col width="13%">
+<col width="18%">
+<col width="18%">
+<col width="18%">
+<col width="18%">
+<col width="13%">
 </colgroup>
 <thead><tr class="header">
 <th>Function</th>
-<th>Status</th>
-<th align="right">Spec</th>
-<th align="right">Display</th>
-<th align="right">Exception</th>
-<th align="right">Total</th>
-<th>Internal (Tier 4)</th>
+<th align="right">SPSS values</th>
+<th align="right">Exact</th>
+<th align="right">Printed precision</th>
+<th align="right">Documented difference</th>
+<th>Not compared with SPSS</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code>ancova</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/ancova.html">ancova()</a></code></td>
+<td align="right">800</td>
 <td align="right">147</td>
 <td align="right">653</td>
 <td align="right">0</td>
-<td align="right">800</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>binomial_test</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/binomial_test.html">binomial_test()</a></code></td>
+<td align="right">58</td>
 <td align="right">24</td>
 <td align="right">34</td>
 <td align="right">0</td>
-<td align="right">58</td>
-<td>weighted variant</td>
+<td>weighted results</td>
 </tr>
 <tr class="odd">
-<td><code>center</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td><code>chi_square</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/chi_square.html">chi_square()</a></code></td>
+<td align="right">235</td>
 <td align="right">53</td>
 <td align="right">182</td>
 <td align="right">0</td>
-<td align="right">235</td>
 <td>—</td>
 </tr>
-<tr class="odd">
-<td><code>chisq_gof</code></td>
-<td>compliant</td>
+<tr class="even">
+<td><code><a href="../reference/chisq_gof.html">chisq_gof()</a></code></td>
+<td align="right">133</td>
 <td align="right">51</td>
 <td align="right">82</td>
 <td align="right">0</td>
-<td align="right">133</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td><code>codebook</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>cramers_v</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td><code>crosstab</code></td>
-<td>compliant</td>
-<td align="right">1419</td>
-<td align="right">1950</td>
+<td><code><a href="../reference/crosstab.html">crosstab()</a></code></td>
+<td align="right">3,369</td>
+<td align="right">1,419</td>
+<td align="right">1,950</td>
 <td align="right">0</td>
-<td align="right">3369</td>
-<td>adjusted standardized residuals (Haberman-formula oracle; SPSS
-/CELLS=ASRESID reference run pending)</td>
+<td>adjusted standardized residuals</td>
 </tr>
-<tr class="odd">
-<td><code>describe</code></td>
-<td>compliant</td>
+<tr class="even">
+<td><code><a href="../reference/describe.html">describe()</a></code></td>
+<td align="right">288</td>
 <td align="right">18</td>
 <td align="right">270</td>
 <td align="right">0</td>
-<td align="right">288</td>
 <td>—</td>
 </tr>
-<tr class="even">
-<td><code>dunn_test</code></td>
-<td>compliant</td>
-<td align="right">0</td>
-<td align="right">6</td>
-<td align="right">0</td>
-<td align="right">6</td>
-<td>weighted variant</td>
-</tr>
 <tr class="odd">
-<td><code>efa</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/dunn_test.html">dunn_test()</a></code></td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td>weighted results</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/efa.html">efa()</a></code></td>
+<td align="right">578</td>
 <td align="right">21</td>
 <td align="right">473</td>
 <td align="right">84</td>
-<td align="right">578</td>
 <td>—</td>
 </tr>
-<tr class="even">
-<td><code>factorial_anova</code></td>
-<td>compliant</td>
+<tr class="odd">
+<td><code><a href="../reference/factorial_anova.html">factorial_anova()</a></code></td>
+<td align="right">609</td>
 <td align="right">200</td>
 <td align="right">409</td>
 <td align="right">0</td>
-<td align="right">609</td>
-<td>—</td>
-</tr>
-<tr class="odd">
-<td><code>fisher_test</code></td>
-<td>compliant</td>
-<td align="right">100</td>
-<td align="right">312</td>
-<td align="right">0</td>
-<td align="right">412</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>frequency</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/fisher_test.html">fisher_test()</a></code></td>
+<td align="right">412</td>
+<td align="right">100</td>
+<td align="right">312</td>
+<td align="right">0</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/frequency.html">frequency()</a></code></td>
+<td align="right">150</td>
 <td align="right">24</td>
 <td align="right">126</td>
 <td align="right">0</td>
-<td align="right">150</td>
 <td>—</td>
 </tr>
-<tr class="odd">
-<td><code>friedman_test</code></td>
-<td>compliant</td>
+<tr class="even">
+<td><code><a href="../reference/friedman_test.html">friedman_test()</a></code></td>
+<td align="right">56</td>
 <td align="right">18</td>
 <td align="right">38</td>
 <td align="right">0</td>
-<td align="right">56</td>
-<td>weighted variant</td>
-</tr>
-<tr class="even">
-<td><code>goodman_gamma</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
+<td>weighted results</td>
 </tr>
 <tr class="odd">
-<td><code>kendall_tau</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/kendall_tau.html">kendall_tau()</a></code></td>
+<td align="right">202</td>
 <td align="right">100</td>
 <td align="right">102</td>
 <td align="right">0</td>
-<td align="right">202</td>
-<td>weighted variant</td>
+<td>weighted results</td>
 </tr>
 <tr class="even">
-<td><code>kruskal_wallis</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/kruskal_wallis.html">kruskal_wallis()</a></code></td>
+<td align="right">97</td>
 <td align="right">52</td>
 <td align="right">45</td>
 <td align="right">0</td>
-<td align="right">97</td>
-<td>weighted variant</td>
+<td>weighted results</td>
 </tr>
 <tr class="odd">
-<td><code>levene_test</code></td>
-<td>compliant</td>
-<td align="right">0</td>
+<td><code><a href="../reference/levene_test.html">levene_test()</a></code></td>
 <td align="right">144</td>
 <td align="right">0</td>
 <td align="right">144</td>
+<td align="right">0</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>linear_regression</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/linear_regression.html">linear_regression()</a></code></td>
+<td align="right">602</td>
 <td align="right">35</td>
 <td align="right">567</td>
 <td align="right">0</td>
-<td align="right">602</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>logistic_regression</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/logistic_regression.html">logistic_regression()</a></code></td>
+<td align="right">29</td>
 <td align="right">12</td>
 <td align="right">17</td>
 <td align="right">0</td>
-<td align="right">29</td>
-<td>all statistics (textbook-formula oracle; no SPSS v29 reference run
-yet)</td>
+<td>all results (checked against the formulas of the SPSS
+algorithm)</td>
 </tr>
 <tr class="even">
-<td><code>mann_whitney</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/mann_whitney.html">mann_whitney()</a></code></td>
+<td align="right">93</td>
 <td align="right">19</td>
 <td align="right">74</td>
 <td align="right">0</td>
-<td align="right">93</td>
-<td>weighted variant</td>
+<td>weighted results</td>
 </tr>
 <tr class="odd">
-<td><code>mcnemar_test</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code></td>
+<td align="right">143</td>
 <td align="right">84</td>
 <td align="right">59</td>
 <td align="right">0</td>
-<td align="right">143</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>multiple_response</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/multiple_response.html">multiple_response()</a></code></td>
+<td align="right">52</td>
 <td align="right">19</td>
 <td align="right">33</td>
 <td align="right">0</td>
-<td align="right">52</td>
-<td>all statistics (hand-computation oracle; SPSS MULT RESPONSE
-reference run pending)</td>
+<td>all results (checked by direct computation)</td>
 </tr>
 <tr class="odd">
-<td><code>normality_test</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/normality_test.html">normality_test()</a></code></td>
+<td align="right">21</td>
 <td align="right">6</td>
 <td align="right">15</td>
 <td align="right">0</td>
-<td align="right">21</td>
-<td>all statistics (independent-implementation oracles; SPSS EXAMINE
-reference run pending)</td>
+<td>all results (checked against independent implementations)</td>
 </tr>
 <tr class="even">
-<td><code>oneway_anova</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/oneway_anova.html">oneway_anova()</a></code></td>
+<td align="right">1,443</td>
 <td align="right">234</td>
-<td align="right">1209</td>
+<td align="right">1,209</td>
 <td align="right">0</td>
-<td align="right">1443</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>pairwise_wilcoxon</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/pairwise_wilcoxon.html">pairwise_wilcoxon()</a></code></td>
+<td align="right">242</td>
 <td align="right">106</td>
 <td align="right">136</td>
 <td align="right">0</td>
-<td align="right">242</td>
-<td>weighted variant</td>
+<td>weighted results</td>
 </tr>
 <tr class="even">
-<td><code>partial_cor</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/partial_cor.html">partial_cor()</a></code></td>
+<td align="right">20</td>
 <td align="right">4</td>
 <td align="right">16</td>
 <td align="right">0</td>
-<td align="right">20</td>
-<td>all statistics (residual-regression oracle; SPSS PARTIAL CORR
-reference run pending)</td>
+<td>all results (checked against an equivalent regression
+computation)</td>
 </tr>
 <tr class="odd">
-<td><code>pearson_cor</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/pearson_cor.html">pearson_cor()</a></code></td>
+<td align="right">73</td>
 <td align="right">18</td>
 <td align="right">55</td>
 <td align="right">0</td>
-<td align="right">73</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>phi</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
-</tr>
-<tr class="odd">
-<td><code>pomps</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td><code>rec</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
-</tr>
-<tr class="odd">
-<td><code>reliability</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/reliability.html">reliability()</a></code></td>
+<td align="right">458</td>
 <td align="right">45</td>
 <td align="right">413</td>
 <td align="right">0</td>
-<td align="right">458</td>
-<td>McDonald’s omega (all paths)</td>
-</tr>
-<tr class="even">
-<td><code>row_count</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
+<td>McDonald’s omega</td>
 </tr>
 <tr class="odd">
-<td><code>row_means</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
+<td><code><a href="../reference/scheffe_test.html">scheffe_test()</a></code></td>
+<td align="right">1,422</td>
+<td align="right">0</td>
+<td align="right">1,422</td>
+<td align="right">0</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>row_sums</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
-</tr>
-<tr class="odd">
-<td><code>scheffe_test</code></td>
-<td>compliant</td>
-<td align="right">0</td>
-<td align="right">1422</td>
-<td align="right">0</td>
-<td align="right">1422</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td><code>spearman_rho</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/spearman_rho.html">spearman_rho()</a></code></td>
+<td align="right">238</td>
 <td align="right">118</td>
 <td align="right">120</td>
 <td align="right">0</td>
-<td align="right">238</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>std</code></td>
-<td>not validated</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td align="right">—</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td><code>t_test</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/t_test.html">t_test()</a></code></td>
+<td align="right">673</td>
 <td align="right">9</td>
 <td align="right">664</td>
 <td align="right">0</td>
-<td align="right">673</td>
-<td>—</td>
-</tr>
-<tr class="odd">
-<td><code>tukey_test</code></td>
-<td>compliant</td>
-<td align="right">0</td>
-<td align="right">1418</td>
-<td align="right">0</td>
-<td align="right">1418</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>w_iqr</code></td>
-<td>compliant</td>
-<td align="right">132</td>
-<td align="right">312</td>
+<td><code><a href="../reference/tukey_test.html">tukey_test()</a></code></td>
+<td align="right">1,418</td>
 <td align="right">0</td>
-<td align="right">444</td>
+<td align="right">1,418</td>
+<td align="right">0</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>w_kurtosis</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_iqr.html">w_iqr()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>w_mean</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_kurtosis.html">w_kurtosis()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>w_median</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_mean.html">w_mean()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>w_modus</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_median.html">w_median()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>w_quantile</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_modus.html">w_modus()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>w_range</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_quantile.html">w_quantile()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>w_sd</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_range.html">w_range()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>w_se</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_sd.html">w_sd()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>w_skew</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_se.html">w_se()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td><code>w_var</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_skew.html">w_skew()</a></code></td>
+<td align="right">444</td>
 <td align="right">132</td>
 <td align="right">312</td>
 <td align="right">0</td>
-<td align="right">444</td>
 <td>—</td>
 </tr>
 <tr class="odd">
-<td><code>wilcoxon_test</code></td>
-<td>compliant</td>
+<td><code><a href="../reference/w_var.html">w_var()</a></code></td>
+<td align="right">444</td>
+<td align="right">132</td>
+<td align="right">312</td>
+<td align="right">0</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/wilcoxon_test.html">wilcoxon_test()</a></code></td>
+<td align="right">114</td>
 <td align="right">48</td>
 <td align="right">66</td>
 <td align="right">0</td>
-<td align="right">114</td>
-<td>weighted variant</td>
+<td>weighted results</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="active-exceptions">Active Exceptions<a class="anchor" aria-label="anchor" href="#active-exceptions"></a>
+<h2 id="documented-differences">Documented differences<a class="anchor" aria-label="anchor" href="#documented-differences"></a>
 </h2>
 <table class="table">
 <colgroup>
-<col width="18%">
-<col width="18%">
-<col width="18%">
-<col width="25%">
-<col width="18%">
+<col width="23%">
+<col width="23%">
+<col width="30%">
+<col width="23%">
 </colgroup>
 <thead><tr class="header">
-<th>ID</th>
 <th>Function</th>
-<th>Statistic</th>
+<th>Results</th>
 <th align="right">Tolerance</th>
 <th>Reason</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>EXC-001</td>
-<td><code>efa</code></td>
+<td><code><a href="../reference/efa.html">efa()</a></code></td>
 <td>ML loadings, sums of squares, % of variance</td>
 <td align="right">0.002</td>
 <td>SPSS stops the ML iteration at its convergence criterion (.001);
 mariposa iterates to the optimum.</td>
 </tr>
 <tr class="even">
-<td>EXC-002</td>
-<td><code>efa</code></td>
+<td><code><a href="../reference/efa.html">efa()</a></code></td>
 <td>ML communalities / SS where SPSS did not converge</td>
 <td align="right">0.05</td>
 <td>The SPSS reference runs end without convergence (3 factors from 6
@@ -687,60 +530,27 @@ items, df = 0, Heywood cases).</td>
 </tr>
 </tbody>
 </table>
-<p>An exception covers an identified algorithmic difference to SPSS, not
-a bug: its tolerance is what the two algorithms agree to. Statistics
-outside an exception are asserted at Spec or Display tier, or are listed
-as Internal (Tier 4) in the table above.</p>
+<p>A documented difference describes a known difference between the
+algorithms, not an error; its tolerance is the agreement the two
+algorithms reach.</p>
 </div>
 <div class="section level2">
-<h2 id="validation-gaps">Validation Gaps<a class="anchor" aria-label="anchor" href="#validation-gaps"></a>
+<h2 id="functions-without-their-own-spss-comparison">Functions without their own SPSS comparison<a class="anchor" aria-label="anchor" href="#functions-without-their-own-spss-comparison"></a>
 </h2>
-<p>The following functions are in SPSS-validation scope (per Charter §9)
-but do not yet have a <code>test-&lt;fn&gt;-spss-validation.R</code>
-file:</p>
 <ul>
-<li><code>center</code></li>
-<li><code>codebook</code></li>
-<li><code>cramers_v</code></li>
-<li><code>goodman_gamma</code></li>
-<li><code>phi</code></li>
-<li><code>pomps</code></li>
-<li><code>rec</code></li>
-<li><code>row_count</code></li>
-<li><code>row_means</code></li>
-<li><code>row_sums</code></li>
-<li><code>std</code></li>
+<li>Computed by <code><a href="../reference/chi_square.html">chi_square()</a></code>, whose results are compared
+with SPSS: <code><a href="../reference/phi.html">cramers_v()</a></code>, <code><a href="../reference/phi.html">goodman_gamma()</a></code>,
+<code><a href="../reference/phi.html">phi()</a></code>
+</li>
+<li>Data transformations, covered by unit tests: <code><a href="../reference/center.html">center()</a></code>,
+<code><a href="../reference/pomps.html">pomps()</a></code>, <code><a href="../reference/rec.html">rec()</a></code>, <code><a href="../reference/row_count.html">row_count()</a></code>,
+<code><a href="../reference/row_means.html">row_means()</a></code>, <code><a href="../reference/row_sums.html">row_sums()</a></code>,
+<code><a href="../reference/std.html">std()</a></code>
+</li>
+<li>Data documentation without an SPSS counterpart:
+<code><a href="../reference/codebook.html">codebook()</a></code>
+</li>
 </ul>
-</div>
-<div class="section level2">
-<h2 id="how-to-read-spss-compatible">How to Read “SPSS-Compatible”<a class="anchor" aria-label="anchor" href="#how-to-read-spss-compatible"></a>
-</h2>
-<p>A function is <strong>SPSS-compatible</strong> when:</p>
-<ol style="list-style-type: decimal">
-<li>It has a validation test file (column “Status: compliant”)</li>
-<li>Its Legacy column is zero</li>
-<li>Every value it asserts falls into Spec, Display, or a registered
-Exception</li>
-<li>It carries no <code>NA</code> placeholders in its
-<code>spss_values</code> block</li>
-</ol>
-<p>Functions with non-zero Legacy counts are mid-migration and not yet
-Charter-compliant; their assertions may pass but do not yet enforce the
-documented tolerance policy.</p>
-</div>
-<div class="section level2">
-<h2 id="methodology">Methodology<a class="anchor" aria-label="anchor" href="#methodology"></a>
-</h2>
-<p>All validation runs SPSS v29 syntax scripts in
-<code>tests/spss_reference/syntax/</code> against
-<code>tests/spss_reference/data/</code>, saves the output to
-<code>tests/spss_reference/outputs/</code>, and asserts the R-side
-computation matches via <code>assert_spss()</code> from the validation
-helpers in <code>tests/testthat/</code>. Inline cached values in test
-files cite their source line via trailing
-<code># &lt;output_file&gt;:&lt;line&gt;</code> comments; the dev-only
-script <code>tests/spss_reference/verify_inline.R</code> audits this
-citation chain before every release.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

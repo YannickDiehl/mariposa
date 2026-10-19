@@ -183,14 +183,12 @@ which specific groups differ</p></li>
 </ul></div>
 
 <div class="section">
-<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+<h3 id="weighted-analyses">Weighted analyses<a class="anchor" aria-label="anchor" href="#weighted-analyses"></a></h3>
 
 
-<p>SPSS <code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have
-no SPSS reference. The weighted variant is an R-only frequency-weight
-extension that reduces exactly to the unweighted test when all weights
-equal 1 (enforced by an internal invariance suite); see
-<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>For repeated measures (same subjects): Use <code><a href="friedman_test.html">friedman_test()</a></code> instead</p></li>
+<p>Weights are treated as frequency weights. With all weights equal to 1 the
+weighted test reproduces the unweighted one exactly. Weighted results are
+not compared with SPSS output; see <code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code>.</p><ul><li><p>For repeated measures (same subjects): Use <code><a href="friedman_test.html">friedman_test()</a></code> instead</p></li>
 </ul></div>
 
     </div>

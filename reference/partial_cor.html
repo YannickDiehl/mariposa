@@ -115,7 +115,7 @@ the pair, for comparison — SPSS <code>/STATISTICS=CORR</code></p></dd>
 
 <dt>df</dt>
 <dd><p>Degrees of freedom, n - 2 - k with k control variables
-(non-integer for weighted data, Charter §5.1)</p></dd>
+(non-integer for weighted data)</p></dd>
 
 <dt>t_stat, p_value</dt>
 <dd><p>t-test of the partial correlation
@@ -170,10 +170,9 @@ the same Pearson formula as <code><a href="pearson_cor.html">pearson_cor</a></co
 throughout, so weighted results follow the SPSS frequency-weight
 convention with unrounded <code>sum(w)</code> in df and test statistics.
 Significance is two-tailed (the SPSS default).</p>
-<p>An SPSS v29 PARTIAL CORR reference run is pending; until it lands the
-statistics are verified against the independent
-residual-of-regressions characterization (see the SPSS compatibility
-vignette).</p>
+<p>The statistics are checked against the equivalent computation from
+regression residuals and are not compared with SPSS output (see the
+SPSS compatibility vignette).</p>
 </div>
 
     </div>

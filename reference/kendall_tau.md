@@ -120,15 +120,13 @@ Choose Kendall's tau when:
 
 - Your data has outliers that might affect Pearson correlation
 
-### Weighted variants
+### Weighted analyses
 
-The weighted tau-b is an exact frequency-weighted computation (it
-reproduces the unweighted tau when all weights equal 1, enforced by an
-internal invariance suite), but its z statistic and p-value use a
-no-ties normal approximation. SPSS `NONPAR CORR` ignores `WEIGHT BY`, so
-weighted results have no SPSS reference; see
-[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for validation status.
+The weighted tau-b is an exact frequency-weighted computation and
+reproduces the unweighted tau when all weights equal 1; its z statistic
+and p-value use a normal approximation without tie correction. Weighted
+results are not compared with SPSS output; see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md).
 
 - You want a more conservative measure than Spearman's rho
 

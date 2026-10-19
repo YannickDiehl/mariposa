@@ -180,14 +180,14 @@ follows <code><a href="kruskal_wallis.html">kruskal_wallis()</a></code></p></li>
 </ul></div>
 
 <div class="section">
-<h3 id="weighted-variants">Weighted variants<a class="anchor" aria-label="anchor" href="#weighted-variants"></a></h3>
+<h3 id="weighted-analyses">Weighted analyses<a class="anchor" aria-label="anchor" href="#weighted-analyses"></a></h3>
 
 
-<p>When the parent <code><a href="friedman_test.html">friedman_test()</a></code> result is weighted, each
-pairwise test uses the same frequency-weighted signed-rank formulas. SPSS
-<code>NPAR TESTS</code> ignores <code>WEIGHT BY</code>, so weighted results have no
-SPSS reference (R-only, guarded by an internal invariance suite); see
-<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code> for validation status.</p><ul><li><p>Each pairwise comparison uses <code><a href="wilcoxon_test.html">wilcoxon_test()</a></code> logic internally</p></li>
+<p>When the <code><a href="friedman_test.html">friedman_test()</a></code> result is weighted, each pairwise
+test uses the same frequency-weighted signed-rank formulas. With all
+weights equal to 1 they reproduce the unweighted tests exactly. Weighted
+results are not compared with SPSS output; see
+<code><a href="../articles/spss-compatibility.html">vignette("spss-compatibility")</a></code>.</p><ul><li><p>Each pairwise comparison uses <code><a href="wilcoxon_test.html">wilcoxon_test()</a></code> logic internally</p></li>
 </ul></div>
 
     </div>

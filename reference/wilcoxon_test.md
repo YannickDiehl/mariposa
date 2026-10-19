@@ -126,14 +126,12 @@ Use Wilcoxon signed-rank test when:
   [`mann_whitney()`](https://YannickDiehl.github.io/mariposa/reference/mann_whitney.md)
   instead
 
-### Weighted variants
+### Weighted analyses
 
-SPSS `NPAR TESTS` ignores `WEIGHT BY`, so weighted results have no SPSS
-reference. The weighted variant is an R-only frequency-weight extension
-that reduces exactly to the unweighted test when all weights equal 1
-(enforced by an internal invariance suite); see
-[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
-for validation status.
+Weights are treated as frequency weights. With all weights equal to 1
+the weighted test reproduces the unweighted one exactly. Weighted
+results are not compared with SPSS output; see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md).
 
 - For 3+ related measurements: Use
   [`friedman_test()`](https://YannickDiehl.github.io/mariposa/reference/friedman_test.md)

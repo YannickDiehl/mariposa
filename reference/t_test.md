@@ -150,7 +150,7 @@ Don't use when:
 
 - Data is severely skewed with small samples (use Mann-Whitney)
 
-- Groups are paired/matched (use paired t-test - coming soon)
+- Groups are paired or matched (use wilcoxon_test())
 
 - Variables are categorical (use chi-square)
 

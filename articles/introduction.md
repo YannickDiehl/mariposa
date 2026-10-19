@@ -14,8 +14,10 @@ the entire workflow — from importing SPSS, Stata, SAS, and Excel files
 through label management, recoding, and standardization to statistical
 analysis with survey weights and publication-ready output.
 
-Every statistical result is validated against SPSS v29, so researchers
-migrating from SPSS can trust their numbers.
+Statistical results are checked against reference output of SPSS v29, so
+researchers migrating from SPSS get the numbers they know;
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md)
+shows the status of every function.
 
 ### Key Features
 

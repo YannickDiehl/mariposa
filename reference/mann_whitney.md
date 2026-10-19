@@ -167,16 +167,14 @@ Use Mann-Whitney test when:
 
 - Consider plotting the data to see the pattern
 
-### Weighted variants
+### Weighted analyses
 
 The weighted test is the design-based Lumley-Scott (2013) rank test
-(Horvitz-Thompson midranks with a sandwich variance), validated against
-[`survey::svyranktest()`](https://rdrr.io/pkg/survey/man/svyranktest.html)
-rather than SPSS: SPSS `NPAR TESTS` ignores `WEIGHT BY`, so no SPSS
-reference exists for weighted results. The weighted descriptive U and W
-are design-based rank quantities and may differ from SPSS's
-expanded-data U; the Z statistic and p-value are the validated
-quantities.
+(Horvitz-Thompson midranks with a sandwich variance) and agrees with
+[`survey::svyranktest()`](https://rdrr.io/pkg/survey/man/svyranktest.html).
+Its U and W are design-based rank quantities; Z and the p-value are the
+test result. Weighted results are not compared with SPSS output; see
+[`vignette("spss-compatibility")`](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md).
 
 - Use this for Likert scales and rating data
 

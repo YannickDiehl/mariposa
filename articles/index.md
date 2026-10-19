@@ -34,5 +34,5 @@
 
 ### Validation
 
-- [SPSS Compatibility
-  Status](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md):
+- [SPSS
+  Compatibility](https://YannickDiehl.github.io/mariposa/articles/spss-compatibility.md):

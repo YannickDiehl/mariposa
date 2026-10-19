@@ -69,6 +69,15 @@ for the long format version
 library(dplyr)
 data(longitudinal_data_wide)
 
-# Analysis of change scores
-# (Repeated measures functions coming in future version)
+# Change over the four time points
+friedman_test(longitudinal_data_wide, score_T1, score_T2, score_T3, score_T4)
+#> Friedman Test: score_T1, score_T2, score_T3, score_T4
+#>   chi2(3) = 61.192, p < 0.001 ***, Kendall's W = 0.272 (weak), N = 75
+#> Use summary() for detailed output.
+
+# Change between two time points
+wilcoxon_test(longitudinal_data_wide, score_T1, score_T2)
+#> Wilcoxon Signed-Rank Test: score_T2 - score_T1
+#>   Z = -5.427, p < 0.001 ***, r = 0.530 (large), N = 105
+#> Use summary() for detailed output.
 ```
