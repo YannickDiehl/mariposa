@@ -30,7 +30,7 @@ Statistical tests determine whether observed differences between groups are real
 
 | Your data | 2 groups | 3+ groups | Paired |
 |-----------|----------|-----------|--------|
-| **Continuous, normal** | `t_test()` | `oneway_anova()` | *paired t-test planned* |
+| **Continuous, normal** | `t_test()` | `oneway_anova()` | `wilcoxon_test()` |
 | **Continuous, non-normal** | `mann_whitney()` | `kruskal_wallis()` | `wilcoxon_test()` |
 | **Categorical** | `chi_square()` | `chi_square()` | `mcnemar_test()` |
 | **Small sample, categorical** | `fisher_test()` | --- | --- |
