@@ -5,6 +5,11 @@ in line with IBM SPSS Statistics, adds `as.data.frame()`, `broom::tidy()`
 and `write_xlsx()` support for all result objects, and improves output and
 error messages. Details are in NEWS.md.
 
+The update follows 0.7.3 after three weeks because it corrects results of
+several functions, for example the marginal effects of transformed
+predictors in `marginal_effects()` and the standard errors of weighted
+post-hoc tests, and a failing default call of `read_sas()`.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes
