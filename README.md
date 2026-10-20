@@ -205,7 +205,7 @@ citation("mariposa")
 ```
 
 > Diehl, Y. (2026). mariposa: SPSS-Compatible Statistical Tools for Survey Data.
-> R package version 0.7.3. https://CRAN.R-project.org/package=mariposa
+> R package. doi:[10.32614/CRAN.package.mariposa](https://doi.org/10.32614/CRAN.package.mariposa)
 
 ## License
 

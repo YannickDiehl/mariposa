@@ -1,16 +1,20 @@
 citHeader("To cite mariposa in publications use:")
 
+year <- sub("-.*", "", meta$`Date/Publication`)
+if (!length(year)) year <- format(Sys.Date(), "%Y")
+note <- sprintf("R package version %s", meta$Version)
+
 bibentry(
   bibtype  = "Manual",
   title    = "{mariposa}: SPSS-Compatible Statistical Tools for Survey Data",
   author   = person("Yannick", "Diehl"),
-  year     = "2026",
-  note     = "R package version 0.7.3",
+  year     = year,
+  note     = note,
+  doi      = "10.32614/CRAN.package.mariposa",
   url      = "https://CRAN.R-project.org/package=mariposa",
-  textVersion = paste(
-    "Diehl, Y. (2026).",
-    "mariposa: SPSS-Compatible Statistical Tools for Survey Data.",
-    "R package version 0.7.3.",
-    "https://CRAN.R-project.org/package=mariposa"
+  textVersion = paste0(
+    "Diehl, Y. (", year, "). ",
+    "mariposa: SPSS-Compatible Statistical Tools for Survey Data. ",
+    note, ". doi:10.32614/CRAN.package.mariposa"
   )
 )
