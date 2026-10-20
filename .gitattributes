@@ -1,0 +1,2 @@
+# SPSS syntax (.sps) is not Scheme; keep it out of the language statistics
+*.sps linguist-detectable=false
