@@ -24,3 +24,5 @@
 ^CRAN-SUBMISSION$
 ^CONTRIBUTING\.md$
 ^paper$
+^LICENSE\.md$
+^\.gitattributes$
