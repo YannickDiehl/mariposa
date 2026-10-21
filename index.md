@@ -242,8 +242,8 @@ survey_data %>%
 - [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues) - Bug
   reports, usage questions, and feature requests
 - [Contributing
-  Guide](https://YannickDiehl.github.io/mariposa/CONTRIBUTING.md) - How
-  to contribute code or documentation
+  Guide](https://github.com/YannickDiehl/mariposa/blob/main/CONTRIBUTING.md) -
+  How to contribute code or documentation
 
 ## Citation
 
@@ -255,8 +255,8 @@ citation("mariposa")
 ```
 
 > Diehl, Y. (2026). mariposa: SPSS-Compatible Statistical Tools for
-> Survey Data. R package version 0.7.3.
-> <https://CRAN.R-project.org/package=mariposa>
+> Survey Data. R package.
+> <doi:%5B10.32614/CRAN.package.mariposa>\](<https://doi.org/10.32614/CRAN.package.mariposa>)
 
 ## License
 

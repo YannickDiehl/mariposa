@@ -238,6 +238,7 @@ change; see “Breaking changes”.
   and
   [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
   work with very large (expansion) weights.
+- `citation("mariposa")` gives the DOI of the CRAN package.
 
 ### Bug fixes
 
