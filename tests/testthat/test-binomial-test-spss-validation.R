@@ -197,8 +197,10 @@ survey_data$east_region   <- ifelse(survey_data$region == "East", "East", "West"
 survey_data$east_region   <- factor(survey_data$east_region, levels = c("East", "West"))
 # Coded as in the SPSS syntax (0 = Low, 1 = High): Group 1 is still High,
 # the category of the first case, not the lowest code
-survey_data$high_life_sat <- haven::labelled(
-  ifelse(survey_data$life_satisfaction >= 4, 1, 0), c(Low = 0, High = 1))
+if (requireNamespace("haven", quietly = TRUE)) {
+  survey_data$high_life_sat <- haven::labelled(
+    ifelse(survey_data$life_satisfaction >= 4, 1, 0), c(Low = 0, High = 1))
+}
 
 
 # =============================================================================
@@ -218,12 +220,14 @@ test_that("Test 1b: Binomial east_region (vs 0.5) — matches SPSS", {
 })
 
 test_that("Test 1c: Binomial derived high_life_sat (vs 0.5) — matches SPSS", {
+  skip_if_not_installed("haven")
   r <- survey_data |> binomial_test(high_life_sat)
   compare_binomial(r$results, spss_values$test_1c_high_life,
                    "1c: high_life_sat vs 0.5")
 })
 
 test_that("Test 1d: Binomial high_life_sat (vs 0.6, 1-tailed) — matches SPSS", {
+  skip_if_not_installed("haven")
   r <- survey_data |> binomial_test(high_life_sat, p = 0.60)
   compare_binomial(r$results, spss_values$test_1d_high_life_p60,
                    "1d: high_life_sat vs 0.6")
@@ -244,6 +248,7 @@ test_that("Test 3a: Binomial gender, grouped by region — matches SPSS", {
 })
 
 test_that("Test 3b: Binomial high_life_sat, grouped by region — matches SPSS", {
+  skip_if_not_installed("haven")
   r <- survey_data |> group_by(region) |> binomial_test(high_life_sat)
   for (rg in c("East", "West")) {
     row <- extract_grouped_row(r, rg)
@@ -282,6 +287,7 @@ test_that("Scenario 2a: weighted gender — R-only stability", {
 })
 
 test_that("Scenario 2b: weighted high_life_sat — R-only stability", {
+  skip_if_not_installed("haven")
   r <- survey_data |> binomial_test(high_life_sat, weights = sampling_weight)
   assert_spss(as.numeric(r$results$p_value), "<.001",
               tier = "display", precision = 3, what = "p_value",

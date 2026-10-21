@@ -835,6 +835,7 @@ test_that("crosstab: a group without positive weights is left out with a warning
 
 test_that("frequency labels system-missing values 'System' like SPSS, also in Excel", {
   # Was: the system-missing row read "NA" (SPSS FREQUENCIES: "Missing System").
+  skip_if_not_installed("openxlsx2")
   f <- tempfile(fileext = ".xlsx")
   write_xlsx(frequency(survey_data, life_satisfaction), f)
   cells <- unlist(openxlsx2::read_xlsx(f, col_names = FALSE, skip_empty_rows = TRUE))
