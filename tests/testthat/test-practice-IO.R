@@ -41,12 +41,16 @@ test_that("IO-16: untag_na() on a large labelled vector is fast", {
   expect_lt(elapsed, 1)
 })
 
-test_that("IO-16: write_xpt() re-tags lowercase tags to uppercase", {
+test_that("IO-16: write_xpt() roundtrips tagged NAs", {
   skip_if_not_installed("haven")
   x <- set_na(c(1, -9, 2, -8), -9, -8)
-  r <- .retag_uppercase(x)
-  expect_equal(.na_tags(r), c(NA, "A", NA, "B"))
-  expect_equal(attr(r, "na_tag_map"), attr(x, "na_tag_map"))
+  df <- data.frame(x = x)
+  tmp <- tempfile(fileext = ".xpt")
+  on.exit(unlink(tmp), add = TRUE)
+  write_xpt(df, tmp)
+  r <- haven::read_xpt(tmp)$x
+  # current haven reads tags as lower case, older versions as upper case
+  expect_equal(tolower(.na_tags(r)), c(NA, "a", NA, "b"))
 })
 
 # Helper for the IO-02/IO-03 blocks: an imported-style item (tagged NAs
