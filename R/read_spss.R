@@ -514,8 +514,11 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
 
   if (length(unique_tags) == 0L) return(x)
 
-  # Build display codes: ".a", ".b" for Stata; ".A", ".B", "._" for SAS
-  native_codes <- paste0(".", unique_tags)
+  # Build display codes: ".a", ".b" for Stata; ".A", ".B", "._" for SAS.
+  # Current haven lowercases all tags, so SAS codes are uppercased for
+  # display while the map names keep haven's lower-case tags.
+  display_tags <- if (identical(format, "sas")) toupper(unique_tags) else unique_tags
+  native_codes <- paste0(".", display_tags)
 
   attr(x, "na_tag_map") <- stats::setNames(native_codes, unique_tags)
   attr(x, "na_tag_format") <- format
@@ -646,8 +649,16 @@ na_frequencies <- function(x, ...) {
     label[!is.na(hit)] <- names(na_labels)[hit[!is.na(hit)]]
   }
 
+  # Current haven lowercases all tags; display SAS tags in upper case to
+  # match the SAS convention (.A, .B, ...). The lookups above use haven's
+  # lower-case tags.
+  disp_tagged <- if (identical(attr(x, "na_tag_format", exact = TRUE), "sas")) {
+    toupper(tagged)
+  } else {
+    tagged
+  }
   out <- data.frame(code = code, label = label, n = unname(n_tag),
-                    tag = tagged, stringsAsFactors = FALSE)
+                    tag = disp_tagged, stringsAsFactors = FALSE)
   # Order by code, like the missing block of frequency() (SPSS order);
   # tags without a known code after them
   out <- out[order(is.na(out$code), out$code, out$tag), , drop = FALSE]

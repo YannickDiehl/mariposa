@@ -120,6 +120,9 @@ write_xpt <- function(data, path, version = 5, name = NULL) {
       if (length(renamed) > 10L) c(" " = paste0("... and ", length(renamed) - 10L, " more.")),
       "i" = if (version == 5L) "Use {.code version = 8} to keep names of up to 32 characters."
     ))
+    # Current haven errors on over-length names instead of truncating
+    # silently, so truncate here as the warning announced
+    names(data)[long] <- short[long]
   }
 
   # Prepare data: ensure tagged NAs are in haven format, clean up attributes
@@ -169,9 +172,13 @@ write_xpt <- function(data, path, version = 5, name = NULL) {
       has_value_labels <- TRUE
     }
 
-    # SAS XPT only supports uppercase tags (A-Z, _)
-    # Convert any lowercase tags from SPSS/Stata to uppercase
-    x <- .retag_uppercase(x)
+    # SAS XPT only supports uppercase tags (A-Z, _). Older haven versions
+    # reject lowercase tags on write, so convert them to uppercase; current
+    # haven stores all tags in lower case and accepts any case, making
+    # re-tagging unnecessary (and impossible).
+    if (!.haven_lowercase_tags()) {
+      x <- .retag_uppercase(x)
+    }
 
     # Clean up mariposa-specific attributes
     attr(x, "na_tag_map") <- NULL
@@ -193,6 +200,17 @@ write_xpt <- function(data, path, version = 5, name = NULL) {
   }
 
   data
+}
+
+
+#' Does the installed haven store tagged NA tags in lower case?
+#'
+#' Current haven lowercases tags in tagged_na()/na_tag() (tidyverse/haven#787);
+#' older versions keep the case given. Detected by behaviour, not version, so
+#' it works with dev versions too.
+#' @noRd
+.haven_lowercase_tags <- function() {
+  isTRUE(haven::na_tag(haven::tagged_na("A")) == "a")
 }
 
 
