@@ -5,7 +5,11 @@ This is a resubmission. In this version I have:
 * replaced the relative link to CONTRIBUTING.md in README.md, a file that is
   not part of the package, with its URL;
 * corrected the package version shown by `citation("mariposa")` and added
-  the DOI of the CRAN package.
+  the DOI of the CRAN package;
+* made the package compatible with the upcoming haven release, which
+  stores the tags of tagged missing values in lower case (contributed by
+  the haven maintainers); the tests pass with the CRAN and the development
+  version of haven.
 
 ## Update submission
 
