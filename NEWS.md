@@ -145,6 +145,7 @@ see "Breaking changes".
   `write_spss()` and `write_xlsx()` are considerably faster on large data.
 * Exact tests (`fisher_test()`, `mcnemar_test()`, `binomial_test()`) and
   `logistic_regression()` work with very large (expansion) weights.
+* `citation("mariposa")` gives the DOI of the CRAN package.
 
 ## Bug fixes
 
