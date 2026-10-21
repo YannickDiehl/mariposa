@@ -146,6 +146,10 @@ see "Breaking changes".
 * Exact tests (`fisher_test()`, `mcnemar_test()`, `binomial_test()`) and
   `logistic_regression()` work with very large (expansion) weights.
 * `citation("mariposa")` gives the DOI of the CRAN package.
+* Compatible with the upcoming haven release, which stores the tags of
+  tagged missing values in lower case: SAS special missing values are
+  still shown as `.A`, `.B`, ..., and `write_xpt()` shortens over-long
+  variable names itself (@hadley, #22).
 
 ## Bug fixes
 
