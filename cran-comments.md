@@ -1,3 +1,12 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* replaced the relative link to CONTRIBUTING.md in README.md, a file that is
+  not part of the package, with its URL;
+* corrected the package version shown by `citation("mariposa")` and added
+  the DOI of the CRAN package.
+
 ## Update submission
 
 This is an update of mariposa from 0.7.3 to 0.7.4. It brings more results
