@@ -38,6 +38,21 @@ NULL
   haven::na_tag(x)
 }
 
+#' Tag characters for user-missing codes
+#'
+#' The single pool from which numeric missing codes get their tagged-NA
+#' characters (62 per variable). No two tags may differ only in case:
+#' current haven lowercases tags (tidyverse/haven#787), so an "A" tag would
+#' become the same tagged NA as "a". Hence a-z, 0-9 and 26 ASCII symbols
+#' instead of A-Z.
+#'
+#' @return Character vector of 62 single-character tags, in assignment order
+#' @noRd
+.na_tag_pool <- function() {
+  c(letters, as.character(0:9),
+    strsplit("!#$%&()*+,-/:;<=>?@[]^{|}~", "", fixed = TRUE)[[1]])
+}
+
 # Weight Validation Functions
 # ---------------------------
 

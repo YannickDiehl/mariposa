@@ -170,6 +170,9 @@ see "Breaking changes".
 * `write_xpt()` warns about shortened variable names; `write_xlsx()`
   creates unique sheet names.
 * `%>%` is available after `library(mariposa)`.
+* `set_na()`, `read_spss()` and `read_xlsx()` keep more than 26
+  missing-value codes of a variable apart with the upcoming haven release,
+  which no longer distinguishes upper- and lower-case tags.
 
 # mariposa 0.7.3
 

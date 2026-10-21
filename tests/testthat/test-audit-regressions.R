@@ -1205,3 +1205,48 @@ test_that("read_spss() reports counts without thousands separators", {
   expect_match(msg, "1500 values")
   expect_false(grepl("1,500", msg, fixed = TRUE))
 })
+
+test_that("more than 26 missing codes get tags that differ beyond case", {
+  # haven >= 2.5.5.9000 lowercases tagged-NA tags (tidyverse/haven#787), so
+  # the former tag pool (a-z, A-Z, 0-9) gave code 27 the same tagged NA as
+  # code 1: untag_na() restored 1 for 27, na_frequencies() merged them.
+  skip_if_not_installed("haven")
+  codes <- 1:40
+  x <- c(codes, codes + 100)
+  distinct_tags <- function(v) {
+    tags <- names(attr(v, "na_tag_map", exact = TRUE))
+    length(tags) == length(codes) && !anyDuplicated(tolower(tags))
+  }
+  roundtrips <- function(v) {
+    expect_equal(as.numeric(untag_na(v)), x)
+    expect_equal(na_frequencies(v)$n[seq_along(codes)], rep(1L, length(codes)))
+  }
+
+  # set_na() on a vector
+  v <- set_na(x, codes)
+  expect_true(distinct_tags(v))
+  roundtrips(v)
+
+  # set_na() on a data frame (shared tagging path of the read_*() functions)
+  v <- set_na(data.frame(x = x), codes)$x
+  expect_true(distinct_tags(v))
+  roundtrips(v)
+
+  # read_spss() with a missing range covering 40 observed values
+  s <- haven::labelled_spss(x, na_range = c(1, 40))
+  f <- tempfile(fileext = ".sav")
+  on.exit(unlink(f), add = TRUE)
+  haven::write_sav(data.frame(x = s), f)
+  v <- read_spss(f)$x
+  expect_true(distinct_tags(v))
+  roundtrips(v)
+
+  # read_xlsx() rebuilding the tags from the metadata sheet
+  skip_if_not_installed("openxlsx2")
+  fx <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(fx), add = TRUE)
+  write_xlsx(data.frame(x = set_na(x, codes)), fx)
+  v <- read_xlsx(fx)$x
+  expect_true(distinct_tags(v))
+  roundtrips(v)
+})

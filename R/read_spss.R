@@ -266,8 +266,8 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
     missing_vals <- sort(unique(missing_vals))
     if (length(missing_vals) == 0L) next
 
-    # Assign tag characters: a-z, A-Z, 0-9 (62 possible tags per variable)
-    tag_pool <- c(letters, LETTERS, as.character(0:9))
+    # Assign tag characters (62 possible tags per variable)
+    tag_pool <- .na_tag_pool()
     if (length(missing_vals) > length(tag_pool)) {
       cli::cli_warn(
         "Variable {.var {names(data)[i]}} has {length(missing_vals)} missing value codes; only the first {length(tag_pool)} will be tagged."
@@ -363,8 +363,8 @@ read_por <- function(path, tag_na = TRUE, verbose = FALSE) {
   missing_values <- sort(unique(missing_values))
   if (length(missing_values) == 0L) return(data)
 
-  # Assign tag characters: a-z, A-Z, 0-9 (62 possible tags)
-  tag_pool <- c(letters, LETTERS, as.character(0:9))
+  # Assign tag characters (62 possible tags)
+  tag_pool <- .na_tag_pool()
   if (length(missing_values) > length(tag_pool)) {
     cli::cli_warn(
       "{.arg tag_na} has {length(missing_values)} values; only the first {length(tag_pool)} will be tagged."

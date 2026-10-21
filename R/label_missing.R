@@ -204,7 +204,7 @@ set_na <- function(data, ..., tag = TRUE, verbose = FALSE) {
     cli::cli_abort("Package {.pkg haven} is required for tagged NAs.")
   }
 
-  tag_pool <- c(letters, LETTERS, as.character(0:9))
+  tag_pool <- .na_tag_pool()
 
   # Check if variable already has tagged NAs — extend existing map
 

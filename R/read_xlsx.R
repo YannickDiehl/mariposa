@@ -417,7 +417,7 @@ read_xlsx <- function(path, sheet = NULL, labels = TRUE,
     }
 
     if (length(missing_codes) > 0L) {
-      tag_pool <- c(letters, LETTERS, as.character(0:9))
+      tag_pool <- .na_tag_pool()
       tag_chars <- tag_pool[seq_along(missing_codes)]
 
       # Create tagged NAs
