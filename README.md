@@ -194,7 +194,7 @@ survey_data %>%
 ## Support and Contributing
 
 - [GitHub Issues](https://github.com/YannickDiehl/mariposa/issues) - Bug reports, usage questions, and feature requests
-- [Contributing Guide](CONTRIBUTING.md) - How to contribute code or documentation
+- [Contributing Guide](https://github.com/YannickDiehl/mariposa/blob/main/CONTRIBUTING.md) - How to contribute code or documentation
 
 ## Citation
 
