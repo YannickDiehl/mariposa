@@ -30,7 +30,8 @@ post-hoc tests, and a failing default call of `read_sas()`.
 ## Test environments
 
 * local macOS (Apple Silicon), R 4.5.3: `R CMD check --as-cran`, including
-  the PDF manual and the URL checks
+  the PDF manual and the URL checks, with the CRAN and the development
+  version of haven
 * win-builder, R-devel
 * GitHub Actions (`R CMD check --as-cran`): ubuntu-latest (R release,
   devel and oldrel-1), macOS-latest (R release), windows-latest (R release)
@@ -40,7 +41,8 @@ post-hoc tests, and a failing default call of `read_sas()`.
 The comparisons with IBM SPSS Statistics reference output are skipped on
 CRAN with `skip_on_cran()`, because their tight numeric tolerances could
 fail on other BLAS implementations; they run in continuous integration on
-every change. All other tests run on CRAN and take about one minute.
+every change. All other tests run on CRAN and take about one minute
+locally (about four minutes on win-builder).
 Suggested packages are used conditionally in code, examples and tests;
 examples write only to `tempfile()`.
 
