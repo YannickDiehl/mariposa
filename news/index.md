@@ -239,6 +239,13 @@ change; see “Breaking changes”.
   [`logistic_regression()`](https://YannickDiehl.github.io/mariposa/reference/logistic_regression.md)
   work with very large (expansion) weights.
 - `citation("mariposa")` gives the DOI of the CRAN package.
+- Compatible with the upcoming haven release, which stores the tags of
+  tagged missing values in lower case: SAS special missing values are
+  still shown as `.A`, `.B`, …, and
+  [`write_xpt()`](https://YannickDiehl.github.io/mariposa/reference/write_xpt.md)
+  shortens over-long variable names itself
+  ([@hadley](https://github.com/hadley),
+  [\#22](https://github.com/YannickDiehl/mariposa/issues/22)).
 
 ### Bug fixes
 
@@ -278,6 +285,13 @@ change; see “Breaking changes”.
   creates unique sheet names.
 - `%>%` is available after
   [`library(mariposa)`](https://YannickDiehl.github.io/mariposa/).
+- [`set_na()`](https://YannickDiehl.github.io/mariposa/reference/set_na.md),
+  [`read_spss()`](https://YannickDiehl.github.io/mariposa/reference/read_spss.md)
+  and
+  [`read_xlsx()`](https://YannickDiehl.github.io/mariposa/reference/read_xlsx.md)
+  keep more than 26 missing-value codes of a variable apart with the
+  upcoming haven release, which no longer distinguishes upper- and
+  lower-case tags.
 
 ## mariposa 0.7.3
 

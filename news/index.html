@@ -155,6 +155,7 @@
 <li>Exact tests (<code><a href="../reference/fisher_test.html">fisher_test()</a></code>, <code><a href="../reference/mcnemar_test.html">mcnemar_test()</a></code>, <code><a href="../reference/binomial_test.html">binomial_test()</a></code>) and <code><a href="../reference/logistic_regression.html">logistic_regression()</a></code> work with very large (expansion) weights.</li>
 <li>
 <code>citation("mariposa")</code> gives the DOI of the CRAN package.</li>
+<li>Compatible with the upcoming haven release, which stores the tags of tagged missing values in lower case: SAS special missing values are still shown as <code>.A</code>, <code>.B</code>, …, and <code><a href="../reference/write_xpt.html">write_xpt()</a></code> shortens over-long variable names itself (<a href="https://github.com/hadley" class="external-link">@hadley</a>, <a href="https://github.com/YannickDiehl/mariposa/issues/22" class="external-link">#22</a>).</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-7-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-4"></a></h3>
@@ -174,6 +175,8 @@
 <code><a href="../reference/write_xpt.html">write_xpt()</a></code> warns about shortened variable names; <code><a href="../reference/write_xlsx.html">write_xlsx()</a></code> creates unique sheet names.</li>
 <li>
 <code>%&gt;%</code> is available after <code><a href="https://YannickDiehl.github.io/mariposa/">library(mariposa)</a></code>.</li>
+<li>
+<code><a href="../reference/set_na.html">set_na()</a></code>, <code><a href="../reference/read_spss.html">read_spss()</a></code> and <code><a href="../reference/read_xlsx.html">read_xlsx()</a></code> keep more than 26 missing-value codes of a variable apart with the upcoming haven release, which no longer distinguishes upper- and lower-case tags.</li>
 </ul></div>
 </div>
     <div class="section level2">
